@@ -485,6 +485,7 @@
                 invoiceDate: "Invoice_Date",
                 dueDate: "Due_Date",
                 customer: "Customer",
+                salesman: "Salesman",
                 refNo: "Reference_Number",
                 totalProduct: "Total_Product_Amount",
                 totalPurchase: "Total_Purchase_Amount",
@@ -770,6 +771,8 @@
             if (dueDate) data[F.dueDate] = dueDate;
             const refNo = document.getElementById('refNo').value;
             if (refNo) data[F.refNo] = refNo;
+            const salesmanId = document.getElementById('salesmanSelect').value;
+            if (salesmanId) data[F.salesman] = salesmanId;
 
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
             return data;
