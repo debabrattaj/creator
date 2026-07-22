@@ -582,21 +582,23 @@
             qty: '.input-ret-qty', returnAmt: '.input-ret-amt', lineTotal: '.input-ret-linetotal'
         };
 
-        // --- 1. MOCK DATABASE ---
-        const MOCK_CUSTOMERS = {
-            "CUST-001": { name: "Arun Kumar", balance: 45000.00 },
-            "CUST-002": { name: "Priya Sharma", balance: -2500.00 },
-            "CUST-003": { name: "RHenova Tech Sandbox", balance: 0.00 },
-            "CUST-004": { name: "Test Customer 01", balance: 125430.50 }
+        // --- CUSTOMER CONFIG ---
+        // REPORT_NAME: link name of the report used to fetch the customer list.
+        // FIELDS: map internal keys to the exact field link names in that
+        // report - verify against Report Builder and correct if these differ.
+        const CUSTOMER_CONFIG = {
+            REPORT_NAME: "Customer_Report",
+            FIELDS: {
+                name: "Name",
+                openingBalance: "Opening_Balance_in_Cash"
+            }
         };
 
-        const MOCK_SALESMEN = [
-            { id: "EMP-101", name: "John Mathew" },
-            { id: "EMP-102", name: "Logged In User (You)" },
-            { id: "EMP-103", name: "Sarah Connor" }
-        ];
+        // Populated at startup from Zoho Creator, keyed by record ID
+        let customersById = {};
 
-        const MOCK_PRICE_LEVELS = ["Retail", "Wholesale", "VIP Partner"];
+        // Static price-level options (not backed by a report)
+        const PRICE_LEVELS = ["Retail", "Wholesale", "VIP Partner"];
 
         // State Management
         let activeSections = { purchase: false, product: false, service: false, return: false };
@@ -610,35 +612,76 @@
             window.onload = initApp;
         }
 
-        function initApp() {
+        async function initApp() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('invoiceDate').value = today;
-            generateInvoiceNumber();
 
-            // Populate Customer Dropdown
-            const custSelect = document.getElementById('customerSelect');
-            custSelect.innerHTML = '<option value="">-Select Customer-</option>';
-            for (const [id, data] of Object.entries(MOCK_CUSTOMERS)) {
-                custSelect.innerHTML += `<option value="${id}">${data.name}</option>`;
-            }
-
-            // Populate Salesman Dropdown
-            const salesSelect = document.getElementById('salesmanSelect');
-            salesSelect.innerHTML = '';
-            MOCK_SALESMEN.forEach(emp => {
-                const isSelected = (emp.id === "EMP-102") ? "selected" : "";
-                salesSelect.innerHTML += `<option value="${emp.id}" ${isSelected}>${emp.name}</option>`;
-            });
+            await Promise.all([
+                generateInvoiceNumber(),
+                loadCustomers(),
+                loadCurrentUserAsSalesman()
+            ]);
 
             // Populate Price Level Dropdown
             const priceSelect = document.getElementById('priceLevel');
             priceSelect.innerHTML = '';
-            MOCK_PRICE_LEVELS.forEach(level => {
+            PRICE_LEVELS.forEach(level => {
                 priceSelect.innerHTML += `<option value="${level}">${level}</option>`;
             });
-            
+
             // Activate Product by default
             toggleSection('product');
+        }
+
+        // Fetches customers from the Customer report and populates the
+        // Customer dropdown; caches full records in customersById for
+        // balance lookups and past-purchase lookups
+        async function loadCustomers() {
+            const custSelect = document.getElementById('customerSelect');
+            custSelect.innerHTML = '<option value="">-Select Customer-</option>';
+            customersById = {};
+
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+                custSelect.innerHTML += '<option value="" disabled>Customer data unavailable outside Zoho Creator</option>';
+                return;
+            }
+
+            try {
+                const response = await ZOHO.CREATOR.API.getAllRecords({
+                    reportName: CUSTOMER_CONFIG.REPORT_NAME
+                });
+                const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                records.forEach(record => {
+                    customersById[record.ID] = record;
+                    const name = record[CUSTOMER_CONFIG.FIELDS.name] || record.ID;
+                    custSelect.innerHTML += `<option value="${record.ID}">${name}</option>`;
+                });
+            } catch (err) {
+                console.error('Failed to fetch customers from "' + CUSTOMER_CONFIG.REPORT_NAME + '".', err);
+                custSelect.innerHTML += '<option value="" disabled>Failed to load customers</option>';
+            }
+        }
+
+        // Sets the Salesman dropdown to the currently logged-in Creator user
+        async function loadCurrentUserAsSalesman() {
+            const salesSelect = document.getElementById('salesmanSelect');
+            salesSelect.innerHTML = '';
+
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.UTIL) {
+                salesSelect.innerHTML = '<option value="">Unavailable outside Zoho Creator</option>';
+                return;
+            }
+
+            try {
+                const initParams = await ZOHO.CREATOR.UTIL.getInitParams();
+                const currentUser = initParams && initParams.loginUser;
+                salesSelect.innerHTML = currentUser
+                    ? `<option value="${currentUser}" selected>${currentUser}</option>`
+                    : '<option value="">Unable to detect logged-in user</option>';
+            } catch (err) {
+                console.error('Failed to fetch logged-in user for Salesman field.', err);
+                salesSelect.innerHTML = '<option value="">Unable to detect logged-in user</option>';
+            }
         }
 
         // Counts this year's invoices already in the system and generates the
@@ -793,13 +836,14 @@
         function handleCustomerChange() {
             const custId = document.getElementById('customerSelect').value;
             const balanceDiv = document.getElementById('ui-current-balance');
+            const customer = customersById[custId];
 
-            if (custId && MOCK_CUSTOMERS[custId]) {
-                const bal = MOCK_CUSTOMERS[custId].balance;
+            if (custId && customer) {
+                const bal = parseFloat(customer[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
                 const formattedBalance = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(bal);
                 balanceDiv.innerText = formattedBalance;
-                balanceDiv.className = bal < 0 
-                    ? "text-red-600 font-bold py-1.5 text-[15px]" 
+                balanceDiv.className = bal < 0
+                    ? "text-red-600 font-bold py-1.5 text-[15px]"
                     : "text-indigo-600 font-bold py-1.5 text-[15px]";
             } else {
                 balanceDiv.innerText = "Select Customer...";
@@ -1041,7 +1085,8 @@
                 return;
             }
             
-            document.getElementById('modal-customer-text').innerText = `Showing purchases for ${MOCK_CUSTOMERS[customer].name}.`;
+            const customerName = (customersById[customer] && customersById[customer][CUSTOMER_CONFIG.FIELDS.name]) || customer;
+            document.getElementById('modal-customer-text').innerText = `Showing purchases for ${customerName}.`;
             const listDiv = document.getElementById('past-purchases-list');
             listDiv.innerHTML = '<p class="text-sm text-slate-500">Loading...</p>';
 
