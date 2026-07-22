@@ -638,7 +638,7 @@
                 });
 
                 if (match) {
-                    const name = match[nameField] || match.Name || email;
+                    const name = zohoValueToText(match[nameField]) || zohoValueToText(match.Name) || email;
                     salesSelect.innerHTML = `<option value="${match.ID}" selected>${name}</option>`;
                 } else {
                     salesSelect.innerHTML = `<option value="" selected>${email}</option>`;
@@ -647,6 +647,20 @@
                 console.error('Failed to look up employee in "' + EMPLOYEE_CONFIG.REPORT_NAME + '".', err);
                 salesSelect.innerHTML = `<option value="" selected>${email}</option>`;
             }
+        }
+
+        function zohoValueToText(value) {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'string') return value.trim();
+            if (typeof value === 'object') {
+                if (value.display_value) return String(value.display_value).trim();
+                if (value.zc_display_value) return String(value.zc_display_value).trim();
+                const parts = [value.prefix, value.first_name, value.last_name, value.suffix]
+                    .filter(Boolean).join(' ').trim();
+                if (parts) return parts;
+                return '';
+            }
+            return String(value).trim();
         }
 
         async function generateInvoiceNumber() {
