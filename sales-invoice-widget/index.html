@@ -625,8 +625,13 @@
             }
 
             try {
+                // fieldConfig: "all" - without this, Creator's default
+                // "quick view" response only includes fields shown as
+                // columns in the report, which likely excludes
+                // Opening_Balance_in_Cash and would make it read as 0.
                 const response = await ZOHO.CREATOR.API.getAllRecords({
-                    reportName: CUSTOMER_CONFIG.REPORT_NAME
+                    reportName: CUSTOMER_CONFIG.REPORT_NAME,
+                    fieldConfig: "all"
                 });
                 const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
                 records.forEach(record => {
@@ -634,6 +639,7 @@
                     const name = record[CUSTOMER_CONFIG.FIELDS.name] || record.ID;
                     custSelect.innerHTML += `<option value="${record.ID}">${name}</option>`;
                 });
+                console.log('Loaded customers:', customersById);
             } catch (err) {
                 console.error('Failed to fetch customers from "' + CUSTOMER_CONFIG.REPORT_NAME + '".', err);
                 custSelect.innerHTML += '<option value="" disabled>Failed to load customers</option>';
