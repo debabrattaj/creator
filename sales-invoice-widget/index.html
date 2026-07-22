@@ -720,15 +720,18 @@
 
             if (typeof ZOHO !== 'undefined' && ZOHO.CREATOR && ZOHO.CREATOR.API) {
                 try {
-                    // getRecordCount + criteria produced a malformed request
-                    // (404 / code 2930) on this SDK version, so count via
-                    // getAllRecords instead - same method used successfully
-                    // for the Customer fetch.
+                    // The "criteria" param (with or without getRecordCount)
+                    // 404s on this app (Creator error 2930), so fetch
+                    // without any server-side filter and count matches
+                    // client-side instead. NOTE: only the first page (up to
+                    // 100 records) is fetched - fine while yearly invoice
+                    // volume stays under that, but will need pagination
+                    // once it doesn't.
                     const response = await ZOHO.CREATOR.API.getAllRecords({
-                        reportName: INVOICE_NUMBER_CONFIG.REPORT_NAME,
-                        criteria: `${INVOICE_NUMBER_CONFIG.FIELD_NAME}.startsWith("${yearPrefix}")`
+                        reportName: INVOICE_NUMBER_CONFIG.REPORT_NAME
                     });
-                    const existingCount = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data.length : 0;
+                    const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                    const existingCount = records.filter(r => String(r[INVOICE_NUMBER_CONFIG.FIELD_NAME] || '').startsWith(yearPrefix)).length;
                     const nextNumber = existingCount + 1;
                     const paddedNumber = String(nextNumber).padStart(INVOICE_NUMBER_CONFIG.PAD_LENGTH, '0');
                     invoiceNoInput.value = `${yearPrefix}${paddedNumber}`;
