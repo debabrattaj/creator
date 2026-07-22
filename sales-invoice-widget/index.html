@@ -589,7 +589,7 @@
         const CUSTOMER_CONFIG = {
             REPORT_NAME: "Customer_Report",
             FIELDS: {
-                name: "Name",
+                name: "Customer_Name",
                 openingBalance: "Opening_Balance_in_Cash"
             }
         };
@@ -662,7 +662,13 @@
             }
         }
 
-        // Sets the Salesman dropdown to the currently logged-in Creator user
+        // Sets the Salesman dropdown to the currently logged-in Creator user.
+        // NOTE: the widget SDK only exposes the logged-in user's email
+        // (ZOHO.CREATOR.UTIL.getInitParams().loginUser), not their registered
+        // display name - there's no client-side call for that. This derives a
+        // readable name from the email's local part (e.g.
+        // "leoragold916@gmail.com" -> "Leoragold916") as a best-effort
+        // stand-in. The option's value stays the real email.
         async function loadCurrentUserAsSalesman() {
             const salesSelect = document.getElementById('salesmanSelect');
             salesSelect.innerHTML = '';
@@ -676,12 +682,22 @@
                 const initParams = await ZOHO.CREATOR.UTIL.getInitParams();
                 const currentUser = initParams && initParams.loginUser;
                 salesSelect.innerHTML = currentUser
-                    ? `<option value="${currentUser}" selected>${currentUser}</option>`
+                    ? `<option value="${currentUser}" selected>${emailToDisplayName(currentUser)}</option>`
                     : '<option value="">Unable to detect logged-in user</option>';
             } catch (err) {
                 console.error('Failed to fetch logged-in user for Salesman field.', err);
                 salesSelect.innerHTML = '<option value="">Unable to detect logged-in user</option>';
             }
+        }
+
+        function emailToDisplayName(email) {
+            const localPart = String(email).split('@')[0];
+            return localPart
+                .replace(/[._-]+/g, ' ')
+                .split(' ')
+                .filter(Boolean)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
         }
 
         // Counts this year's invoices already in the system and generates the
