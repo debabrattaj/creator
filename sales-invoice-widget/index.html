@@ -728,15 +728,15 @@
         }
 
         // Validates the invoice, builds the record payload and saves it to
-        // Zoho Creator via ZOHO.CREATOR.API.addRecord. NOTE: tried switching
-        // this to ZOHO.CREATOR.DATA.addRecords (per Zoho's general widget
-        // SDK docs, which use a different { app_name, form_name, payload:
-        // { data } } shape), but ZOHO.CREATOR.DATA doesn't exist at runtime
-        // in this widget - the widgetsdk-min.js version 1.0 loaded here only
-        // exposes ZOHO.CREATOR.API (consistent with getAllRecords working
-        // under that same namespace above). So EXTRA_KEY_FOUND_IN_JSON is a
-        // real content issue with this payload, not an API-shape mismatch -
-        // back to bisecting field-by-field below.
+        // Zoho Creator via ZOHO.CREATOR.API.addRecord.
+        //
+        // IMPORTANT - the v1 widget SDK's addRecord config requires BOTH an
+        // appName AND the field data wrapped in a nested inner "data" key:
+        //   { appName, formName, data: { data: { Field: value, ... } } }
+        // Passing the fields flat as data: { Field: value } (and omitting
+        // appName) is what caused every EXTRA_KEY_FOUND_IN_JSON failure -
+        // each field name landed where the API expected only the "data"
+        // wrapper. Confirmed against Zoho's JS API docs.
         async function saveInvoice() {
             if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
                 alert('Save is only available when this widget is running inside Zoho Creator.');
@@ -767,19 +767,23 @@
 
             try {
                 const response = await ZOHO.CREATOR.API.addRecord({
+                    appName: SAVE_INVOICE_CONFIG.APP_NAME,
                     formName: SAVE_INVOICE_CONFIG.FORM_NAME,
-                    data: buildInvoicePayload(customerId)
+                    data: {
+                        data: buildInvoicePayload(customerId)
+                    }
                 });
 
                 if (response && response.code === 3000) {
-                    const newId = response.data && response.data.ID;
-                    const savedInvoiceNo = response.data && response.data[INVOICE_NUMBER_CONFIG.FIELD_NAME];
+                    const savedRecord = response.data || {};
+                    const newId = savedRecord.ID;
+                    const savedInvoiceNo = savedRecord[INVOICE_NUMBER_CONFIG.FIELD_NAME];
                     if (savedInvoiceNo) {
                         document.getElementById('invoiceNo').value = savedInvoiceNo;
                     }
                     alert('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.');
                 } else {
-                    throw new Error((response && response.message) || 'Unknown error while saving invoice.');
+                    throw new Error((response && (response.message || JSON.stringify(response))) || 'Unknown error while saving invoice.');
                 }
             } catch (err) {
                 console.error('Failed to save invoice', err);
@@ -801,9 +805,7 @@
             const data = {
                 [F.invoiceNo]: document.getElementById('invoiceNo').value,
                 [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
-                [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
                 [F.customer]: customerId,
-                [F.refNo]: document.getElementById('refNo').value,
                 [F.totalProduct]: parseAmount(document.getElementById('sum-product').innerText),
                 [F.totalPurchase]: parseAmount(document.getElementById('sum-purchase').innerText),
                 [F.totalService]: parseAmount(document.getElementById('sum-service').innerText),
@@ -812,6 +814,13 @@
                 [F.invoiceType]: activeSectionNames.map(section => INVOICE_TYPE_LABELS[section]),
                 [F.chooseSalesReturn]: activeSections.return
             };
+
+            // Optional fields - only send when set, so an empty Due_Date
+            // (a date field) or blank ref can't trigger a value error.
+            const dueDate = formatDateForZoho(document.getElementById('dueDate').value);
+            if (dueDate) data[F.dueDate] = dueDate;
+            const refNo = document.getElementById('refNo').value;
+            if (refNo) data[F.refNo] = refNo;
 
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
             return data;
