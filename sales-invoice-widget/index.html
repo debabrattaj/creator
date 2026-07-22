@@ -42,7 +42,7 @@
             <div class="flex items-center gap-3">
                 <button class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm">Cancel</button>
                 <button class="px-4 py-2.5 text-sm font-medium border border-indigo-600 rounded-lg bg-white text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm">Save as Draft</button>
-                <button class="px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all">Save Invoice</button>
+                <button id="btn-save-invoice" onclick="saveInvoice()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">Save Invoice</button>
                 <button class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
                     Print <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
@@ -493,6 +493,95 @@
             PAD_LENGTH: 4
         };
 
+        // --- SAVE INVOICE CONFIG ---
+        // FORM_NAME: link name of the Form (Form Builder, not Report) used to
+        // create a new invoice record.
+        // FIELDS / SUBFORMS.*.fields: map this widget's internal keys to the
+        // exact field link names in your Creator form. These are best-guess
+        // defaults following Zoho's "Label" -> "Label_With_Underscores"
+        // convention - verify each one against Form Builder and correct any
+        // that differ before going live.
+        const SAVE_INVOICE_CONFIG = {
+            FORM_NAME: "Sales_Invoice",
+            FIELDS: {
+                invoiceNo: "Invoice_No",
+                invoiceDate: "Invoice_Date",
+                dueDate: "Due_Date",
+                customer: "Customer",
+                salesman: "Salesman",
+                refNo: "Reference_Number",
+                priceLevel: "Price_Level",
+                discount: "Discount",
+                charges: "Additional_Charges",
+                cgst: "CGST",
+                sgst: "SGST",
+                netTaxable: "Net_Taxable_Amount",
+                grandTotal: "Grand_Total"
+            },
+            SUBFORMS: {
+                purchase: {
+                    name: "Purchase_Items",
+                    fields: {
+                        item: "Item_Detail", design: "Design", purity: "Purity", qty: "Qty",
+                        gwt: "GWT", nwt: "NWT", rate: "Rate", amount: "Amount",
+                        dmdWt: "DMD_WT", dmdRt: "DMD_RT", dmdAmt: "DMD_Amount",
+                        csWt: "CS_WT", csRt: "CS_RT", csAmt: "CS_Amount",
+                        psWt: "PS_WT", psRt: "PS_RT", psAmt: "PS_Amount",
+                        tchType: "TCH_Type", tchPct: "TCH_Percent", tchRt: "TCH_Rate", tchAmt: "TCH_Amount",
+                        discType: "Discount_Type", discPct: "Discount_Percent_Rate", discAmt: "Discount_Amount",
+                        lineTotal: "Line_Total"
+                    }
+                },
+                product: {
+                    name: "Product_Items",
+                    fields: {
+                        item: "Item_Detail", design: "Design", purity: "Purity", qty: "Qty",
+                        gwt: "GWT", nwt: "NWT", rate: "Rate", amount: "Amount",
+                        dmdWt: "DMD_WT", dmdRt: "DMD_RT", dmdAmt: "DMD_Amount",
+                        csWt: "CS_WT", csRt: "CS_RT", csAmt: "CS_Amount",
+                        psWt: "PS_WT", psRt: "PS_RT", psAmt: "PS_Amount",
+                        tchType: "TCH_Type", tchPct: "TCH_Percent", tchRt: "TCH_Rate", tchAmt: "TCH_Amount",
+                        discType: "Discount_Type", discPct: "Discount_Percent_Rate", discAmt: "Discount_Amount",
+                        lineTotal: "Line_Total"
+                    }
+                },
+                service: {
+                    name: "Service_Items",
+                    fields: {
+                        svcType: "Service_Type", svcDesc: "Description",
+                        svcQty: "Qty", svcRate: "Rate", lineTotal: "Line_Total"
+                    }
+                },
+                return: {
+                    name: "Return_Items",
+                    fields: {
+                        origInv: "Original_Invoice_No", item: "Item_Detail",
+                        qty: "Qty", returnAmt: "Return_Amount", lineTotal: "Line_Total"
+                    }
+                }
+            }
+        };
+
+        // CSS selector maps for reading each subform row's inputs
+        const PRODUCT_ROW_CLASS_MAP = {
+            item: '.input-item', design: '.input-design', purity: '.input-purity', qty: '.input-qty',
+            gwt: '.input-gwt', nwt: '.input-nwt', rate: '.input-rate', amount: '.input-amt',
+            dmdWt: '.input-dmd-wt', dmdRt: '.input-dmd-rt', dmdAmt: '.input-dmd-amt',
+            csWt: '.input-cs-wt', csRt: '.input-cs-rt', csAmt: '.input-cs-amt',
+            psWt: '.input-ps-wt', psRt: '.input-ps-rt', psAmt: '.input-ps-amt',
+            tchType: '.input-tch-type', tchPct: '.input-tch-pct', tchRt: '.input-tch-rt', tchAmt: '.input-tch-amt',
+            discType: '.input-disc-type', discPct: '.input-disc-pct', discAmt: '.input-disc-amt',
+            lineTotal: '.input-linetotal'
+        };
+        const SERVICE_ROW_CLASS_MAP = {
+            svcType: '.input-svc-type', svcDesc: '.input-svc-desc',
+            svcQty: '.input-svc-qty', svcRate: '.input-svc-rate', lineTotal: '.input-svc-linetotal'
+        };
+        const RETURN_ROW_CLASS_MAP = {
+            origInv: '.input-ret-inv', item: '.input-ret-item',
+            qty: '.input-ret-qty', returnAmt: '.input-ret-amt', lineTotal: '.input-ret-linetotal'
+        };
+
         // --- 1. MOCK DATABASE ---
         const MOCK_CUSTOMERS = {
             "CUST-001": { name: "Arun Kumar", balance: 45000.00 },
@@ -583,6 +672,121 @@
                 const paddedNumber = String(mockCount).padStart(INVOICE_NUMBER_CONFIG.PAD_LENGTH, '0');
                 invoiceNoInput.value = `${yearPrefix}${paddedNumber}`;
             }
+        }
+
+        // Validates the invoice, builds the record payload and saves it to
+        // Zoho Creator via ZOHO.CREATOR.API.addRecord
+        async function saveInvoice() {
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+                alert('Save is only available when this widget is running inside Zoho Creator.');
+                return;
+            }
+
+            const customerId = document.getElementById('customerSelect').value;
+            if (!customerId) {
+                alert('Please select a Customer before saving.');
+                return;
+            }
+            if (!document.getElementById('invoiceDate').value) {
+                alert('Please set the Invoice Date.');
+                return;
+            }
+            const hasItems = ['purchase', 'product', 'service', 'return'].some(section =>
+                activeSections[section] && document.getElementById(`tbody-${section}`).children.length > 0
+            );
+            if (!hasItems) {
+                alert('Please add at least one item before saving.');
+                return;
+            }
+
+            const saveBtn = document.getElementById('btn-save-invoice');
+            const originalLabel = saveBtn.innerText;
+            saveBtn.disabled = true;
+            saveBtn.innerText = 'Saving...';
+
+            try {
+                const response = await ZOHO.CREATOR.API.addRecord({
+                    formName: SAVE_INVOICE_CONFIG.FORM_NAME,
+                    data: buildInvoicePayload(customerId)
+                });
+
+                if (response && response.code === 3000) {
+                    const newId = response.data && response.data.ID;
+                    alert('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.');
+                } else {
+                    throw new Error((response && response.message) || 'Unknown error while saving invoice.');
+                }
+            } catch (err) {
+                console.error('Failed to save invoice', err);
+                alert('Failed to save invoice: ' + (err && err.message ? err.message : err));
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerText = originalLabel;
+            }
+        }
+
+        function buildInvoicePayload(customerId) {
+            const F = SAVE_INVOICE_CONFIG.FIELDS;
+            const data = {
+                [F.invoiceNo]: document.getElementById('invoiceNo').value,
+                [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
+                [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
+                [F.customer]: customerId,
+                [F.salesman]: document.getElementById('salesmanSelect').value,
+                [F.refNo]: document.getElementById('refNo').value,
+                [F.priceLevel]: document.getElementById('priceLevel').value,
+                [F.discount]: parseFloat(document.getElementById('global-discount').value) || 0,
+                [F.charges]: parseFloat(document.getElementById('global-charges').value) || 0,
+                [F.cgst]: parseAmount(document.getElementById('sum-cgst').innerText),
+                [F.sgst]: parseAmount(document.getElementById('sum-sgst').innerText),
+                [F.netTaxable]: parseAmount(document.getElementById('sum-taxable').innerText),
+                [F.grandTotal]: parseAmount(document.getElementById('sum-grandtotal').innerText)
+            };
+
+            if (activeSections.purchase) {
+                data[SAVE_INVOICE_CONFIG.SUBFORMS.purchase.name] = collectRows('purchase', PRODUCT_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.purchase.fields);
+            }
+            if (activeSections.product) {
+                data[SAVE_INVOICE_CONFIG.SUBFORMS.product.name] = collectRows('product', PRODUCT_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.product.fields);
+            }
+            if (activeSections.service) {
+                data[SAVE_INVOICE_CONFIG.SUBFORMS.service.name] = collectRows('service', SERVICE_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.service.fields);
+            }
+            if (activeSections.return) {
+                data[SAVE_INVOICE_CONFIG.SUBFORMS.return.name] = collectRows('return', RETURN_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.return.fields);
+            }
+
+            return data;
+        }
+
+        // Reads every row in a subform's tbody into an array of
+        // { zohoFieldName: value } objects, using classMap to locate each
+        // input and fieldMap to translate it to the configured Zoho field
+        function collectRows(section, classMap, fieldMap) {
+            const tbody = document.getElementById(`tbody-${section}`);
+            return Array.from(tbody.children).map(tr => {
+                const row = {};
+                Object.entries(classMap).forEach(([key, selector]) => {
+                    const zohoField = fieldMap[key];
+                    if (!zohoField) return;
+                    const el = tr.querySelector(selector);
+                    if (!el) return;
+                    row[zohoField] = (el.tagName === 'SELECT' || el.type === 'text') ? el.value : (parseFloat(el.value) || 0);
+                });
+                return row;
+            });
+        }
+
+        // "₹ 1,234.50" -> 1234.5
+        function parseAmount(text) {
+            return parseFloat(String(text).replace(/[^0-9.-]/g, '')) || 0;
+        }
+
+        // "2026-07-22" -> "22-07-2026" (Zoho Creator's default date format)
+        function formatDateForZoho(isoDate) {
+            if (!isoDate) return '';
+            const [y, m, d] = isoDate.split('-');
+            return `${d}-${m}-${y}`;
         }
 
         // Triggered every time the Customer Dropdown changes
