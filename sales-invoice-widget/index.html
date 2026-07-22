@@ -480,6 +480,10 @@
     </template>
 
     <script>
+        // Resolved server-side by Zoho Creator when this page renders
+        // (embedded Deluge expression) - the actual logged-in user's name.
+        var CURRENT_USER_NAME = "<%= thisapp.permissions.loginUserName() %>";
+
         // --- INVOICE NUMBER CONFIG ---
         // REPORT_NAME: link name of the report listing all invoices (from the
         // Creator URL, e.g. .../#Report:Sales_Invoice_Report)
@@ -662,16 +666,20 @@
             }
         }
 
-        // Sets the Salesman dropdown to the currently logged-in Creator user.
-        // NOTE: the widget SDK only exposes the logged-in user's email
-        // (ZOHO.CREATOR.UTIL.getInitParams().loginUser), not their registered
-        // display name - there's no client-side call for that. This derives a
-        // readable name from the email's local part (e.g.
-        // "leoragold916@gmail.com" -> "Leoragold916") as a best-effort
-        // stand-in. The option's value stays the real email.
+        // Sets the Salesman dropdown to the currently logged-in Creator user's
+        // real name, via CURRENT_USER_NAME (resolved server-side above by
+        // thisapp.permissions.loginUserName()). Falls back to deriving a
+        // readable name from the widget SDK's email-only user info, for
+        // local/standalone preview where the server-side expression above
+        // isn't evaluated (it renders literally instead of resolving).
         async function loadCurrentUserAsSalesman() {
             const salesSelect = document.getElementById('salesmanSelect');
             salesSelect.innerHTML = '';
+
+            if (CURRENT_USER_NAME && !CURRENT_USER_NAME.includes('<%')) {
+                salesSelect.innerHTML = `<option value="${CURRENT_USER_NAME}" selected>${CURRENT_USER_NAME}</option>`;
+                return;
+            }
 
             if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.UTIL) {
                 salesSelect.innerHTML = '<option value="">Unavailable outside Zoho Creator</option>';
