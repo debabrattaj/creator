@@ -726,16 +726,17 @@
         }
 
         // Validates the invoice, builds the record payload and saves it to
-        // Zoho Creator via ZOHO.CREATOR.DATA.addRecords. NOTE: this is a
-        // different SDK namespace/shape than the read calls above
-        // (ZOHO.CREATOR.API.getAllRecords) - addRecords expects
-        // { app_name, form_name, payload: { data: {...} } }, snake_case,
-        // with the field data nested under payload.data. Using the
-        // API.addRecord({ formName, data }) shape (camelCase, unwrapped) is
-        // what was producing EXTRA_KEY_FOUND_IN_JSON - Zoho's official
-        // widget SDK docs confirm this exact shape.
+        // Zoho Creator via ZOHO.CREATOR.API.addRecord. NOTE: tried switching
+        // this to ZOHO.CREATOR.DATA.addRecords (per Zoho's general widget
+        // SDK docs, which use a different { app_name, form_name, payload:
+        // { data } } shape), but ZOHO.CREATOR.DATA doesn't exist at runtime
+        // in this widget - the widgetsdk-min.js version 1.0 loaded here only
+        // exposes ZOHO.CREATOR.API (consistent with getAllRecords working
+        // under that same namespace above). So EXTRA_KEY_FOUND_IN_JSON is a
+        // real content issue with this payload, not an API-shape mismatch -
+        // back to bisecting field-by-field below.
         async function saveInvoice() {
-            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.DATA) {
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
                 alert('Save is only available when this widget is running inside Zoho Creator.');
                 return;
             }
@@ -763,12 +764,9 @@
             saveBtn.innerText = 'Saving...';
 
             try {
-                const response = await ZOHO.CREATOR.DATA.addRecords({
-                    app_name: SAVE_INVOICE_CONFIG.APP_NAME,
-                    form_name: SAVE_INVOICE_CONFIG.FORM_NAME,
-                    payload: {
-                        data: buildInvoicePayload(customerId)
-                    }
+                const response = await ZOHO.CREATOR.API.addRecord({
+                    formName: SAVE_INVOICE_CONFIG.FORM_NAME,
+                    data: buildInvoicePayload(customerId)
                 });
 
                 if (response && response.code === 3000) {
@@ -794,15 +792,16 @@
         // SAVE_INVOICE_CONFIG above for what's intentionally left out
         // (Salesman, Price_Level, Discount/Charges/CGST/SGST/Grand Total,
         // and all line-item subforms) and why.
+        // TEMPORARY: trimmed to 2 fields to bisect which key is causing
+        // EXTRA_KEY_FOUND_IN_JSON. Once this saves cleanly (or fails,
+        // narrowing it further), add invoiceNo/dueDate/refNo back one at a
+        // time and retest each.
         function buildInvoicePayload(customerId) {
             const F = SAVE_INVOICE_CONFIG.FIELDS;
 
             const data = {
-                [F.invoiceNo]: document.getElementById('invoiceNo').value,
-                [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
-                [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
                 [F.customer]: customerId,
-                [F.refNo]: document.getElementById('refNo').value
+                [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value)
             };
 
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
