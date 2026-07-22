@@ -481,11 +481,14 @@
 
     <script>
         // --- INVOICE NUMBER CONFIG ---
-        // Update INVOICE_REPORT_NAME to match the Report (link name) in your
-        // Creator app that lists all Sales Invoice records.
-        // Format produced: INV-26-0006  ->  PREFIX-YY-#### (padded running count)
+        // REPORT_NAME: link name of the report listing all invoices (from the
+        // Creator URL, e.g. .../#Report:Sales_Invoice_Report)
+        // FIELD_NAME: link name of the "Invoice No" field in that report
+        // Format produced: INV-26-0006  ->  PREFIX-YY-#### (count of this
+        // year's invoices, padded, + 1)
         const INVOICE_NUMBER_CONFIG = {
             REPORT_NAME: "Sales_Invoice_Report",
+            FIELD_NAME: "Invoice_No",
             PREFIX: "INV",
             PAD_LENGTH: 4
         };
@@ -549,33 +552,36 @@
             toggleSection('product');
         }
 
-        // Counts existing invoices in the system and generates the next
-        // sequential invoice number, e.g. INV-26-0006
+        // Counts this year's invoices already in the system and generates the
+        // next sequential invoice number, e.g. INV-26-0006. Scoped to the
+        // current year prefix so the running number resets each year.
         async function generateInvoiceNumber() {
             const invoiceNoInput = document.getElementById('invoiceNo');
             invoiceNoInput.value = "Generating...";
 
             const yy = new Date().getFullYear().toString().slice(-2);
+            const yearPrefix = `${INVOICE_NUMBER_CONFIG.PREFIX}-${yy}-`;
 
             if (typeof ZOHO !== 'undefined' && ZOHO.CREATOR && ZOHO.CREATOR.API) {
                 try {
                     const response = await ZOHO.CREATOR.API.getRecordCount({
-                        reportName: INVOICE_NUMBER_CONFIG.REPORT_NAME
+                        reportName: INVOICE_NUMBER_CONFIG.REPORT_NAME,
+                        criteria: `${INVOICE_NUMBER_CONFIG.FIELD_NAME}.startsWith("${yearPrefix}")`
                     });
                     const existingCount = (response && response.code === 3000) ? parseInt(response.result, 10) || 0 : 0;
                     const nextNumber = existingCount + 1;
                     const paddedNumber = String(nextNumber).padStart(INVOICE_NUMBER_CONFIG.PAD_LENGTH, '0');
-                    invoiceNoInput.value = `${INVOICE_NUMBER_CONFIG.PREFIX}-${yy}-${paddedNumber}`;
+                    invoiceNoInput.value = `${yearPrefix}${paddedNumber}`;
                 } catch (err) {
                     console.error('Failed to fetch invoice count from "' + INVOICE_NUMBER_CONFIG.REPORT_NAME + '". Falling back to a placeholder number.', err);
-                    invoiceNoInput.value = `${INVOICE_NUMBER_CONFIG.PREFIX}-${yy}-${'0'.repeat(INVOICE_NUMBER_CONFIG.PAD_LENGTH)}`;
+                    invoiceNoInput.value = `${yearPrefix}${'0'.repeat(INVOICE_NUMBER_CONFIG.PAD_LENGTH)}`;
                 }
             } else {
                 // Local/standalone preview (outside Zoho Creator) - mock an incrementing count
                 const mockCount = (parseInt(localStorage.getItem('mockInvoiceCount') || '0', 10)) + 1;
                 localStorage.setItem('mockInvoiceCount', mockCount);
                 const paddedNumber = String(mockCount).padStart(INVOICE_NUMBER_CONFIG.PAD_LENGTH, '0');
-                invoiceNoInput.value = `${INVOICE_NUMBER_CONFIG.PREFIX}-${yy}-${paddedNumber}`;
+                invoiceNoInput.value = `${yearPrefix}${paddedNumber}`;
             }
         }
 
