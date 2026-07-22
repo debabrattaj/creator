@@ -857,11 +857,18 @@
             return parseFloat(String(text).replace(/[^0-9.-]/g, '')) || 0;
         }
 
-        // "2026-07-22" -> "22-07-2026" (Zoho Creator's default date format)
+        // "2026-07-22" -> "22-Jul-2026 00:00:00"
+        // Invoice_Date / Due_Date are date-time fields, and the Add Records
+        // API expects the "dd-MMM-yyyy HH:mm:ss" format (three-letter month
+        // abbreviation) - the numeric "22-07-2026" was rejected with
+        // "Enter a valid date format".
         function formatDateForZoho(isoDate) {
             if (!isoDate) return '';
+            const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const [y, m, d] = isoDate.split('-');
-            return `${d}-${m}-${y}`;
+            const monthAbbr = MONTHS[parseInt(m, 10) - 1];
+            if (!monthAbbr) return '';
+            return `${d}-${monthAbbr}-${y} 00:00:00`;
         }
 
         // Triggered every time the Customer Dropdown changes
