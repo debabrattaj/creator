@@ -492,23 +492,28 @@
         // year's invoices, padded, + 1)
         const INVOICE_NUMBER_CONFIG = {
             REPORT_NAME: "Sales_Invoice_Report",
-            // "Invoice_No" on the form is a number-type field (not this);
-            // "Invoice_No1" is the text field that actually holds "INV-26-0006"
-            FIELD_NAME: "Invoice_No1",
+            FIELD_NAME: "Invoice_No",
             PREFIX: "INV",
             PAD_LENGTH: 4
         };
 
         // --- SAVE INVOICE CONFIG ---
-        // Even after removing the 6 fields confirmed not to exist
-        // (Discount/Additional_Charges/CGST/SGST/Net_Taxable_Amount/
-        // Grand_Total), the save still 401s with EXTRA_KEY_FOUND_IN_JSON -
-        // and that error doesn't say which key is the problem. Rather than
-        // guess again against live data, this is trimmed down to only the
-        // fields that appeared at the very top of your field list, clearly
-        // before any subform section (highest confidence they truly belong
-        // to Sales_Invoice itself). Once this minimal set saves cleanly,
-        // we'll add the rest back one at a time and confirm each:
+        // Even with Invoice_No confirmed as the correct field link name, the
+        // save still 401s with EXTRA_KEY_FOUND_IN_JSON on it specifically.
+        // Given its type (number) and formatted value ("INV-26-0006"), it's
+        // almost certainly a Zoho native Auto Number field - those are
+        // populated by Zoho automatically on insert and rejected as an input
+        // key via the Add Record API, which is exactly this error. So
+        // Invoice_No is intentionally left out of FIELDS below; the
+        // client-side counting logic above is now just a preview shown
+        // before saving, and saveInvoice() reads the real value back from
+        // the API response afterward.
+        //
+        // Still trimmed down otherwise to only the fields that appeared at
+        // the very top of your field list, before any subform section
+        // (highest confidence they truly belong to Sales_Invoice itself).
+        // Once this minimal set saves cleanly, we'll add the rest back one
+        // at a time and confirm each:
         //   - Total_Product_Amount / Total_Purchase_Amount /
         //     Total_Service_Amount / Total_Sales_Return_Amount,
         //     Calculations_Involved, Invoice_Type, Choose_Sales_Return -
@@ -525,7 +530,6 @@
         const SAVE_INVOICE_CONFIG = {
             FORM_NAME: "Sales_Invoice",
             FIELDS: {
-                invoiceNo: "Invoice_No1",
                 invoiceDate: "Invoice_Date",
                 dueDate: "Due_Date",
                 customer: "Customer",
@@ -766,6 +770,10 @@
 
                 if (response && response.code === 3000) {
                     const newId = response.data && response.data.ID;
+                    const savedInvoiceNo = response.data && response.data[INVOICE_NUMBER_CONFIG.FIELD_NAME];
+                    if (savedInvoiceNo) {
+                        document.getElementById('invoiceNo').value = savedInvoiceNo;
+                    }
                     alert('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.');
                 } else {
                     throw new Error((response && response.message) || 'Unknown error while saving invoice.');
@@ -787,7 +795,6 @@
             const F = SAVE_INVOICE_CONFIG.FIELDS;
 
             const data = {
-                [F.invoiceNo]: document.getElementById('invoiceNo').value,
                 [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
                 [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
                 [F.customer]: customerId,
