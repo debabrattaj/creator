@@ -500,25 +500,28 @@
         };
 
         // --- SAVE INVOICE CONFIG ---
-        // Based on the actual Sales_Invoice field list. A few things are
-        // deliberately left out of FIELDS/SUBFORMS below because they don't
-        // exist on the form (sending them 401s with EXTRA_KEY_FOUND_IN_JSON):
-        //   - Discount, Additional_Charges, CGST, SGST, Net_Taxable_Amount,
-        //     Grand_Total have no matching field anywhere on this form - the
-        //     widget still shows/calculates them, but they aren't persisted
-        //     here until you tell me where (if anywhere) they should go.
-        //   - Salesman is a NUMBER field (a lookup), not text, so the
-        //     logged-in user's name can't be written into it directly - it
-        //     needs a matching record ID from whatever report it looks up.
-        //   - Price_Level is a DECIMAL field, not the Retail/Wholesale/VIP
-        //     Partner text list this widget currently offers.
+        // Even after removing the 6 fields confirmed not to exist
+        // (Discount/Additional_Charges/CGST/SGST/Net_Taxable_Amount/
+        // Grand_Total), the save still 401s with EXTRA_KEY_FOUND_IN_JSON -
+        // and that error doesn't say which key is the problem. Rather than
+        // guess again against live data, this is trimmed down to only the
+        // fields that appeared at the very top of your field list, clearly
+        // before any subform section (highest confidence they truly belong
+        // to Sales_Invoice itself). Once this minimal set saves cleanly,
+        // we'll add the rest back one at a time and confirm each:
+        //   - Total_Product_Amount / Total_Purchase_Amount /
+        //     Total_Service_Amount / Total_Sales_Return_Amount,
+        //     Calculations_Involved, Invoice_Type, Choose_Sales_Return -
+        //     removed for now; they appeared later in the list, closer to
+        //     the subform sections, so their exact form ownership is
+        //     unconfirmed.
+        //   - Salesman is a NUMBER field (a lookup), not text - needs a
+        //     matching record ID from whatever report it looks up.
+        //   - Price_Level is DECIMAL, not the Retail/Wholesale/VIP Partner
+        //     text list this widget currently offers.
         //   - Line-item subforms (Purchase_Information, Product_Information,
-        //     Service_Information, and Sales Return's own form) are NOT
-        //     wired into the save yet - the real schema doesn't line up
-        //     cleanly with this widget's UI columns (e.g. Purchase_Information
-        //     has no TCH/Discount fields, Product_Information appears to
-        //     double as the Service subform in places). Saving currently
-        //     only writes the header record; see saveInvoice().
+        //     Service_Information, and Sales Return's own form) are not
+        //     wired into the save yet - see saveInvoice().
         const SAVE_INVOICE_CONFIG = {
             FORM_NAME: "Sales_Invoice",
             FIELDS: {
@@ -526,14 +529,7 @@
                 invoiceDate: "Invoice_Date",
                 dueDate: "Due_Date",
                 customer: "Customer",
-                refNo: "Reference_Number",
-                totalProduct: "Total_Product_Amount",
-                totalPurchase: "Total_Purchase_Amount",
-                totalService: "Total_Service_Amount",
-                totalReturn: "Total_Sales_Return_Amount",
-                calculationsInvolved: "Calculations_Involved",
-                invoiceType: "Invoice_Type",
-                chooseSalesReturn: "Choose_Sales_Return"
+                refNo: "Reference_Number"
             }
         };
 
@@ -783,30 +779,17 @@
         // and all line-item subforms) and why.
         function buildInvoicePayload(customerId) {
             const F = SAVE_INVOICE_CONFIG.FIELDS;
-            const activeSectionNames = Object.keys(activeSections).filter(section => activeSections[section]);
 
-            return {
+            const data = {
                 [F.invoiceNo]: document.getElementById('invoiceNo').value,
                 [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
                 [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
                 [F.customer]: customerId,
-                [F.refNo]: document.getElementById('refNo').value,
-                [F.totalProduct]: parseAmount(document.getElementById('sum-product').innerText),
-                [F.totalPurchase]: parseAmount(document.getElementById('sum-purchase').innerText),
-                [F.totalService]: parseAmount(document.getElementById('sum-service').innerText),
-                [F.totalReturn]: parseAmount(document.getElementById('sum-return').innerText),
-                [F.calculationsInvolved]: getSelectedCalculations(),
-                [F.invoiceType]: activeSectionNames.map(section => INVOICE_TYPE_LABELS[section]),
-                [F.chooseSalesReturn]: activeSections.return
+                [F.refNo]: document.getElementById('refNo').value
             };
-        }
 
-        function getSelectedCalculations() {
-            const list = [];
-            if (document.getElementById('chk-dmd').checked) list.push('DMD');
-            if (document.getElementById('chk-cs').checked) list.push('CS');
-            if (document.getElementById('chk-ps').checked) list.push('PS');
-            return list;
+            console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
+            return data;
         }
 
         // Reads every row in a subform's tbody into an array of
