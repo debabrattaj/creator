@@ -492,78 +492,56 @@
         // year's invoices, padded, + 1)
         const INVOICE_NUMBER_CONFIG = {
             REPORT_NAME: "Sales_Invoice_Report",
-            FIELD_NAME: "Invoice_No",
+            // "Invoice_No" on the form is a number-type field (not this);
+            // "Invoice_No1" is the text field that actually holds "INV-26-0006"
+            FIELD_NAME: "Invoice_No1",
             PREFIX: "INV",
             PAD_LENGTH: 4
         };
 
         // --- SAVE INVOICE CONFIG ---
-        // FORM_NAME: link name of the Form (Form Builder, not Report) used to
-        // create a new invoice record.
-        // FIELDS / SUBFORMS.*.fields: map this widget's internal keys to the
-        // exact field link names in your Creator form. These are best-guess
-        // defaults following Zoho's "Label" -> "Label_With_Underscores"
-        // convention - verify each one against Form Builder and correct any
-        // that differ before going live.
+        // Based on the actual Sales_Invoice field list. A few things are
+        // deliberately left out of FIELDS/SUBFORMS below because they don't
+        // exist on the form (sending them 401s with EXTRA_KEY_FOUND_IN_JSON):
+        //   - Discount, Additional_Charges, CGST, SGST, Net_Taxable_Amount,
+        //     Grand_Total have no matching field anywhere on this form - the
+        //     widget still shows/calculates them, but they aren't persisted
+        //     here until you tell me where (if anywhere) they should go.
+        //   - Salesman is a NUMBER field (a lookup), not text, so the
+        //     logged-in user's name can't be written into it directly - it
+        //     needs a matching record ID from whatever report it looks up.
+        //   - Price_Level is a DECIMAL field, not the Retail/Wholesale/VIP
+        //     Partner text list this widget currently offers.
+        //   - Line-item subforms (Purchase_Information, Product_Information,
+        //     Service_Information, and Sales Return's own form) are NOT
+        //     wired into the save yet - the real schema doesn't line up
+        //     cleanly with this widget's UI columns (e.g. Purchase_Information
+        //     has no TCH/Discount fields, Product_Information appears to
+        //     double as the Service subform in places). Saving currently
+        //     only writes the header record; see saveInvoice().
         const SAVE_INVOICE_CONFIG = {
             FORM_NAME: "Sales_Invoice",
             FIELDS: {
-                invoiceNo: "Invoice_No",
+                invoiceNo: "Invoice_No1",
                 invoiceDate: "Invoice_Date",
                 dueDate: "Due_Date",
                 customer: "Customer",
-                salesman: "Salesman",
                 refNo: "Reference_Number",
-                priceLevel: "Price_Level",
-                discount: "Discount",
-                charges: "Additional_Charges",
-                cgst: "CGST",
-                sgst: "SGST",
-                netTaxable: "Net_Taxable_Amount",
-                grandTotal: "Grand_Total"
-            },
-            SUBFORMS: {
-                purchase: {
-                    name: "Purchase_Items",
-                    fields: {
-                        item: "Item_Detail", design: "Design", purity: "Purity", qty: "Qty",
-                        gwt: "GWT", nwt: "NWT", rate: "Rate", amount: "Amount",
-                        dmdWt: "DMD_WT", dmdRt: "DMD_RT", dmdAmt: "DMD_Amount",
-                        csWt: "CS_WT", csRt: "CS_RT", csAmt: "CS_Amount",
-                        psWt: "PS_WT", psRt: "PS_RT", psAmt: "PS_Amount",
-                        tchType: "TCH_Type", tchPct: "TCH_Percent", tchRt: "TCH_Rate", tchAmt: "TCH_Amount",
-                        discType: "Discount_Type", discPct: "Discount_Percent_Rate", discAmt: "Discount_Amount",
-                        lineTotal: "Line_Total"
-                    }
-                },
-                product: {
-                    name: "Product_Items",
-                    fields: {
-                        item: "Item_Detail", design: "Design", purity: "Purity", qty: "Qty",
-                        gwt: "GWT", nwt: "NWT", rate: "Rate", amount: "Amount",
-                        dmdWt: "DMD_WT", dmdRt: "DMD_RT", dmdAmt: "DMD_Amount",
-                        csWt: "CS_WT", csRt: "CS_RT", csAmt: "CS_Amount",
-                        psWt: "PS_WT", psRt: "PS_RT", psAmt: "PS_Amount",
-                        tchType: "TCH_Type", tchPct: "TCH_Percent", tchRt: "TCH_Rate", tchAmt: "TCH_Amount",
-                        discType: "Discount_Type", discPct: "Discount_Percent_Rate", discAmt: "Discount_Amount",
-                        lineTotal: "Line_Total"
-                    }
-                },
-                service: {
-                    name: "Service_Items",
-                    fields: {
-                        svcType: "Service_Type", svcDesc: "Description",
-                        svcQty: "Qty", svcRate: "Rate", lineTotal: "Line_Total"
-                    }
-                },
-                return: {
-                    name: "Return_Items",
-                    fields: {
-                        origInv: "Original_Invoice_No", item: "Item_Detail",
-                        qty: "Qty", returnAmt: "Return_Amount", lineTotal: "Line_Total"
-                    }
-                }
+                totalProduct: "Total_Product_Amount",
+                totalPurchase: "Total_Purchase_Amount",
+                totalService: "Total_Service_Amount",
+                totalReturn: "Total_Sales_Return_Amount",
+                calculationsInvolved: "Calculations_Involved",
+                invoiceType: "Invoice_Type",
+                chooseSalesReturn: "Choose_Sales_Return"
             }
+        };
+
+        const INVOICE_TYPE_LABELS = {
+            purchase: "Purchase Old Gold",
+            product: "Product",
+            service: "Service",
+            return: "Sales Return"
         };
 
         // CSS selector maps for reading each subform row's inputs
@@ -799,38 +777,36 @@
             }
         }
 
+        // NOTE: only writes the header record for now - see the comment on
+        // SAVE_INVOICE_CONFIG above for what's intentionally left out
+        // (Salesman, Price_Level, Discount/Charges/CGST/SGST/Grand Total,
+        // and all line-item subforms) and why.
         function buildInvoicePayload(customerId) {
             const F = SAVE_INVOICE_CONFIG.FIELDS;
-            const data = {
+            const activeSectionNames = Object.keys(activeSections).filter(section => activeSections[section]);
+
+            return {
                 [F.invoiceNo]: document.getElementById('invoiceNo').value,
                 [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
                 [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
                 [F.customer]: customerId,
-                [F.salesman]: document.getElementById('salesmanSelect').value,
                 [F.refNo]: document.getElementById('refNo').value,
-                [F.priceLevel]: document.getElementById('priceLevel').value,
-                [F.discount]: parseFloat(document.getElementById('global-discount').value) || 0,
-                [F.charges]: parseFloat(document.getElementById('global-charges').value) || 0,
-                [F.cgst]: parseAmount(document.getElementById('sum-cgst').innerText),
-                [F.sgst]: parseAmount(document.getElementById('sum-sgst').innerText),
-                [F.netTaxable]: parseAmount(document.getElementById('sum-taxable').innerText),
-                [F.grandTotal]: parseAmount(document.getElementById('sum-grandtotal').innerText)
+                [F.totalProduct]: parseAmount(document.getElementById('sum-product').innerText),
+                [F.totalPurchase]: parseAmount(document.getElementById('sum-purchase').innerText),
+                [F.totalService]: parseAmount(document.getElementById('sum-service').innerText),
+                [F.totalReturn]: parseAmount(document.getElementById('sum-return').innerText),
+                [F.calculationsInvolved]: getSelectedCalculations(),
+                [F.invoiceType]: activeSectionNames.map(section => INVOICE_TYPE_LABELS[section]),
+                [F.chooseSalesReturn]: activeSections.return
             };
+        }
 
-            if (activeSections.purchase) {
-                data[SAVE_INVOICE_CONFIG.SUBFORMS.purchase.name] = collectRows('purchase', PRODUCT_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.purchase.fields);
-            }
-            if (activeSections.product) {
-                data[SAVE_INVOICE_CONFIG.SUBFORMS.product.name] = collectRows('product', PRODUCT_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.product.fields);
-            }
-            if (activeSections.service) {
-                data[SAVE_INVOICE_CONFIG.SUBFORMS.service.name] = collectRows('service', SERVICE_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.service.fields);
-            }
-            if (activeSections.return) {
-                data[SAVE_INVOICE_CONFIG.SUBFORMS.return.name] = collectRows('return', RETURN_ROW_CLASS_MAP, SAVE_INVOICE_CONFIG.SUBFORMS.return.fields);
-            }
-
-            return data;
+        function getSelectedCalculations() {
+            const list = [];
+            if (document.getElementById('chk-dmd').checked) list.push('DMD');
+            if (document.getElementById('chk-cs').checked) list.push('CS');
+            if (document.getElementById('chk-ps').checked) list.push('PS');
+            return list;
         }
 
         // Reads every row in a subform's tbody into an array of
