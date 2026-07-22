@@ -519,6 +519,7 @@
         //     Service_Information, and Sales Return's own form) are not
         //     wired into the save yet - see saveInvoice().
         const SAVE_INVOICE_CONFIG = {
+            APP_NAME: "ciyor",
             FORM_NAME: "Sales_Invoice",
             FIELDS: {
                 invoiceNo: "Invoice_No",
@@ -725,9 +726,16 @@
         }
 
         // Validates the invoice, builds the record payload and saves it to
-        // Zoho Creator via ZOHO.CREATOR.API.addRecord
+        // Zoho Creator via ZOHO.CREATOR.DATA.addRecords. NOTE: this is a
+        // different SDK namespace/shape than the read calls above
+        // (ZOHO.CREATOR.API.getAllRecords) - addRecords expects
+        // { app_name, form_name, payload: { data: {...} } }, snake_case,
+        // with the field data nested under payload.data. Using the
+        // API.addRecord({ formName, data }) shape (camelCase, unwrapped) is
+        // what was producing EXTRA_KEY_FOUND_IN_JSON - Zoho's official
+        // widget SDK docs confirm this exact shape.
         async function saveInvoice() {
-            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.DATA) {
                 alert('Save is only available when this widget is running inside Zoho Creator.');
                 return;
             }
@@ -755,9 +763,12 @@
             saveBtn.innerText = 'Saving...';
 
             try {
-                const response = await ZOHO.CREATOR.API.addRecord({
-                    formName: SAVE_INVOICE_CONFIG.FORM_NAME,
-                    data: buildInvoicePayload(customerId)
+                const response = await ZOHO.CREATOR.DATA.addRecords({
+                    app_name: SAVE_INVOICE_CONFIG.APP_NAME,
+                    form_name: SAVE_INVOICE_CONFIG.FORM_NAME,
+                    payload: {
+                        data: buildInvoicePayload(customerId)
+                    }
                 });
 
                 if (response && response.code === 3000) {
