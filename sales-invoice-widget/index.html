@@ -498,22 +498,13 @@
         };
 
         // --- SAVE INVOICE CONFIG ---
-        // Even with Invoice_No confirmed as the correct field link name, the
-        // save still 401s with EXTRA_KEY_FOUND_IN_JSON on it specifically.
-        // Given its type (number) and formatted value ("INV-26-0006"), it's
-        // almost certainly a Zoho native Auto Number field - those are
-        // populated by Zoho automatically on insert and rejected as an input
-        // key via the Add Record API, which is exactly this error. So
-        // Invoice_No is intentionally left out of FIELDS below; the
-        // client-side counting logic above is now just a preview shown
-        // before saving, and saveInvoice() reads the real value back from
-        // the API response afterward.
-        //
-        // Still trimmed down otherwise to only the fields that appeared at
-        // the very top of your field list, before any subform section
-        // (highest confidence they truly belong to Sales_Invoice itself).
-        // Once this minimal set saves cleanly, we'll add the rest back one
-        // at a time and confirm each:
+        // Invoice_No is a plain single-line text field (not Auto Number as
+        // previously assumed) - "INV-26-0006"-style values are valid input,
+        // so it's included below again. Still trimmed down otherwise to only
+        // the fields that appeared at the very top of your field list,
+        // before any subform section (highest confidence they truly belong
+        // to Sales_Invoice itself). Once this set saves cleanly, we'll add
+        // the rest back one at a time and confirm each:
         //   - Total_Product_Amount / Total_Purchase_Amount /
         //     Total_Service_Amount / Total_Sales_Return_Amount,
         //     Calculations_Involved, Invoice_Type, Choose_Sales_Return -
@@ -530,6 +521,7 @@
         const SAVE_INVOICE_CONFIG = {
             FORM_NAME: "Sales_Invoice",
             FIELDS: {
+                invoiceNo: "Invoice_No",
                 invoiceDate: "Invoice_Date",
                 dueDate: "Due_Date",
                 customer: "Customer",
@@ -795,6 +787,7 @@
             const F = SAVE_INVOICE_CONFIG.FIELDS;
 
             const data = {
+                [F.invoiceNo]: document.getElementById('invoiceNo').value,
                 [F.invoiceDate]: formatDateForZoho(document.getElementById('invoiceDate').value),
                 [F.dueDate]: formatDateForZoho(document.getElementById('dueDate').value),
                 [F.customer]: customerId,
