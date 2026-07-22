@@ -720,11 +720,15 @@
 
             if (typeof ZOHO !== 'undefined' && ZOHO.CREATOR && ZOHO.CREATOR.API) {
                 try {
-                    const response = await ZOHO.CREATOR.API.getRecordCount({
+                    // getRecordCount + criteria produced a malformed request
+                    // (404 / code 2930) on this SDK version, so count via
+                    // getAllRecords instead - same method used successfully
+                    // for the Customer fetch.
+                    const response = await ZOHO.CREATOR.API.getAllRecords({
                         reportName: INVOICE_NUMBER_CONFIG.REPORT_NAME,
                         criteria: `${INVOICE_NUMBER_CONFIG.FIELD_NAME}.startsWith("${yearPrefix}")`
                     });
-                    const existingCount = (response && response.code === 3000) ? parseInt(response.result, 10) || 0 : 0;
+                    const existingCount = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data.length : 0;
                     const nextNumber = existingCount + 1;
                     const paddedNumber = String(nextNumber).padStart(INVOICE_NUMBER_CONFIG.PAD_LENGTH, '0');
                     invoiceNoInput.value = `${yearPrefix}${paddedNumber}`;
