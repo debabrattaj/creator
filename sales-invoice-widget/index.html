@@ -540,9 +540,14 @@
             }
         };
 
-        let customersById = {};
+        const PRICE_LEVEL_CONFIG = {
+            REPORT_NAME: "Price_Level_Report",
+            FIELDS: {
+                name: "Name"
+            }
+        };
 
-        const PRICE_LEVELS = ["Retail", "Wholesale", "VIP Partner"];
+        let customersById = {};
 
         let activeSections = { purchase: false, product: false, service: false, return: false };
 
@@ -561,16 +566,36 @@
             await Promise.all([
                 generateInvoiceNumber(),
                 loadCustomers(),
-                loadCurrentUserAsSalesman()
+                loadCurrentUserAsSalesman(),
+                loadPriceLevels()
             ]);
 
+            toggleSection('product');
+        }
+
+        async function loadPriceLevels() {
             const priceSelect = document.getElementById('priceLevel');
             priceSelect.innerHTML = '';
-            PRICE_LEVELS.forEach(level => {
-                priceSelect.innerHTML += `<option value="${level}">${level}</option>`;
-            });
 
-            toggleSection('product');
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+                priceSelect.innerHTML = '<option value="">Unavailable outside Zoho Creator</option>';
+                return;
+            }
+
+            try {
+                const response = await ZOHO.CREATOR.API.getAllRecords({
+                    reportName: PRICE_LEVEL_CONFIG.REPORT_NAME,
+                    fieldConfig: "all"
+                });
+                const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                records.forEach(record => {
+                    const name = zohoValueToText(record[PRICE_LEVEL_CONFIG.FIELDS.name]) || record.ID;
+                    priceSelect.innerHTML += `<option value="${record.ID}">${name}</option>`;
+                });
+            } catch (err) {
+                console.error('Failed to fetch price levels from "' + PRICE_LEVEL_CONFIG.REPORT_NAME + '".', err);
+                priceSelect.innerHTML = '<option value="">Failed to load price levels</option>';
+            }
         }
 
         async function loadCustomers() {
