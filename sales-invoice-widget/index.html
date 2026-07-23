@@ -620,8 +620,11 @@
                     reportName: PRODUCT_ITEM_CONFIG.REPORT_NAME,
                     fieldConfig: "all"
                 });
+                console.log('Product items API response:', response);
                 const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
-                console.log('Loaded product items:', records);
+                if (!records.length) {
+                    productItemOptionsHtml += '<option value="" disabled>(no items in ' + PRODUCT_ITEM_CONFIG.REPORT_NAME + ')</option>';
+                }
                 records.forEach(record => {
                     productItemsById[record.ID] = record;
                     const label = zohoValueToText(record[PRODUCT_ITEM_CONFIG.FIELDS.itemDisplay])
@@ -631,6 +634,7 @@
                 });
             } catch (err) {
                 console.error('Failed to fetch product items from "' + PRODUCT_ITEM_CONFIG.REPORT_NAME + '".', err);
+                productItemOptionsHtml += '<option value="" disabled>(failed to load - see console)</option>';
             }
         }
 
