@@ -548,7 +548,39 @@
             }
         };
 
+        const PRODUCT_ITEM_CONFIG = {
+            REPORT_NAME: "Product_Information_Sales_Invoice_Report",
+            SUBFORM_NAME: "Product_Information",
+            FIELDS: {
+                itemDetail: "Item_Detail",
+                itemDisplay: "Item_Details_Display",
+                design: "Design",
+                purity: "Purity",
+                qty: "Qty",
+                grossWeight: "Gross_Weight",
+                netWeight: "Net_Weight",
+                boardRate: "Board_Rate",
+                boardAmount: "Board_Amount",
+                dmdWeight: "DMD_Weight",
+                dmdRate: "DMD_Rate",
+                dmdAmount: "DMD_Amount",
+                csWeight: "CS_Weight",
+                csRate: "CS_Rate",
+                csAmount: "CS_Amount",
+                psWeight: "PS_Weight",
+                psRate: "PS_Rate",
+                psAmount: "PS_Amount",
+                discountType: "Discount_Type",
+                discountPercent: "Discount_percnt",
+                discountRate: "Discount_Rate",
+                discountAmount: "Discount_Amount",
+                lineTotal: "Line_Total"
+            }
+        };
+
         let customersById = {};
+        let productItemsById = {};
+        let productItemOptionsHtml = '';
 
         let activeSections = { purchase: false, product: false, service: false, return: false };
 
@@ -568,10 +600,38 @@
                 generateInvoiceNumber(),
                 loadCustomers(),
                 loadCurrentUserAsSalesman(),
-                loadPriceLevels()
+                loadPriceLevels(),
+                loadProductItems()
             ]);
 
             toggleSection('product');
+        }
+
+        async function loadProductItems() {
+            productItemsById = {};
+            productItemOptionsHtml = '<option value="">-Select Item-</option>';
+
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+                return;
+            }
+
+            try {
+                const response = await ZOHO.CREATOR.API.getAllRecords({
+                    reportName: PRODUCT_ITEM_CONFIG.REPORT_NAME,
+                    fieldConfig: "all"
+                });
+                const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                console.log('Loaded product items:', records);
+                records.forEach(record => {
+                    productItemsById[record.ID] = record;
+                    const label = zohoValueToText(record[PRODUCT_ITEM_CONFIG.FIELDS.itemDisplay])
+                        || zohoValueToText(record[PRODUCT_ITEM_CONFIG.FIELDS.itemDetail])
+                        || record.ID;
+                    productItemOptionsHtml += `<option value="${record.ID}">${label}</option>`;
+                });
+            } catch (err) {
+                console.error('Failed to fetch product items from "' + PRODUCT_ITEM_CONFIG.REPORT_NAME + '".', err);
+            }
         }
 
         async function loadPriceLevels() {
@@ -807,8 +867,56 @@
                 data[F.currentBalance] = parseFloat(customer[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
             }
 
+            if (activeSections.product) {
+                const productRows = collectProductRows();
+                if (productRows.length) data[PRODUCT_ITEM_CONFIG.SUBFORM_NAME] = productRows;
+            }
+
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
             return data;
+        }
+
+        function collectProductRows() {
+            const tbody = document.getElementById('tbody-product');
+            const P = PRODUCT_ITEM_CONFIG.FIELDS;
+            return Array.from(tbody.children).map(tr => {
+                const src = tr._srcRecord || {};
+                const row = {};
+
+                const itemId = rawId(src[P.itemDetail]);
+                if (!itemId) return null;
+                row[P.itemDetail] = itemId;
+
+                const display = zohoValueToText(src[P.itemDisplay]);
+                if (display) row[P.itemDisplay] = display;
+                const designId = rawId(src[P.design]);
+                if (designId) row[P.design] = designId;
+                const purityId = rawId(src[P.purity]);
+                if (purityId) row[P.purity] = purityId;
+
+                row[P.qty] = getVal(tr, '.input-qty');
+                row[P.grossWeight] = getVal(tr, '.input-gwt');
+                row[P.netWeight] = getVal(tr, '.input-nwt');
+                row[P.boardRate] = getVal(tr, '.input-rate');
+                row[P.boardAmount] = getVal(tr, '.input-amt');
+                row[P.dmdWeight] = getVal(tr, '.input-dmd-wt');
+                row[P.dmdRate] = getVal(tr, '.input-dmd-rt');
+                row[P.dmdAmount] = getVal(tr, '.input-dmd-amt');
+                row[P.csWeight] = getVal(tr, '.input-cs-wt');
+                row[P.csRate] = getVal(tr, '.input-cs-rt');
+                row[P.csAmount] = getVal(tr, '.input-cs-amt');
+                row[P.psWeight] = getVal(tr, '.input-ps-wt');
+                row[P.psRate] = getVal(tr, '.input-ps-rt');
+                row[P.psAmount] = getVal(tr, '.input-ps-amt');
+
+                const discType = tr.querySelector('.input-disc-type').value;
+                if (discType && discType !== 'none') row[P.discountType] = discType;
+                row[P.discountPercent] = getVal(tr, '.input-disc-pct');
+                row[P.discountAmount] = getVal(tr, '.input-disc-amt');
+                row[P.lineTotal] = getVal(tr, '.input-linetotal');
+
+                return row;
+            }).filter(Boolean);
         }
 
         function getSelectedCalculations() {
@@ -922,7 +1030,20 @@
             
             const tr = clone.querySelector('tr');
             tr.setAttribute('data-section', section);
-            
+
+            if (section === 'product') {
+                const itemInput = tr.querySelector('.input-item');
+                const itemCell = itemInput.parentElement;
+                const select = document.createElement('select');
+                select.className = 'input-item';
+                select.innerHTML = productItemOptionsHtml;
+                select.addEventListener('change', function() {
+                    applyProductItem(this);
+                });
+                itemCell.innerHTML = '';
+                itemCell.appendChild(select);
+            }
+
             if (section === 'product' || section === 'purchase') {
                 tr.querySelectorAll('.calc-trigger').forEach(input => {
                     input.addEventListener('input', function() {
@@ -965,6 +1086,54 @@
         function getVal(tr, selector) {
             const el = tr.querySelector(selector);
             return el ? (parseFloat(el.value) || 0) : 0;
+        }
+
+        function numOr(value, fallback) {
+            const n = parseFloat(value);
+            return isNaN(n) ? fallback : n;
+        }
+
+        function rawId(value) {
+            if (value === null || value === undefined || value === '') return '';
+            if (typeof value === 'object') return value.ID || value.id || '';
+            return value;
+        }
+
+        function applyProductItem(selectEl) {
+            const tr = selectEl.closest('tr');
+            const record = productItemsById[selectEl.value];
+            if (!record) {
+                delete tr.dataset.hasSource;
+                tr._srcRecord = null;
+                return;
+            }
+            tr._srcRecord = record;
+            const P = PRODUCT_ITEM_CONFIG.FIELDS;
+            const setVal = (sel, val) => {
+                const el = tr.querySelector(sel);
+                if (el) el.value = (val === undefined || val === null) ? '' : val;
+            };
+
+            setVal('.input-design', zohoValueToText(record[P.design]));
+            setVal('.input-purity', zohoValueToText(record[P.purity]));
+            setVal('.input-qty', numOr(record[P.qty], 1));
+            setVal('.input-gwt', numOr(record[P.grossWeight], 0));
+            setVal('.input-nwt', numOr(record[P.netWeight], 0));
+            setVal('.input-rate', numOr(record[P.boardRate], 0));
+            setVal('.input-dmd-wt', numOr(record[P.dmdWeight], 0));
+            setVal('.input-dmd-rt', numOr(record[P.dmdRate], 0));
+            setVal('.input-cs-wt', numOr(record[P.csWeight], 0));
+            setVal('.input-cs-rt', numOr(record[P.csRate], 0));
+            setVal('.input-ps-wt', numOr(record[P.psWeight], 0));
+            setVal('.input-ps-rt', numOr(record[P.psRate], 0));
+            setVal('.input-disc-pct', numOr(record[P.discountPercent], 0));
+
+            const discType = String(record[P.discountType] || '').toLowerCase();
+            const discSel = tr.querySelector('.input-disc-type');
+            if (discType.includes('perc') || discType === '%') discSel.value = 'percent';
+            else if (discType.includes('amt') || discType.includes('amount')) discSel.value = 'amount';
+
+            calcRow(tr.querySelector('.input-nwt'));
         }
 
         function calcRow(inputElem) {
