@@ -486,6 +486,7 @@
                 dueDate: "Due_Date",
                 customer: "Customer",
                 salesman: "Salesman",
+                priceLevel: "Price_Level",
                 currentBalance: "Current_Balance",
                 refNo: "Reference_Number",
                 totalProduct: "Total_Product_Amount",
@@ -799,6 +800,8 @@
             if (refNo) data[F.refNo] = refNo;
             const salesmanId = document.getElementById('salesmanSelect').value;
             if (salesmanId) data[F.salesman] = salesmanId;
+            const priceLevelId = document.getElementById('priceLevel').value;
+            if (priceLevelId) data[F.priceLevel] = priceLevelId;
             const customer = customersById[customerId];
             if (customer) {
                 data[F.currentBalance] = parseFloat(customer[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
