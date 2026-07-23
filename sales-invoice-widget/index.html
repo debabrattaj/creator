@@ -548,39 +548,120 @@
             }
         };
 
-        const PRODUCT_ITEM_CONFIG = {
-            REPORT_NAME: "Product_Information_Sales_Invoice_Report",
-            SUBFORM_NAME: "Product_Information",
-            FIELDS: {
-                itemDetail: "Item_Detail",
-                itemDisplay: "Item_Details_Display",
-                design: "Design",
-                purity: "Purity",
-                qty: "Qty",
-                grossWeight: "Gross_Weight",
-                netWeight: "Net_Weight",
-                boardRate: "Board_Rate",
-                boardAmount: "Board_Amount",
-                dmdWeight: "DMD_Weight",
-                dmdRate: "DMD_Rate",
-                dmdAmount: "DMD_Amount",
-                csWeight: "CS_Weight",
-                csRate: "CS_Rate",
-                csAmount: "CS_Amount",
-                psWeight: "PS_Weight",
-                psRate: "PS_Rate",
-                psAmount: "PS_Amount",
-                discountType: "Discount_Type",
-                discountPercent: "Discount_percnt",
-                discountRate: "Discount_Rate",
-                discountAmount: "Discount_Amount",
-                lineTotal: "Line_Total"
+        const ITEM_SOURCES = {
+            product: {
+                reportName: "Product_Information_Sales_Invoice_Report",
+                subformName: "Product_Information",
+                itemDetailField: "Item_Detail",
+                itemDisplayField: "Item_Details_Display",
+                autofill: [
+                    { field: "Design", sel: ".input-design", text: true },
+                    { field: "Purity", sel: ".input-purity", text: true },
+                    { field: "Qty", sel: ".input-qty" },
+                    { field: "Gross_Weight", sel: ".input-gwt" },
+                    { field: "Net_Weight", sel: ".input-nwt" },
+                    { field: "Board_Rate", sel: ".input-rate" },
+                    { field: "DMD_Weight", sel: ".input-dmd-wt" },
+                    { field: "DMD_Rate", sel: ".input-dmd-rt" },
+                    { field: "CS_Weight", sel: ".input-cs-wt" },
+                    { field: "CS_Rate", sel: ".input-cs-rt" },
+                    { field: "PS_Weight", sel: ".input-ps-wt" },
+                    { field: "PS_Rate", sel: ".input-ps-rt" },
+                    { field: "Discount_percnt", sel: ".input-disc-pct" }
+                ],
+                save: [
+                    { field: "Item_Detail", srcId: "Item_Detail" },
+                    { field: "Item_Details_Display", srcText: "Item_Details_Display" },
+                    { field: "Design", srcId: "Design" },
+                    { field: "Purity", srcId: "Purity" },
+                    { field: "Qty", sel: ".input-qty" },
+                    { field: "Gross_Weight", sel: ".input-gwt" },
+                    { field: "Net_Weight", sel: ".input-nwt" },
+                    { field: "Board_Rate", sel: ".input-rate" },
+                    { field: "Board_Amount", sel: ".input-amt" },
+                    { field: "DMD_Weight", sel: ".input-dmd-wt" },
+                    { field: "DMD_Rate", sel: ".input-dmd-rt" },
+                    { field: "DMD_Amount", sel: ".input-dmd-amt" },
+                    { field: "CS_Weight", sel: ".input-cs-wt" },
+                    { field: "CS_Rate", sel: ".input-cs-rt" },
+                    { field: "CS_Amount", sel: ".input-cs-amt" },
+                    { field: "PS_Weight", sel: ".input-ps-wt" },
+                    { field: "PS_Rate", sel: ".input-ps-rt" },
+                    { field: "PS_Amount", sel: ".input-ps-amt" },
+                    { field: "Discount_percnt", sel: ".input-disc-pct" },
+                    { field: "Discount_Amount", sel: ".input-disc-amt" },
+                    { field: "Line_Total", sel: ".input-linetotal" }
+                ]
+            },
+            purchase: {
+                reportName: "Purchase_Old_Gold_Report",
+                subformName: "Purchase_Information",
+                itemDetailField: "Item_Detail",
+                itemDisplayField: "",
+                autofill: [
+                    { field: "Purity", sel: ".input-purity", text: true },
+                    { field: "Gross_Weight", sel: ".input-gwt" },
+                    { field: "Net_Weight", sel: ".input-nwt" },
+                    { field: "Board_Rate", sel: ".input-rate" },
+                    { field: "Stone_Weight", sel: ".input-cs-wt" },
+                    { field: "Stone_Rate", sel: ".input-cs-rt" }
+                ],
+                save: [
+                    { field: "Item_Detail", srcId: "Item_Detail" },
+                    { field: "Purity", srcId: "Purity" },
+                    { field: "Gross_Weight", sel: ".input-gwt" },
+                    { field: "Net_Weight", sel: ".input-nwt" },
+                    { field: "Board_Rate", sel: ".input-rate" },
+                    { field: "Stone_Weight", sel: ".input-cs-wt" },
+                    { field: "Stone_Rate", sel: ".input-cs-rt" },
+                    { field: "Stone_Amount", sel: ".input-cs-amt" },
+                    { field: "Mud_Weight", srcNum: "Mud_Weight" },
+                    { field: "Line_Total", sel: ".input-linetotal" }
+                ]
+            },
+            return: {
+                reportName: "Product_Information_Sales_Return_Report",
+                subformName: "Sales_Return_Item",
+                itemDetailField: "Item_Detail",
+                itemDisplayField: "",
+                customerField: "Customer",
+                amountField: "Line_Total",
+                qtyField: "Qty",
+                autofill: [],
+                save: [
+                    { field: "Item_Detail", srcId: "Item_Detail" },
+                    { field: "Design_Style", srcId: "Design_Style" },
+                    { field: "Purity", srcId: "Purity" },
+                    { field: "Qty", srcNum: "Qty" },
+                    { field: "Gross_Weight", srcNum: "Gross_Weight" },
+                    { field: "Net_Weight", srcNum: "Net_Weight" },
+                    { field: "Board_Rate", srcNum: "Board_Rate" },
+                    { field: "Board_Amount", srcNum: "Board_Amount" },
+                    { field: "DMD_Weight", srcNum: "DMD_Weight" },
+                    { field: "DMD_Rate", srcNum: "DMD_Rate" },
+                    { field: "DMD_Amount", srcNum: "DMD_Amount" },
+                    { field: "CS_Weight", srcNum: "CS_Weight" },
+                    { field: "CS_Rate", srcNum: "CS_Rate" },
+                    { field: "CS_Amount", srcNum: "CS_Amount" },
+                    { field: "PS_Weight", srcNum: "PS_Weight" },
+                    { field: "PS_Rate", srcNum: "PS_Rate" },
+                    { field: "PS_Amount", srcNum: "PS_Amount" },
+                    { field: "Disc_Type", srcText: "Disc_Type" },
+                    { field: "Disc_RT", srcNum: "Disc_RT" },
+                    { field: "Discount", srcNum: "Discount" },
+                    { field: "Discount_Amount", srcNum: "Discount_Amount" },
+                    { field: "Service_Item", srcText: "Service_Item" },
+                    { field: "Service_Rate", srcNum: "Service_Rate" },
+                    { field: "Service_Amount", srcNum: "Service_Amount" },
+                    { field: "Service_percnt", srcNum: "Service_percnt" },
+                    { field: "Line_Total", srcNum: "Line_Total" }
+                ]
             }
         };
 
         let customersById = {};
-        let productItemsById = {};
-        let productItemOptionsHtml = '';
+        let itemsBySection = { product: {}, purchase: {}, return: {} };
+        let itemOptionsBySection = { product: '', purchase: '', return: '' };
 
         let activeSections = { purchase: false, product: false, service: false, return: false };
 
@@ -601,15 +682,18 @@
                 loadCustomers(),
                 loadCurrentUserAsSalesman(),
                 loadPriceLevels(),
-                loadProductItems()
+                loadItemSource('product'),
+                loadItemSource('purchase'),
+                loadItemSource('return')
             ]);
 
             toggleSection('product');
         }
 
-        async function loadProductItems() {
-            productItemsById = {};
-            productItemOptionsHtml = '<option value="">-Select Item-</option>';
+        async function loadItemSource(section) {
+            const cfg = ITEM_SOURCES[section];
+            itemsBySection[section] = {};
+            itemOptionsBySection[section] = '<option value="">-Select Item-</option>';
 
             if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
                 return;
@@ -617,23 +701,22 @@
 
             try {
                 const response = await ZOHO.CREATOR.API.getAllRecords({
-                    reportName: PRODUCT_ITEM_CONFIG.REPORT_NAME,
+                    reportName: cfg.reportName,
                     fieldConfig: "all"
                 });
-                console.log('Product items API response:', response);
                 const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                if (records[0]) console.log(`Sample ${section} item record:`, records[0]);
                 if (!records.length) {
-                    productItemOptionsHtml += '<option value="" disabled>(no items in ' + PRODUCT_ITEM_CONFIG.REPORT_NAME + ')</option>';
+                    itemOptionsBySection[section] += '<option value="" disabled>(no items in ' + cfg.reportName + ')</option>';
                 }
-                if (records[0]) console.log('Sample product item record:', records[0]);
                 records.forEach(record => {
-                    productItemsById[record.ID] = record;
-                    const label = itemLabel(record) || record.ID;
-                    productItemOptionsHtml += `<option value="${record.ID}">${label}</option>`;
+                    itemsBySection[section][record.ID] = record;
+                    const label = itemLabel(section, record) || record.ID;
+                    itemOptionsBySection[section] += `<option value="${record.ID}">${label}</option>`;
                 });
             } catch (err) {
-                console.error('Failed to fetch product items from "' + PRODUCT_ITEM_CONFIG.REPORT_NAME + '".', err);
-                productItemOptionsHtml += '<option value="" disabled>(failed to load - see console)</option>';
+                console.error('Failed to fetch items from "' + cfg.reportName + '".', err);
+                itemOptionsBySection[section] += '<option value="" disabled>(failed to load - see console)</option>';
             }
         }
 
@@ -758,11 +841,11 @@
             return /^\d{10,}$/.test(String(value).trim());
         }
 
-        function itemLabel(record) {
-            const P = PRODUCT_ITEM_CONFIG.FIELDS;
+        function itemLabel(section, record) {
+            const cfg = ITEM_SOURCES[section];
             const candidates = [
-                zohoValueToText(record[P.itemDetail]),
-                zohoValueToText(record[P.itemDisplay])
+                cfg.itemDetailField ? zohoValueToText(record[cfg.itemDetailField]) : '',
+                cfg.itemDisplayField ? zohoValueToText(record[cfg.itemDisplayField]) : ''
             ];
             const named = candidates.find(c => c && !isZohoId(c));
             if (named) return named;
@@ -885,54 +968,38 @@
                 data[F.currentBalance] = parseFloat(customer[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
             }
 
-            if (activeSections.product) {
-                const productRows = collectProductRows();
-                if (productRows.length) data[PRODUCT_ITEM_CONFIG.SUBFORM_NAME] = productRows;
-            }
+            ['product', 'purchase', 'return'].forEach(section => {
+                if (!activeSections[section]) return;
+                const rows = collectItemRows(section);
+                if (rows.length) data[ITEM_SOURCES[section].subformName] = rows;
+            });
 
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
             return data;
         }
 
-        function collectProductRows() {
-            const tbody = document.getElementById('tbody-product');
-            const P = PRODUCT_ITEM_CONFIG.FIELDS;
+        function collectItemRows(section) {
+            const cfg = ITEM_SOURCES[section];
+            const tbody = document.getElementById(`tbody-${section}`);
             return Array.from(tbody.children).map(tr => {
                 const src = tr._srcRecord || {};
-                const row = {};
-
-                const itemId = rawId(src[P.itemDetail]);
+                const itemId = rawId(src[cfg.itemDetailField]);
                 if (!itemId) return null;
-                row[P.itemDetail] = itemId;
 
-                const display = zohoValueToText(src[P.itemDisplay]);
-                if (display) row[P.itemDisplay] = display;
-                const designId = rawId(src[P.design]);
-                if (designId) row[P.design] = designId;
-                const purityId = rawId(src[P.purity]);
-                if (purityId) row[P.purity] = purityId;
-
-                row[P.qty] = getVal(tr, '.input-qty');
-                row[P.grossWeight] = getVal(tr, '.input-gwt');
-                row[P.netWeight] = getVal(tr, '.input-nwt');
-                row[P.boardRate] = getVal(tr, '.input-rate');
-                row[P.boardAmount] = getVal(tr, '.input-amt');
-                row[P.dmdWeight] = getVal(tr, '.input-dmd-wt');
-                row[P.dmdRate] = getVal(tr, '.input-dmd-rt');
-                row[P.dmdAmount] = getVal(tr, '.input-dmd-amt');
-                row[P.csWeight] = getVal(tr, '.input-cs-wt');
-                row[P.csRate] = getVal(tr, '.input-cs-rt');
-                row[P.csAmount] = getVal(tr, '.input-cs-amt');
-                row[P.psWeight] = getVal(tr, '.input-ps-wt');
-                row[P.psRate] = getVal(tr, '.input-ps-rt');
-                row[P.psAmount] = getVal(tr, '.input-ps-amt');
-
-                const discType = tr.querySelector('.input-disc-type').value;
-                if (discType && discType !== 'none') row[P.discountType] = discType;
-                row[P.discountPercent] = getVal(tr, '.input-disc-pct');
-                row[P.discountAmount] = getVal(tr, '.input-disc-amt');
-                row[P.lineTotal] = getVal(tr, '.input-linetotal');
-
+                const row = {};
+                cfg.save.forEach(map => {
+                    if (map.srcId) {
+                        const id = rawId(src[map.field]);
+                        if (id) row[map.field] = id;
+                    } else if (map.srcText) {
+                        const text = zohoValueToText(src[map.srcText]);
+                        if (text) row[map.field] = text;
+                    } else if (map.srcNum) {
+                        row[map.field] = numOr(src[map.srcNum], 0);
+                    } else if (map.sel) {
+                        row[map.field] = getVal(tr, map.sel);
+                    }
+                });
                 return row;
             }).filter(Boolean);
         }
@@ -1049,14 +1116,14 @@
             const tr = clone.querySelector('tr');
             tr.setAttribute('data-section', section);
 
-            if (section === 'product') {
+            if (section === 'product' || section === 'purchase') {
                 const itemInput = tr.querySelector('.input-item');
                 const itemCell = itemInput.parentElement;
                 const select = document.createElement('select');
                 select.className = 'input-item';
-                select.innerHTML = productItemOptionsHtml;
+                select.innerHTML = itemOptionsBySection[section];
                 select.addEventListener('change', function() {
-                    applyProductItem(this);
+                    applyItemToRow(this, section);
                 });
                 itemCell.innerHTML = '';
                 itemCell.appendChild(select);
@@ -1117,39 +1184,20 @@
             return value;
         }
 
-        function applyProductItem(selectEl) {
+        function applyItemToRow(selectEl, section) {
             const tr = selectEl.closest('tr');
-            const record = productItemsById[selectEl.value];
+            const record = itemsBySection[section][selectEl.value];
             if (!record) {
-                delete tr.dataset.hasSource;
                 tr._srcRecord = null;
                 return;
             }
             tr._srcRecord = record;
-            const P = PRODUCT_ITEM_CONFIG.FIELDS;
-            const setVal = (sel, val) => {
-                const el = tr.querySelector(sel);
-                if (el) el.value = (val === undefined || val === null) ? '' : val;
-            };
 
-            setVal('.input-design', zohoValueToText(record[P.design]));
-            setVal('.input-purity', zohoValueToText(record[P.purity]));
-            setVal('.input-qty', numOr(record[P.qty], 1));
-            setVal('.input-gwt', numOr(record[P.grossWeight], 0));
-            setVal('.input-nwt', numOr(record[P.netWeight], 0));
-            setVal('.input-rate', numOr(record[P.boardRate], 0));
-            setVal('.input-dmd-wt', numOr(record[P.dmdWeight], 0));
-            setVal('.input-dmd-rt', numOr(record[P.dmdRate], 0));
-            setVal('.input-cs-wt', numOr(record[P.csWeight], 0));
-            setVal('.input-cs-rt', numOr(record[P.csRate], 0));
-            setVal('.input-ps-wt', numOr(record[P.psWeight], 0));
-            setVal('.input-ps-rt', numOr(record[P.psRate], 0));
-            setVal('.input-disc-pct', numOr(record[P.discountPercent], 0));
-
-            const discType = String(record[P.discountType] || '').toLowerCase();
-            const discSel = tr.querySelector('.input-disc-type');
-            if (discType.includes('perc') || discType === '%') discSel.value = 'percent';
-            else if (discType.includes('amt') || discType.includes('amount')) discSel.value = 'amount';
+            ITEM_SOURCES[section].autofill.forEach(map => {
+                const el = tr.querySelector(map.sel);
+                if (!el) return;
+                el.value = map.text ? zohoValueToText(record[map.field]) : numOr(record[map.field], 0);
+            });
 
             calcRow(tr.querySelector('.input-nwt'));
         }
@@ -1259,10 +1307,13 @@
         }
 
         function fetchPastPurchases(customerId) {
-            return Promise.resolve([
-                { inv: "INV-001", item: "22K Gold Bangle", qty: 1, amount: 45000 },
-                { inv: "INV-002", item: "Diamond Ring", qty: 1, amount: 120000 }
-            ]);
+            const cfg = ITEM_SOURCES.return;
+            const all = Object.values(itemsBySection.return);
+            const forCustomer = all.filter(r => {
+                const recCust = rawId(r[cfg.customerField]);
+                return !recCust || String(recCust) === String(customerId);
+            });
+            return forCustomer.length ? forCustomer : all;
         }
 
         function triggerSalesReturn() {
@@ -1274,43 +1325,57 @@
                 alert("Please select a Customer first to fetch their past purchases.");
                 return;
             }
-            
+
+            const cfg = ITEM_SOURCES.return;
             const customerName = (customersById[customer] && customersById[customer][CUSTOMER_CONFIG.FIELDS.name]) || customer;
             document.getElementById('modal-customer-text').innerText = `Showing purchases for ${customerName}.`;
             const listDiv = document.getElementById('past-purchases-list');
-            listDiv.innerHTML = '<p class="text-sm text-slate-500">Loading...</p>';
 
-            fetchPastPurchases(customer).then(items => {
-                listDiv.innerHTML = '';
-                items.forEach(item => {
-                    listDiv.innerHTML += `
-                        <div class="flex justify-between items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
-                            <div>
-                                <p class="font-medium text-[13px] text-slate-800">${item.item} <span class="text-xs text-slate-500 ml-2">(${item.inv})</span></p>
-                                <p class="text-xs text-slate-500 mt-1">Qty: ${item.qty} | Amt: ${formatCurrency(item.amount)}</p>
-                            </div>
-                            <button onclick="addReturnItem('${item.inv}', '${item.item}', ${item.qty}, ${item.amount})" class="px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded border border-indigo-100 hover:bg-indigo-100">Add to Return</button>
-                        </div>
-                    `;
-                });
+            const records = fetchPastPurchases(customer);
+            if (!records.length) {
+                listDiv.innerHTML = '<p class="text-sm text-slate-500">No past purchases found.</p>';
                 openReturnModal();
+                return;
+            }
+
+            listDiv.innerHTML = '';
+            records.forEach(record => {
+                const label = itemLabel('return', record) || record.ID;
+                const qty = numOr(record[cfg.qtyField], 1);
+                const amount = numOr(record[cfg.amountField], 0);
+                listDiv.innerHTML += `
+                    <div class="flex justify-between items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
+                        <div>
+                            <p class="font-medium text-[13px] text-slate-800">${label}</p>
+                            <p class="text-xs text-slate-500 mt-1">Qty: ${qty} | Amt: ${formatCurrency(amount)}</p>
+                        </div>
+                        <button onclick="addReturnItem('${record.ID}')" class="px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded border border-indigo-100 hover:bg-indigo-100">Add to Return</button>
+                    </div>
+                `;
             });
+            openReturnModal();
         }
         function openReturnModal() { document.getElementById('returnModal').classList.remove('hidden'); }
         function closeReturnModal() { document.getElementById('returnModal').classList.add('hidden'); }
 
-        function addReturnItem(inv, item, qty, amount) {
+        function addReturnItem(recordId) {
+            const cfg = ITEM_SOURCES.return;
+            const record = itemsBySection.return[recordId];
+            if (!record) return;
+
             const template = document.getElementById('tpl-return-row');
             const clone = template.content.cloneNode(true);
             const tr = clone.querySelector('tr');
             tr.setAttribute('data-section', 'return');
-            
-            tr.querySelector('.input-ret-inv').value = inv;
-            tr.querySelector('.input-ret-item').value = item;
-            tr.querySelector('.input-ret-qty').value = qty;
+            tr._srcRecord = record;
+
+            const amount = numOr(record[cfg.amountField], 0);
+            tr.querySelector('.input-ret-inv').value = rawId(record.Point_of_Sale) || rawId(record.Sales_Invoice) || '';
+            tr.querySelector('.input-ret-item').value = itemLabel('return', record) || record.ID;
+            tr.querySelector('.input-ret-qty').value = numOr(record[cfg.qtyField], 1);
             tr.querySelector('.input-ret-amt').value = amount;
             tr.querySelector('.input-ret-linetotal').value = amount.toFixed(2);
-            
+
             document.getElementById('tbody-return').appendChild(clone);
             updateRowIndices('return');
             closeReturnModal();
