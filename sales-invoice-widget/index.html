@@ -486,6 +486,7 @@
                 dueDate: "Due_Date",
                 customer: "Customer",
                 salesman: "Salesman",
+                currentBalance: "Current_Balance",
                 refNo: "Reference_Number",
                 totalProduct: "Total_Product_Amount",
                 totalPurchase: "Total_Purchase_Amount",
@@ -773,6 +774,10 @@
             if (refNo) data[F.refNo] = refNo;
             const salesmanId = document.getElementById('salesmanSelect').value;
             if (salesmanId) data[F.salesman] = salesmanId;
+            const customer = customersById[customerId];
+            if (customer) {
+                data[F.currentBalance] = parseFloat(customer[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
+            }
 
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
             return data;
