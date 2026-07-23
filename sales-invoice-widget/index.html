@@ -625,11 +625,10 @@
                 if (!records.length) {
                     productItemOptionsHtml += '<option value="" disabled>(no items in ' + PRODUCT_ITEM_CONFIG.REPORT_NAME + ')</option>';
                 }
+                if (records[0]) console.log('Sample product item record:', records[0]);
                 records.forEach(record => {
                     productItemsById[record.ID] = record;
-                    const label = zohoValueToText(record[PRODUCT_ITEM_CONFIG.FIELDS.itemDisplay])
-                        || zohoValueToText(record[PRODUCT_ITEM_CONFIG.FIELDS.itemDetail])
-                        || record.ID;
+                    const label = itemLabel(record) || record.ID;
                     productItemOptionsHtml += `<option value="${record.ID}">${label}</option>`;
                 });
             } catch (err) {
@@ -753,6 +752,21 @@
                 return '';
             }
             return String(value).trim();
+        }
+
+        function isZohoId(value) {
+            return /^\d{10,}$/.test(String(value).trim());
+        }
+
+        function itemLabel(record) {
+            const P = PRODUCT_ITEM_CONFIG.FIELDS;
+            const candidates = [
+                zohoValueToText(record[P.itemDetail]),
+                zohoValueToText(record[P.itemDisplay])
+            ];
+            const named = candidates.find(c => c && !isZohoId(c));
+            if (named) return named;
+            return candidates.find(Boolean) || '';
         }
 
         async function generateInvoiceNumber() {
