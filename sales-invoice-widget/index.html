@@ -1331,9 +1331,14 @@
             document.getElementById('modal-customer-text').innerText = `Showing purchases for ${customerName}.`;
             const listDiv = document.getElementById('past-purchases-list');
 
-            const records = fetchPastPurchases(customer);
+            const addedIds = new Set(
+                Array.from(document.getElementById('tbody-return').children)
+                    .map(tr => tr._srcRecord && tr._srcRecord.ID)
+                    .filter(Boolean)
+            );
+            const records = fetchPastPurchases(customer).filter(r => !addedIds.has(r.ID));
             if (!records.length) {
-                listDiv.innerHTML = '<p class="text-sm text-slate-500">No past purchases found.</p>';
+                listDiv.innerHTML = '<p class="text-sm text-slate-500">No more past purchases to return.</p>';
                 openReturnModal();
                 return;
             }
