@@ -593,7 +593,9 @@
         const SERVICE_MASTER_CONFIG = {
             REPORT_NAME: "Service_Master_Report",
             FIELDS: {
-                name: "Service_Name"
+                name: "Service_Name",
+                descriptionCandidates: ["Description", "Service_Description", "Details", "Desc"],
+                rateCandidates: ["Rate", "Service_Rate", "Price", "Amount"]
             }
         };
 
@@ -1265,7 +1267,12 @@
 
             if (section === 'service' && serviceOptionsHtml) {
                 const svcSelect = tr.querySelector('.input-svc-type');
-                if (svcSelect) svcSelect.innerHTML = serviceOptionsHtml;
+                if (svcSelect) {
+                    svcSelect.innerHTML = serviceOptionsHtml;
+                    svcSelect.addEventListener('change', function() {
+                        applyServiceMaster(this);
+                    });
+                }
             }
 
             if (section === 'product' || section === 'purchase') {
@@ -1396,6 +1403,30 @@
             const rate = getVal(tr, '.input-svc-rate');
             tr.querySelector('.input-svc-linetotal').value = (qty * rate).toFixed(2);
             calculateInvoiceTotals();
+        }
+
+        function firstFieldValue(record, candidates) {
+            for (const f of candidates) {
+                const v = zohoValueToText(record[f]);
+                if (v) return v;
+            }
+            return '';
+        }
+
+        function applyServiceMaster(selectEl) {
+            const tr = selectEl.closest('tr');
+            const record = serviceMasterById[selectEl.value];
+            if (!record) return;
+
+            const desc = firstFieldValue(record, SERVICE_MASTER_CONFIG.FIELDS.descriptionCandidates);
+            if (desc) tr.querySelector('.input-svc-desc').value = desc;
+
+            const rate = firstFieldValue(record, SERVICE_MASTER_CONFIG.FIELDS.rateCandidates);
+            if (rate && !isNaN(parseFloat(rate))) {
+                tr.querySelector('.input-svc-rate').value = parseFloat(rate);
+            }
+
+            calcServiceRow(tr.querySelector('.input-svc-qty'));
         }
 
         function calculateInvoiceTotals() {
