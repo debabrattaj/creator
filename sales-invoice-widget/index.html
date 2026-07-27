@@ -930,6 +930,22 @@
             return candidates.find(Boolean) || '';
         }
 
+        function returnItemAmount(record) {
+            const parts = ['Board_Amount', 'DMD_Amount', 'CS_Amount', 'PS_Amount', 'Service_Amount']
+                .reduce((sum, f) => sum + numOr(record[f], 0), 0);
+            const net = parts - numOr(record.Discount_Amount, 0);
+            return net || numOr(record.Line_Total, 0);
+        }
+
+        function returnItemInvoice(record) {
+            const candidates = [
+                zohoValueToText(record.Product_Information_Sales_Invoice),
+                zohoValueToText(record.Point_of_Sale),
+                zohoValueToText(record.Sales_Invoice)
+            ];
+            return candidates.find(Boolean) || '';
+        }
+
         async function generateInvoiceNumber() {
             const invoiceNoInput = document.getElementById('invoiceNo');
             invoiceNoInput.value = "Generating...";
@@ -1423,13 +1439,6 @@
                     .filter(Boolean)
             );
             const records = fetchPastPurchases(customer).filter(r => !addedIds.has(r.ID));
-            console.table(records.map(r => ({
-                item: itemLabel('return', r),
-                Qty: r.Qty,
-                Line_Total: r.Line_Total,
-                Board_Amount: r.Board_Amount,
-                Discount_Amount: r.Discount_Amount
-            })));
             if (!records.length) {
                 listDiv.innerHTML = '<p class="text-sm text-slate-500">No more past purchases to return.</p>';
                 openReturnModal();
@@ -1440,7 +1449,7 @@
             records.forEach(record => {
                 const label = itemLabel('return', record) || record.ID;
                 const qty = numOr(record[cfg.qtyField], 1);
-                const amount = numOr(record[cfg.amountField], 0);
+                const amount = returnItemAmount(record);
                 listDiv.innerHTML += `
                     <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
                         <input type="checkbox" class="return-select w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500" value="${record.ID}">
@@ -1502,8 +1511,8 @@
             tr.setAttribute('data-section', 'return');
             tr._srcRecord = record;
 
-            const amount = numOr(record[cfg.amountField], 0);
-            tr.querySelector('.input-ret-inv').value = rawId(record.Point_of_Sale) || rawId(record.Sales_Invoice) || '';
+            const amount = returnItemAmount(record);
+            tr.querySelector('.input-ret-inv').value = returnItemInvoice(record);
             tr.querySelector('.input-ret-item').value = itemLabel('return', record) || record.ID;
             tr.querySelector('.input-ret-qty').value = numOr(record[cfg.qtyField], 1);
             tr.querySelector('.input-ret-amt').value = amount;
