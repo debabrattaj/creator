@@ -358,6 +358,10 @@
                             <button onclick="document.getElementById('global-charges').focus()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> Add Charges
                             </button>
+                            <button onclick="openPaymentModal()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payment
+                            </button>
+                            <div id="payment-summary" class="hidden text-[12px] text-slate-600 px-1 pt-1"></div>
                         </div>
                     </div>
                 </div>
@@ -378,6 +382,43 @@
             </div>
             <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
                 <button onclick="closeReturnModal()" class="px-4 py-2 text-[13px] font-medium border border-slate-300 rounded text-slate-700 bg-white shadow-sm">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="paymentModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center">
+        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-base font-semibold text-slate-800">Payment</h3>
+                <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Payment Type</label>
+                    <select id="paymentType" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm">
+                        <option value="Cash">Cash</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Cheque">Cheque</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Amount</label>
+                    <div class="flex items-center border border-slate-300 rounded-md px-3 py-2 bg-white shadow-sm">
+                        <span class="text-slate-400 mr-1">₹</span>
+                        <input type="number" id="paymentAmount" class="w-full outline-none text-slate-800 bg-transparent p-0 border-0" value="0">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Reference / Note <span class="text-slate-400">(optional)</span></label>
+                    <input type="text" id="paymentRef" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm" placeholder="Txn ID, cheque no, etc.">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
+                <button onclick="closePaymentModal()" class="px-4 py-2 text-[13px] font-medium border border-slate-300 rounded text-slate-700 bg-white shadow-sm">Cancel</button>
+                <button onclick="savePayment()" class="px-4 py-2 text-[13px] font-medium rounded bg-indigo-600 text-white shadow-sm hover:bg-indigo-700">Save Payment</button>
             </div>
         </div>
     </div>
@@ -695,6 +736,7 @@
         };
 
         let customersById = {};
+        let paymentInfo = null;
         let itemsBySection = { product: {}, purchase: {}, return: {} };
         let itemOptionsBySection = { product: '', purchase: '', return: '' };
 
@@ -1399,6 +1441,30 @@
         }
         function openReturnModal() { document.getElementById('returnModal').classList.remove('hidden'); }
         function closeReturnModal() { document.getElementById('returnModal').classList.add('hidden'); }
+
+        function openPaymentModal() {
+            if (paymentInfo) {
+                document.getElementById('paymentType').value = paymentInfo.type;
+                document.getElementById('paymentAmount').value = paymentInfo.amount;
+                document.getElementById('paymentRef').value = paymentInfo.reference || '';
+            } else {
+                document.getElementById('paymentAmount').value = parseAmount(document.getElementById('sum-grandtotal').innerText);
+            }
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
+
+        function savePayment() {
+            paymentInfo = {
+                type: document.getElementById('paymentType').value,
+                amount: parseFloat(document.getElementById('paymentAmount').value) || 0,
+                reference: document.getElementById('paymentRef').value.trim()
+            };
+            const summary = document.getElementById('payment-summary');
+            summary.classList.remove('hidden');
+            summary.innerText = `Payment: ${paymentInfo.type} — ${formatCurrency(paymentInfo.amount)}${paymentInfo.reference ? ' (' + paymentInfo.reference + ')' : ''}`;
+            closePaymentModal();
+        }
 
         function addReturnItem(recordId) {
             const cfg = ITEM_SOURCES.return;
