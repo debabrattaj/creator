@@ -1419,7 +1419,7 @@
             if (!record) return;
 
             const desc = firstFieldValue(record, SERVICE_MASTER_CONFIG.FIELDS.descriptionCandidates);
-            if (desc) tr.querySelector('.input-svc-desc').value = desc;
+            tr.querySelector('.input-svc-desc').value = desc;
 
             const rate = firstFieldValue(record, SERVICE_MASTER_CONFIG.FIELDS.rateCandidates);
             if (rate && !isNaN(parseFloat(rate))) {
