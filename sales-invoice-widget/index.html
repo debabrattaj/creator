@@ -938,12 +938,17 @@
         }
 
         function returnItemInvoice(record) {
+            const linkedId = rawId(record.Product_Information_Sales_Invoice);
+            if (linkedId && itemsBySection.product[linkedId]) {
+                const name = itemLabel('product', itemsBySection.product[linkedId]);
+                if (name) return name;
+            }
             const candidates = [
                 zohoValueToText(record.Product_Information_Sales_Invoice),
                 zohoValueToText(record.Point_of_Sale),
                 zohoValueToText(record.Sales_Invoice)
             ];
-            return candidates.find(Boolean) || '';
+            return candidates.find(c => c && !isZohoId(c)) || '';
         }
 
         async function generateInvoiceNumber() {
