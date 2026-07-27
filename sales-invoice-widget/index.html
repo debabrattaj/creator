@@ -1326,12 +1326,12 @@
             const globalDiscount = parseFloat(document.getElementById('global-discount').value) || 0;
             const globalCharges = parseFloat(document.getElementById('global-charges').value) || 0;
             
-            let taxableAfterDisc = taxable - globalDiscount + globalCharges;
-            if (taxableAfterDisc < 0) taxableAfterDisc = 0;
+            const taxableAfterDisc = taxable - globalDiscount + globalCharges;
+            const taxBase = Math.max(taxableAfterDisc, 0);
 
-            const cgst = taxableAfterDisc * 0.015;
-            const sgst = taxableAfterDisc * 0.015;
-            
+            const cgst = taxBase * 0.015;
+            const sgst = taxBase * 0.015;
+
             document.getElementById('sum-cgst').innerText = formatCurrency(cgst);
             document.getElementById('sum-sgst').innerText = formatCurrency(sgst);
 
