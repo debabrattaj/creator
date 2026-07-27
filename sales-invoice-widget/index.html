@@ -1423,6 +1423,13 @@
                     .filter(Boolean)
             );
             const records = fetchPastPurchases(customer).filter(r => !addedIds.has(r.ID));
+            console.table(records.map(r => ({
+                item: itemLabel('return', r),
+                Qty: r.Qty,
+                Line_Total: r.Line_Total,
+                Board_Amount: r.Board_Amount,
+                Discount_Amount: r.Discount_Amount
+            })));
             if (!records.length) {
                 listDiv.innerHTML = '<p class="text-sm text-slate-500">No more past purchases to return.</p>';
                 openReturnModal();
