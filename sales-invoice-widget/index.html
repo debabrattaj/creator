@@ -590,6 +590,13 @@
             }
         };
 
+        const SERVICE_MASTER_CONFIG = {
+            REPORT_NAME: "Service_Master_Report",
+            FIELDS: {
+                name: "Service_Name"
+            }
+        };
+
         const ITEM_SOURCES = {
             product: {
                 reportName: "Product_Information_Sales_Invoice_Report",
@@ -740,6 +747,8 @@
         let paymentInfo = null;
         let itemsBySection = { product: {}, purchase: {}, return: {} };
         let itemOptionsBySection = { product: '', purchase: '', return: '' };
+        let serviceMasterById = {};
+        let serviceOptionsHtml = '';
 
         let activeSections = { purchase: false, product: false, service: false, return: false };
 
@@ -762,10 +771,36 @@
                 loadPriceLevels(),
                 loadItemSource('product'),
                 loadItemSource('purchase'),
-                loadItemSource('return')
+                loadItemSource('return'),
+                loadServiceMaster()
             ]);
 
             toggleSection('product');
+        }
+
+        async function loadServiceMaster() {
+            serviceMasterById = {};
+            serviceOptionsHtml = '<option value="">-Select Service-</option>';
+
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+                return;
+            }
+
+            try {
+                const response = await ZOHO.CREATOR.API.getAllRecords({
+                    reportName: SERVICE_MASTER_CONFIG.REPORT_NAME,
+                    fieldConfig: "all"
+                });
+                const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                if (records[0]) console.log('Sample service master record:', records[0]);
+                records.forEach(record => {
+                    serviceMasterById[record.ID] = record;
+                    const name = zohoValueToText(record[SERVICE_MASTER_CONFIG.FIELDS.name]) || record.ID;
+                    serviceOptionsHtml += `<option value="${record.ID}">${name}</option>`;
+                });
+            } catch (err) {
+                console.error('Failed to fetch services from "' + SERVICE_MASTER_CONFIG.REPORT_NAME + '".', err);
+            }
         }
 
         async function loadItemSource(section) {
@@ -1226,6 +1261,11 @@
                 });
                 itemCell.innerHTML = '';
                 itemCell.appendChild(select);
+            }
+
+            if (section === 'service' && serviceOptionsHtml) {
+                const svcSelect = tr.querySelector('.input-svc-type');
+                if (svcSelect) svcSelect.innerHTML = serviceOptionsHtml;
             }
 
             if (section === 'product' || section === 'purchase') {
