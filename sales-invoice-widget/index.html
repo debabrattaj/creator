@@ -264,7 +264,7 @@
                             <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></span>
                             <h2 class="text-[15px] font-semibold text-slate-800">Sales Return Information</h2>
                         </div>
-                        <button onclick="triggerSalesReturn()" class="px-4 py-2 text-[13px] font-medium border border-indigo-200 rounded-md text-indigo-600 bg-white hover:bg-indigo-50 flex items-center gap-2 shadow-sm">
+                        <button onclick="openReturnFetch()" class="px-4 py-2 text-[13px] font-medium border border-indigo-200 rounded-md text-indigo-600 bg-white hover:bg-indigo-50 flex items-center gap-2 shadow-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Fetch Past Purchases
                         </button>
                     </div>
@@ -1396,10 +1396,16 @@
         }
 
         function triggerSalesReturn() {
-            const customer = document.getElementById('customerSelect').value;
-            if (!activeSections['return']) {
+            if (activeSections['return']) {
                 toggleSection('return');
+                return;
             }
+            toggleSection('return');
+            openReturnFetch();
+        }
+
+        function openReturnFetch() {
+            const customer = document.getElementById('customerSelect').value;
             if(!customer) {
                 alert("Please select a Customer first to fetch their past purchases.");
                 return;
