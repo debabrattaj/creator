@@ -629,8 +629,18 @@
                     { field: "Net_Weight", sel: ".input-nwt" },
                     { field: "Board_Rate", sel: ".input-rate" },
                     { field: "Stone_Weight", sel: ".input-cs-wt" },
-                    { field: "Stone_Rate", sel: ".input-cs-rt" }
+                    { field: "Stone_Rate", sel: ".input-cs-rt" },
+                    { field: "Stone_Amount", sel: ".input-cs-amt" }
                 ],
+                postFill: function(tr, record) {
+                    if (numOr(record.Stone_Weight, 0) || numOr(record.Stone_Rate, 0) || numOr(record.Stone_Amount, 0)) {
+                        const cs = document.getElementById('chk-cs');
+                        if (cs && !cs.checked) {
+                            cs.checked = true;
+                            toggleColumns();
+                        }
+                    }
+                },
                 save: [
                     { field: "Item_Detail", srcId: "Item_Detail" },
                     { field: "Purity", srcId: "Purity" },
