@@ -601,10 +601,11 @@
 
         const ITEM_SOURCES = {
             product: {
-                reportName: "Product_Information_Sales_Invoice_Report",
+                reportName: "Item_Master_Report",
                 subformName: "Product_Information",
-                itemDetailField: "Item_Detail",
-                itemDisplayField: "Item_Details_Display",
+                itemDetailField: "Item_Code",
+                itemDisplayField: "",
+                saveItemAsRecordId: true,
                 autofill: [
                     { field: "Design", sel: ".input-design", text: true },
                     { field: "Purity", sel: ".input-purity", text: true },
@@ -642,8 +643,7 @@
                     else discSel.value = 'none';
                 },
                 save: [
-                    { field: "Item_Detail", srcId: "Item_Detail" },
-                    { field: "Item_Details_Display", srcText: "Item_Details_Display" },
+                    { field: "Item_Detail", srcRecordId: true },
                     { field: "Design", srcId: "Design" },
                     { field: "Purity", srcId: "Purity" },
                     { field: "Qty", sel: ".input-qty" },
@@ -670,10 +670,11 @@
                 ]
             },
             purchase: {
-                reportName: "Purchase_Old_Gold_Report",
+                reportName: "Item_Master_Report",
                 subformName: "Purchase_Information",
-                itemDetailField: "Item_Detail",
+                itemDetailField: "Item_Code",
                 itemDisplayField: "",
+                saveItemAsRecordId: true,
                 autofill: [
                     { field: "Purity", sel: ".input-purity", text: true },
                     { field: "Gross_Weight", sel: ".input-gwt" },
@@ -693,7 +694,7 @@
                     }
                 },
                 save: [
-                    { field: "Item_Detail", srcId: "Item_Detail" },
+                    { field: "Item_Detail", srcRecordId: true },
                     { field: "Purity", srcId: "Purity" },
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
@@ -1118,13 +1119,14 @@
             const cfg = ITEM_SOURCES[section];
             const tbody = document.getElementById(`tbody-${section}`);
             return Array.from(tbody.children).map(tr => {
-                const src = tr._srcRecord || {};
-                const itemId = rawId(src[cfg.itemDetailField]);
-                if (!itemId) return null;
+                const src = tr._srcRecord;
+                if (!src || !src.ID) return null;
 
                 const row = {};
                 cfg.save.forEach(map => {
-                    if (map.srcId) {
+                    if (map.srcRecordId) {
+                        row[map.field] = src.ID;
+                    } else if (map.srcId) {
                         const id = rawId(src[map.field]);
                         if (id) row[map.field] = id;
                     } else if (map.srcText) {
