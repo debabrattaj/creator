@@ -471,8 +471,8 @@
                     <option value="Other Rate">Other Rate</option>
                 </select>
             </td>
-            <td><input type="number" class="input-tch-pct calc-trigger" value="0" readonly></td>
-            <td><input type="number" class="input-tch-rt calc-trigger" value="0" readonly></td>
+            <td><input type="number" class="input-tch-pct" value="0" readonly oninput="updateTchFromPercent(this)"></td>
+            <td><input type="number" class="input-tch-rt" value="0" readonly oninput="updateTchFromRate(this)"></td>
             <td><input type="number" class="input-tch-amt calc-trigger" value="0"></td>
             
             <td>
@@ -1376,6 +1376,28 @@
             }
 
             calcRow(selectEl);
+        }
+
+        function updateTchFromPercent(pctInput) {
+            const tr = pctInput.closest('tr');
+            const boardAmount = getVal(tr, '.input-amt');
+            const pct = getVal(tr, '.input-tch-pct');
+
+            tr.querySelector('.input-tch-amt').value = (boardAmount * pct / 100).toFixed(2);
+            tr.querySelector('.input-tch-rt').value = '0';
+
+            calcRow(pctInput);
+        }
+
+        function updateTchFromRate(rtInput) {
+            const tr = rtInput.closest('tr');
+            const qty = getVal(tr, '.input-qty');
+            const rate = getVal(tr, '.input-tch-rt');
+
+            tr.querySelector('.input-tch-amt').value = (qty * rate).toFixed(2);
+            tr.querySelector('.input-tch-pct').value = '0';
+
+            calcRow(rtInput);
         }
 
         function toggleColumns() {
