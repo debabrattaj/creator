@@ -646,8 +646,8 @@
                 ],
                 save: [
                     { field: "Item_Detail", srcRecordId: true },
-                    { field: "Design", srcText: "Collection" },
-                    { field: "Purity", srcText: "Purity" },
+                    { field: "Design", srcId: "Collection" },
+                    { field: "Purity", srcId: "Purity" },
                     { field: "Qty", sel: ".input-qty" },
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
@@ -700,8 +700,8 @@
                 },
                 save: [
                     { field: "Item_Detail", srcRecordId: true },
-                    { field: "Design", srcText: "Collection" },
-                    { field: "Purity", srcText: "Purity" },
+                    { field: "Design", srcId: "Collection" },
+                    { field: "Purity", srcId: "Purity" },
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
                     { field: "Board_Rate", sel: ".input-rate" },
@@ -1121,7 +1121,7 @@
                     appName: SAVE_INVOICE_CONFIG.APP_NAME,
                     formName: SAVE_INVOICE_CONFIG.FORM_NAME,
                     data: {
-                        data: stringifyPayloadValues(buildInvoicePayload(customerId))
+                        data: buildInvoicePayload(customerId)
                     }
                 });
 
@@ -1214,7 +1214,7 @@
                     if (map.srcRecordId) {
                         row[map.field] = src.ID;
                     } else if (map.srcId) {
-                        const id = rawId(src[map.field]);
+                        const id = rawId(src[map.srcId]);
                         if (id) row[map.field] = id;
                     } else if (map.srcText) {
                         const text = zohoValueToText(src[map.srcText]);
