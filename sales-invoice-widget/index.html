@@ -158,30 +158,14 @@
                                 <tr>
                                     <th class="w-10 text-center">#</th>
                                     <th>Item Detail</th>
-                                    <th>Design</th>
                                     <th>Purity</th>
-                                    <th>Qty</th>
                                     <th>GWT</th>
                                     <th>NWT</th>
-                                    <th>RATE</th>
-                                    <th>AMOUNT</th>
-                                    <th class="col-dmd col-hidden">DMD WT</th>
-                                    <th class="col-dmd col-hidden">DMD RT</th>
-                                    <th class="col-dmd col-hidden">DMD AMT</th>
-                                    <th class="col-cs col-hidden">CS WT</th>
-                                    <th class="col-cs col-hidden">CS RT</th>
-                                    <th class="col-cs col-hidden">CS AMT</th>
-                                    <th class="col-ps col-hidden">PS WT</th>
-                                    <th class="col-ps col-hidden">PS RT</th>
-                                    <th class="col-ps col-hidden">PS AMT</th>
-                                    <th>TCH</th>
-                                    <th>TCH %</th>
-                                    <th>TCH RT</th>
-                                    <th>TCH AMT</th>
-                                    <th>Disc Type</th>
-                                    <th>Disc %</th>
-                                    <th>Disc RT</th>
-                                    <th>Disc AMT</th>
+                                    <th>Mud WT</th>
+                                    <th>Stone WT</th>
+                                    <th>Stone RT</th>
+                                    <th>Stone AMT</th>
+                                    <th>Rate</th>
                                     <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
                                     <th class="w-10 text-center">Act</th>
                                 </tr>
@@ -495,6 +479,25 @@
         </tr>
     </template>
 
+    <template id="tpl-purchase-row">
+        <tr>
+            <td class="text-center row-idx"></td>
+            <td><input type="text" class="input-item" placeholder="Item Name"></td>
+            <td><input type="text" class="input-purity" placeholder="22K" readonly></td>
+            <td><input type="number" class="input-gwt calc-trigger" value="0"></td>
+            <td><input type="number" class="input-nwt" readonly value="0.000"></td>
+            <td><input type="number" class="input-mud-wt calc-trigger" value="0"></td>
+            <td><input type="number" class="input-cs-wt calc-trigger" value="0"></td>
+            <td><input type="number" class="input-cs-rt calc-trigger" value="0"></td>
+            <td><input type="number" class="input-cs-amt" readonly value="0"></td>
+            <td><input type="number" class="input-rate calc-trigger" value="0"></td>
+            <td><input type="number" class="input-linetotal font-bold text-indigo-700 bg-indigo-50" readonly value="0"></td>
+            <td class="text-center">
+                <button onclick="removeRow(this)" class="text-red-500 hover:text-red-700"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+            </td>
+        </tr>
+    </template>
+
     <template id="tpl-service-row">
         <tr>
             <td class="text-center row-idx"></td>
@@ -680,7 +683,6 @@
                 itemDisplayField: "",
                 saveItemAsRecordId: true,
                 autofill: [
-                    { field: "Collection", sel: ".input-design", text: true },
                     { field: "Purity", sel: ".input-purity", text: true },
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
@@ -689,18 +691,8 @@
                     { field: "Stone_Rate", sel: ".input-cs-rt" },
                     { field: "Stone_Amount", sel: ".input-cs-amt" }
                 ],
-                postFill: function(tr, record) {
-                    if (numOr(record.Stone_Weight, 0) || numOr(record.Stone_Rate, 0) || numOr(record.Stone_Amount, 0)) {
-                        const cs = document.getElementById('chk-cs');
-                        if (cs && !cs.checked) {
-                            cs.checked = true;
-                            toggleColumns();
-                        }
-                    }
-                },
                 save: [
                     { field: "Item_Detail", srcRecordId: true },
-                    { field: "Design", srcId: "Collection" },
                     { field: "Purity", srcId: "Purity" },
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
@@ -708,7 +700,7 @@
                     { field: "Stone_Weight", sel: ".input-cs-wt" },
                     { field: "Stone_Rate", sel: ".input-cs-rt" },
                     { field: "Stone_Amount", sel: ".input-cs-amt" },
-                    { field: "Mud_Weight", srcNum: "Mud_Weight" },
+                    { field: "Mud_Weight", sel: ".input-mud-wt" },
                     { field: "Line_Total", sel: ".input-linetotal" }
                 ]
             },
@@ -1460,20 +1452,20 @@
                     else col.classList.add('col-hidden');
                 });
             });
-            ['product', 'purchase'].forEach(section => {
-                const tbody = document.getElementById(`tbody-${section}`);
-                if (!tbody) return;
-                Array.from(tbody.children).forEach(tr => {
+            const productTbody = document.getElementById('tbody-product');
+            if (productTbody) {
+                Array.from(productTbody.children).forEach(tr => {
                     const gwtInput = tr.querySelector('.input-gwt');
                     if (gwtInput) calcRow(gwtInput);
                 });
-            });
+            }
             calculateInvoiceTotals();
         }
 
         function addItem(section) {
             let tplId = 'tpl-product-row';
             if (section === 'service') tplId = 'tpl-service-row';
+            if (section === 'purchase') tplId = 'tpl-purchase-row';
             
             const template = document.getElementById(tplId);
             const clone = template.content.cloneNode(true);
@@ -1505,13 +1497,22 @@
                 }
             }
 
-            if (section === 'product' || section === 'purchase') {
+            if (section === 'product') {
                 tr.querySelectorAll('.calc-trigger').forEach(input => {
                     input.addEventListener('input', function() {
                         calcRow(this);
                     });
                     input.addEventListener('change', function() {
                         calcRow(this);
+                    });
+                });
+            } else if (section === 'purchase') {
+                tr.querySelectorAll('.calc-trigger').forEach(input => {
+                    input.addEventListener('input', function() {
+                        calcPurchaseRow(this);
+                    });
+                    input.addEventListener('change', function() {
+                        calcPurchaseRow(this);
                     });
                 });
             } else if (section === 'service') {
@@ -1577,7 +1578,39 @@
 
             if (ITEM_SOURCES[section].postFill) ITEM_SOURCES[section].postFill(tr, record);
 
-            calcRow(tr.querySelector('.input-nwt'));
+            if (section === 'purchase') {
+                calcPurchaseRow(tr.querySelector('.input-nwt'));
+            } else {
+                calcRow(tr.querySelector('.input-nwt'));
+            }
+        }
+
+        // ASSUMPTION (unconfirmed): NWT = GWT - Mud_Weight - Stone_Weight, and
+        // Line_Total = (Rate x NWT) + Stone_Amount. No confirmed Deluge script
+        // for Purchase Information's own calculation exists yet - flag/correct
+        // if this doesn't match the real formula.
+        function calcPurchaseRow(inputElem) {
+            const tr = inputElem.closest('tr');
+            const gwt = getVal(tr, '.input-gwt');
+            const rate = getVal(tr, '.input-rate');
+            const mudWt = getVal(tr, '.input-mud-wt');
+            const csWt = getVal(tr, '.input-cs-wt');
+            const csRt = getVal(tr, '.input-cs-rt');
+
+            const nwtInput = tr.querySelector('.input-nwt');
+            const nwt = Math.max(gwt - mudWt - csWt, 0);
+            nwtInput.value = nwt.toFixed(3);
+            nwtInput.readOnly = true;
+
+            const amount = rate * nwt;
+
+            const csAmt = csWt * csRt;
+            tr.querySelector('.input-cs-amt').value = csAmt.toFixed(2);
+
+            const lineTotal = amount + csAmt;
+            tr.querySelector('.input-linetotal').value = lineTotal.toFixed(2);
+
+            calculateInvoiceTotals();
         }
 
         function calcRow(inputElem) {
