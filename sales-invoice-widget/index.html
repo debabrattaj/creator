@@ -1483,7 +1483,7 @@
             nwtInput.value = nwt.toFixed(3);
             nwtInput.readOnly = true;
 
-            let amount = qty * nwt * rate;
+            let amount = qty * rate;
             tr.querySelector('.input-amt').value = amount.toFixed(2);
 
             let stonesAmount = 0;
