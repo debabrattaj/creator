@@ -1353,20 +1353,14 @@
 
             if (val) {
                 if (TCH_RATE_TYPES.includes(val)) {
-                    rtInput.closest('td').classList.remove('col-hidden');
-                    pctInput.closest('td').classList.add('col-hidden');
                     rtInput.readOnly = false;
                     pctInput.readOnly = true;
                 } else {
-                    pctInput.closest('td').classList.remove('col-hidden');
-                    rtInput.closest('td').classList.add('col-hidden');
                     pctInput.readOnly = false;
                     rtInput.readOnly = true;
                 }
                 amtInput.readOnly = false;
             } else {
-                pctInput.closest('td').classList.remove('col-hidden');
-                rtInput.closest('td').classList.remove('col-hidden');
                 pctInput.readOnly = true;
                 rtInput.readOnly = true;
                 amtInput.readOnly = false;
