@@ -162,9 +162,15 @@
                                     <th>GWT</th>
                                     <th>NWT</th>
                                     <th>Mud WT</th>
-                                    <th>Stone WT</th>
-                                    <th>Stone RT</th>
-                                    <th>Stone AMT</th>
+                                    <th class="col-dmd col-hidden">DMD WT</th>
+                                    <th class="col-dmd col-hidden">DMD RT</th>
+                                    <th class="col-dmd col-hidden">DMD AMT</th>
+                                    <th class="col-cs col-hidden">Stone WT</th>
+                                    <th class="col-cs col-hidden">Stone RT</th>
+                                    <th class="col-cs col-hidden">Stone AMT</th>
+                                    <th class="col-ps col-hidden">PS WT</th>
+                                    <th class="col-ps col-hidden">PS RT</th>
+                                    <th class="col-ps col-hidden">PS AMT</th>
                                     <th>Rate</th>
                                     <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
                                     <th class="w-10 text-center">Act</th>
@@ -273,6 +279,15 @@
                                     <th>Original Invoice #</th>
                                     <th>Item Detail</th>
                                     <th>Qty</th>
+                                    <th class="col-dmd col-hidden">DMD WT</th>
+                                    <th class="col-dmd col-hidden">DMD RT</th>
+                                    <th class="col-dmd col-hidden">DMD AMT</th>
+                                    <th class="col-cs col-hidden">CS WT</th>
+                                    <th class="col-cs col-hidden">CS RT</th>
+                                    <th class="col-cs col-hidden">CS AMT</th>
+                                    <th class="col-ps col-hidden">PS WT</th>
+                                    <th class="col-ps col-hidden">PS RT</th>
+                                    <th class="col-ps col-hidden">PS AMT</th>
                                     <th>Return Amount</th>
                                     <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
                                     <th class="w-10 text-center">Act</th>
@@ -487,9 +502,19 @@
             <td><input type="number" class="input-gwt calc-trigger" value="0"></td>
             <td><input type="number" class="input-nwt" readonly value="0.000"></td>
             <td><input type="number" class="input-mud-wt calc-trigger" value="0"></td>
-            <td><input type="number" class="input-cs-wt calc-trigger" value="0"></td>
-            <td><input type="number" class="input-cs-rt calc-trigger" value="0"></td>
-            <td><input type="number" class="input-cs-amt" readonly value="0"></td>
+
+            <td class="col-dmd col-hidden"><input type="number" class="input-dmd-wt calc-trigger" value="0"></td>
+            <td class="col-dmd col-hidden"><input type="number" class="input-dmd-rt calc-trigger" value="0"></td>
+            <td class="col-dmd col-hidden"><input type="number" class="input-dmd-amt" readonly value="0"></td>
+
+            <td class="col-cs col-hidden"><input type="number" class="input-cs-wt calc-trigger" value="0"></td>
+            <td class="col-cs col-hidden"><input type="number" class="input-cs-rt calc-trigger" value="0"></td>
+            <td class="col-cs col-hidden"><input type="number" class="input-cs-amt" readonly value="0"></td>
+
+            <td class="col-ps col-hidden"><input type="number" class="input-ps-wt calc-trigger" value="0"></td>
+            <td class="col-ps col-hidden"><input type="number" class="input-ps-rt calc-trigger" value="0"></td>
+            <td class="col-ps col-hidden"><input type="number" class="input-ps-amt" readonly value="0"></td>
+
             <td><input type="number" class="input-rate calc-trigger" value="0"></td>
             <td><input type="number" class="input-linetotal font-bold text-indigo-700 bg-indigo-50" readonly value="0"></td>
             <td class="text-center">
@@ -524,6 +549,19 @@
             <td><input type="text" class="input-ret-inv" readonly></td>
             <td><input type="text" class="input-ret-item" readonly></td>
             <td><input type="number" class="input-ret-qty" readonly></td>
+
+            <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-wt" readonly></td>
+            <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-rt" readonly></td>
+            <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-amt" readonly></td>
+
+            <td class="col-cs col-hidden"><input type="number" class="input-ret-cs-wt" readonly></td>
+            <td class="col-cs col-hidden"><input type="number" class="input-ret-cs-rt" readonly></td>
+            <td class="col-cs col-hidden"><input type="number" class="input-ret-cs-amt" readonly></td>
+
+            <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-wt" readonly></td>
+            <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-rt" readonly></td>
+            <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-amt" readonly></td>
+
             <td><input type="number" class="input-ret-amt" readonly></td>
             <td><input type="number" class="input-ret-linetotal font-bold text-indigo-700 bg-indigo-50" readonly></td>
             <td class="text-center">
@@ -687,9 +725,15 @@
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
                     { field: "Board_Rate", sel: ".input-rate" },
+                    { field: "DMD_Weight", sel: ".input-dmd-wt" },
+                    { field: "DMD_Rate", sel: ".input-dmd-rt" },
+                    { field: "DMD_Amount", sel: ".input-dmd-amt" },
                     { field: "Stone_Weight", sel: ".input-cs-wt" },
                     { field: "Stone_Rate", sel: ".input-cs-rt" },
-                    { field: "Stone_Amount", sel: ".input-cs-amt" }
+                    { field: "Stone_Amount", sel: ".input-cs-amt" },
+                    { field: "PS_Weight", sel: ".input-ps-wt" },
+                    { field: "PS_Rate", sel: ".input-ps-rt" },
+                    { field: "PS_Amount", sel: ".input-ps-amt" }
                 ],
                 save: [
                     { field: "Item_Detail", srcRecordId: true },
@@ -697,9 +741,15 @@
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
                     { field: "Board_Rate", sel: ".input-rate" },
+                    { field: "DMD_Weight", sel: ".input-dmd-wt" },
+                    { field: "DMD_Rate", sel: ".input-dmd-rt" },
+                    { field: "DMD_Amount", sel: ".input-dmd-amt" },
                     { field: "Stone_Weight", sel: ".input-cs-wt" },
                     { field: "Stone_Rate", sel: ".input-cs-rt" },
                     { field: "Stone_Amount", sel: ".input-cs-amt" },
+                    { field: "PS_Weight", sel: ".input-ps-wt" },
+                    { field: "PS_Rate", sel: ".input-ps-rt" },
+                    { field: "PS_Amount", sel: ".input-ps-amt" },
                     { field: "Mud_Weight", sel: ".input-mud-wt" },
                     { field: "Line_Total", sel: ".input-linetotal" }
                 ]
@@ -1459,6 +1509,13 @@
                     if (gwtInput) calcRow(gwtInput);
                 });
             }
+            const purchaseTbody = document.getElementById('tbody-purchase');
+            if (purchaseTbody) {
+                Array.from(purchaseTbody.children).forEach(tr => {
+                    const gwtInput = tr.querySelector('.input-gwt');
+                    if (gwtInput) calcPurchaseRow(gwtInput);
+                });
+            }
             calculateInvoiceTotals();
         }
 
@@ -1594,20 +1651,28 @@
             const gwt = getVal(tr, '.input-gwt');
             const rate = getVal(tr, '.input-rate');
             const mudWt = getVal(tr, '.input-mud-wt');
+            const dmdWt = getVal(tr, '.input-dmd-wt');
             const csWt = getVal(tr, '.input-cs-wt');
             const csRt = getVal(tr, '.input-cs-rt');
+            const psWt = getVal(tr, '.input-ps-wt');
 
             const nwtInput = tr.querySelector('.input-nwt');
-            const nwt = Math.max(gwt - mudWt - csWt, 0);
+            const nwt = Math.max(gwt - mudWt - (dmdWt * 0.2) - csWt - psWt, 0);
             nwtInput.value = nwt.toFixed(3);
             nwtInput.readOnly = true;
 
             const amount = rate * nwt;
 
-            const csAmt = csWt * csRt;
-            tr.querySelector('.input-cs-amt').value = csAmt.toFixed(2);
+            let stonesAmount = 0;
+            ['dmd', 'cs', 'ps'].forEach(type => {
+                const wt = getVal(tr, `.input-${type}-wt`);
+                const rt = getVal(tr, `.input-${type}-rt`);
+                const amt = wt * rt;
+                tr.querySelector(`.input-${type}-amt`).value = amt.toFixed(2);
+                stonesAmount += amt;
+            });
 
-            const lineTotal = amount + csAmt;
+            const lineTotal = amount + stonesAmount;
             tr.querySelector('.input-linetotal').value = lineTotal.toFixed(2);
 
             calculateInvoiceTotals();
@@ -1848,6 +1913,14 @@
             tr.querySelector('.input-ret-inv').value = returnItemInvoice(record);
             tr.querySelector('.input-ret-item').value = itemLabel('return', record) || record.ID;
             tr.querySelector('.input-ret-qty').value = numOr(record[cfg.qtyField], 1);
+
+            ['dmd', 'cs', 'ps'].forEach(type => {
+                const prefix = type.toUpperCase();
+                tr.querySelector(`.input-ret-${type}-wt`).value = numOr(record[`${prefix}_Weight`], 0);
+                tr.querySelector(`.input-ret-${type}-rt`).value = numOr(record[`${prefix}_Rate`], 0);
+                tr.querySelector(`.input-ret-${type}-amt`).value = numOr(record[`${prefix}_Amount`], 0);
+            });
+
             tr.querySelector('.input-ret-amt').value = amount;
             tr.querySelector('.input-ret-linetotal').value = amount.toFixed(2);
 
