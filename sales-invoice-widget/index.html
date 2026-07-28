@@ -1207,7 +1207,8 @@
                     } else if (map.sel) {
                         if (map.text) {
                             const el = tr.querySelector(map.sel);
-                            row[map.field] = el ? el.value : '';
+                            const val = el ? el.value : '';
+                            if (val) row[map.field] = val;
                         } else {
                             row[map.field] = getVal(tr, map.sel);
                         }
