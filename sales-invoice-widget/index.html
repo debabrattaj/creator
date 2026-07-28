@@ -387,19 +387,6 @@
         </div>
     </div>
 
-    <div id="customerFormModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-4xl h-[85vh] rounded-xl shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-base font-semibold text-slate-800">Add New Customer</h3>
-                <div class="flex items-center gap-4">
-                    <button onclick="refreshCustomersAfterAdd()" class="text-[13px] font-medium text-indigo-600 hover:text-indigo-700">Done, Refresh List</button>
-                    <button onclick="closeCustomerFormModal()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                </div>
-            </div>
-            <iframe id="customerFormFrame" src="" class="flex-1 w-full border-0"></iframe>
-        </div>
-    </div>
-
     <div id="paymentModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center">
         <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -1228,17 +1215,20 @@
         const CUSTOMER_FORM_URL = 'https://creatorapp.zoho.in/leoragold/ciyor/#Form:Customer';
 
         function openCustomerForm() {
-            document.getElementById('customerFormFrame').src = CUSTOMER_FORM_URL;
-            document.getElementById('customerFormModal').classList.remove('hidden');
-        }
-
-        function closeCustomerFormModal() {
-            document.getElementById('customerFormModal').classList.add('hidden');
-            document.getElementById('customerFormFrame').src = '';
+            const win = window.open(CUSTOMER_FORM_URL, 'CustomerFormWindow', 'width=1000,height=750,scrollbars=yes,resizable=yes');
+            if (!win) {
+                alert('Popup blocked. Please allow popups for this site and try again.');
+                return;
+            }
+            const checkClosed = setInterval(() => {
+                if (win.closed) {
+                    clearInterval(checkClosed);
+                    refreshCustomersAfterAdd();
+                }
+            }, 500);
         }
 
         async function refreshCustomersAfterAdd() {
-            closeCustomerFormModal();
             await loadCustomers();
             const custSelect = document.getElementById('customerSelect');
             custSelect.value = lastSelectedCustomerId || '';
