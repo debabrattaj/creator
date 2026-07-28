@@ -1471,12 +1471,10 @@
             const gwt = getVal(tr, '.input-gwt');
             const rate = getVal(tr, '.input-rate');
 
-            let stoneWeightTotal = 0;
-            ['dmd', 'cs', 'ps'].forEach(type => {
-                if (document.getElementById(`chk-${type}`).checked) {
-                    stoneWeightTotal += getVal(tr, `.input-${type}-wt`);
-                }
-            });
+            const dmdWt = getVal(tr, '.input-dmd-wt');
+            const csWt = getVal(tr, '.input-cs-wt');
+            const psWt = getVal(tr, '.input-ps-wt');
+            const stoneWeightTotal = (dmdWt * 0.2) + csWt + psWt;
 
             const nwtInput = tr.querySelector('.input-nwt');
             const nwt = Math.max(gwt - stoneWeightTotal, 0);
