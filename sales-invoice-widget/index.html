@@ -443,7 +443,7 @@
             <td><input type="text" class="input-purity" placeholder="22K"></td>
             <td><input type="number" class="input-qty calc-trigger" value="1"></td>
             <td><input type="number" class="input-gwt calc-trigger" value="0"></td>
-            <td><input type="number" class="input-nwt calc-trigger" value="0"></td>
+            <td><input type="number" class="input-nwt" readonly value="0.000"></td>
             <td><input type="number" class="input-rate calc-trigger" value="0"></td>
             <td><input type="number" class="input-amt" readonly value="0"></td>
             
@@ -1345,6 +1345,14 @@
                     else col.classList.add('col-hidden');
                 });
             });
+            ['product', 'purchase'].forEach(section => {
+                const tbody = document.getElementById(`tbody-${section}`);
+                if (!tbody) return;
+                Array.from(tbody.children).forEach(tr => {
+                    const gwtInput = tr.querySelector('.input-gwt');
+                    if (gwtInput) calcRow(gwtInput);
+                });
+            });
             calculateInvoiceTotals();
         }
 
@@ -1460,10 +1468,22 @@
         function calcRow(inputElem) {
             const tr = inputElem.closest('tr');
             const qty = getVal(tr, '.input-qty');
-            const nwt = getVal(tr, '.input-nwt');
+            const gwt = getVal(tr, '.input-gwt');
             const rate = getVal(tr, '.input-rate');
-            
-            let amount = nwt * rate;
+
+            let stoneWeightTotal = 0;
+            ['dmd', 'cs', 'ps'].forEach(type => {
+                if (document.getElementById(`chk-${type}`).checked) {
+                    stoneWeightTotal += getVal(tr, `.input-${type}-wt`);
+                }
+            });
+
+            const nwtInput = tr.querySelector('.input-nwt');
+            const nwt = Math.max(gwt - stoneWeightTotal, 0);
+            nwtInput.value = nwt.toFixed(3);
+            nwtInput.readOnly = true;
+
+            let amount = qty * nwt * rate;
             tr.querySelector('.input-amt').value = amount.toFixed(2);
 
             let stonesAmount = 0;
@@ -1494,11 +1514,11 @@
                 const pct = getVal(tr, '.input-disc-pct');
                 discAmt = (subForDisc * pct) / 100;
             } else if (discType === 'amount') {
-                discAmt = getVal(tr, '.input-disc-pct'); 
+                discAmt = getVal(tr, '.input-disc-pct');
             }
             tr.querySelector('.input-disc-amt').value = discAmt.toFixed(2);
 
-            const lineTotal = (amount + stonesAmount + tchAmt - discAmt) * qty;
+            const lineTotal = amount + stonesAmount + tchAmt - discAmt;
             tr.querySelector('.input-linetotal').value = lineTotal.toFixed(2);
 
             calculateInvoiceTotals();
