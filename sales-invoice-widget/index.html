@@ -1121,7 +1121,7 @@
                     appName: SAVE_INVOICE_CONFIG.APP_NAME,
                     formName: SAVE_INVOICE_CONFIG.FORM_NAME,
                     data: {
-                        data: buildInvoicePayload(customerId)
+                        data: stringifyPayloadValues(buildInvoicePayload(customerId))
                     }
                 });
 
@@ -1143,6 +1143,23 @@
                 saveBtn.disabled = false;
                 saveBtn.innerText = originalLabel;
             }
+        }
+
+        // Zoho Creator's Add Records API expects Number/Decimal/Currency/Percent
+        // fields as quoted strings (e.g. "1000.03") and Decision box fields as
+        // the string "true"/"false", not native JS numbers/booleans.
+        function stringifyPayloadValues(value) {
+            if (Array.isArray(value)) {
+                return value.map(stringifyPayloadValues);
+            }
+            if (value && typeof value === 'object') {
+                const out = {};
+                Object.keys(value).forEach(k => { out[k] = stringifyPayloadValues(value[k]); });
+                return out;
+            }
+            if (typeof value === 'number') return String(value);
+            if (typeof value === 'boolean') return value ? 'true' : 'false';
+            return value;
         }
 
         function buildInvoicePayload(customerId) {
