@@ -162,15 +162,9 @@
                                     <th>GWT</th>
                                     <th>NWT</th>
                                     <th>Mud WT</th>
-                                    <th class="col-dmd col-hidden">DMD WT</th>
-                                    <th class="col-dmd col-hidden">DMD RT</th>
-                                    <th class="col-dmd col-hidden">DMD AMT</th>
                                     <th class="col-cs col-hidden">Stone WT</th>
                                     <th class="col-cs col-hidden">Stone RT</th>
                                     <th class="col-cs col-hidden">Stone AMT</th>
-                                    <th class="col-ps col-hidden">PS WT</th>
-                                    <th class="col-ps col-hidden">PS RT</th>
-                                    <th class="col-ps col-hidden">PS AMT</th>
                                     <th>Rate</th>
                                     <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
                                     <th class="w-10 text-center">Act</th>
@@ -503,17 +497,9 @@
             <td><input type="number" class="input-nwt" readonly value="0.000"></td>
             <td><input type="number" class="input-mud-wt calc-trigger" value="0"></td>
 
-            <td class="col-dmd col-hidden"><input type="number" class="input-dmd-wt calc-trigger" value="0"></td>
-            <td class="col-dmd col-hidden"><input type="number" class="input-dmd-rt calc-trigger" value="0"></td>
-            <td class="col-dmd col-hidden"><input type="number" class="input-dmd-amt" readonly value="0"></td>
-
             <td class="col-cs col-hidden"><input type="number" class="input-cs-wt calc-trigger" value="0"></td>
             <td class="col-cs col-hidden"><input type="number" class="input-cs-rt calc-trigger" value="0"></td>
             <td class="col-cs col-hidden"><input type="number" class="input-cs-amt" readonly value="0"></td>
-
-            <td class="col-ps col-hidden"><input type="number" class="input-ps-wt calc-trigger" value="0"></td>
-            <td class="col-ps col-hidden"><input type="number" class="input-ps-rt calc-trigger" value="0"></td>
-            <td class="col-ps col-hidden"><input type="number" class="input-ps-amt" readonly value="0"></td>
 
             <td><input type="number" class="input-rate calc-trigger" value="0"></td>
             <td><input type="number" class="input-linetotal font-bold text-indigo-700 bg-indigo-50" readonly value="0"></td>
@@ -725,15 +711,9 @@
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
                     { field: "Board_Rate", sel: ".input-rate" },
-                    { field: "DMD_Weight", sel: ".input-dmd-wt" },
-                    { field: "DMD_Rate", sel: ".input-dmd-rt" },
-                    { field: "DMD_Amount", sel: ".input-dmd-amt" },
                     { field: "Stone_Weight", sel: ".input-cs-wt" },
                     { field: "Stone_Rate", sel: ".input-cs-rt" },
-                    { field: "Stone_Amount", sel: ".input-cs-amt" },
-                    { field: "PS_Weight", sel: ".input-ps-wt" },
-                    { field: "PS_Rate", sel: ".input-ps-rt" },
-                    { field: "PS_Amount", sel: ".input-ps-amt" }
+                    { field: "Stone_Amount", sel: ".input-cs-amt" }
                 ],
                 save: [
                     { field: "Item_Detail", srcRecordId: true },
@@ -741,15 +721,9 @@
                     { field: "Gross_Weight", sel: ".input-gwt" },
                     { field: "Net_Weight", sel: ".input-nwt" },
                     { field: "Board_Rate", sel: ".input-rate" },
-                    { field: "DMD_Weight", sel: ".input-dmd-wt" },
-                    { field: "DMD_Rate", sel: ".input-dmd-rt" },
-                    { field: "DMD_Amount", sel: ".input-dmd-amt" },
                     { field: "Stone_Weight", sel: ".input-cs-wt" },
                     { field: "Stone_Rate", sel: ".input-cs-rt" },
                     { field: "Stone_Amount", sel: ".input-cs-amt" },
-                    { field: "PS_Weight", sel: ".input-ps-wt" },
-                    { field: "PS_Rate", sel: ".input-ps-rt" },
-                    { field: "PS_Amount", sel: ".input-ps-amt" },
                     { field: "Mud_Weight", sel: ".input-mud-wt" },
                     { field: "Line_Total", sel: ".input-linetotal" }
                 ]
@@ -1642,37 +1616,27 @@
             }
         }
 
-        // ASSUMPTION (unconfirmed): NWT = GWT - Mud_Weight - Stone_Weight, and
-        // Line_Total = (Rate x NWT) + Stone_Amount. No confirmed Deluge script
-        // for Purchase Information's own calculation exists yet - flag/correct
-        // if this doesn't match the real formula.
+        // Matches the confirmed Deluge scripts for Purchase Information:
+        // Net_Weight = Gross_Weight - Mud_Weight - Stone_Weight
+        // Line_Total = (Board_Rate x Net_Weight) + Stone_Amount
+        // No DMD/PS involvement in Purchase's own calculation.
         function calcPurchaseRow(inputElem) {
             const tr = inputElem.closest('tr');
             const gwt = getVal(tr, '.input-gwt');
             const rate = getVal(tr, '.input-rate');
             const mudWt = getVal(tr, '.input-mud-wt');
-            const dmdWt = getVal(tr, '.input-dmd-wt');
             const csWt = getVal(tr, '.input-cs-wt');
             const csRt = getVal(tr, '.input-cs-rt');
-            const psWt = getVal(tr, '.input-ps-wt');
 
             const nwtInput = tr.querySelector('.input-nwt');
-            const nwt = Math.max(gwt - mudWt - (dmdWt * 0.2) - csWt - psWt, 0);
+            const nwt = gwt - mudWt - csWt;
             nwtInput.value = nwt.toFixed(3);
             nwtInput.readOnly = true;
 
-            const amount = rate * nwt;
+            const csAmt = csRt * csWt;
+            tr.querySelector('.input-cs-amt').value = csAmt.toFixed(2);
 
-            let stonesAmount = 0;
-            ['dmd', 'cs', 'ps'].forEach(type => {
-                const wt = getVal(tr, `.input-${type}-wt`);
-                const rt = getVal(tr, `.input-${type}-rt`);
-                const amt = wt * rt;
-                tr.querySelector(`.input-${type}-amt`).value = amt.toFixed(2);
-                stonesAmount += amt;
-            });
-
-            const lineTotal = amount + stonesAmount;
+            const lineTotal = (rate * nwt) + csAmt;
             tr.querySelector('.input-linetotal').value = lineTotal.toFixed(2);
 
             calculateInvoiceTotals();
