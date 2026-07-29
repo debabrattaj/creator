@@ -427,39 +427,72 @@
         </div>
     </div>
 
-    <div id="paymentModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden flex flex-col">
+    <div id="paymentModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-base font-semibold text-slate-800">Payment</h3>
+                <h3 class="text-base font-semibold text-slate-800">Record Payment</h3>
                 <button onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Payment Type</label>
-                    <select id="paymentType" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm">
-                        <option value="Cash">Cash</option>
-                        <option value="Debit Card">Debit Card</option>
-                        <option value="Credit Card">Credit Card</option>
-                        <option value="UPI">UPI</option>
-                        <option value="Cheque">Cheque</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Amount</label>
-                    <div class="flex items-center border border-slate-300 rounded-md px-3 py-2 bg-white shadow-sm">
-                        <span class="text-slate-400 mr-1">₹</span>
-                        <input type="number" id="paymentAmount" class="w-full outline-none text-slate-800 bg-transparent p-0 border-0" value="0">
+            <div class="p-6 overflow-y-auto flex-1 space-y-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="flex items-center gap-3 bg-indigo-50 rounded-lg p-4">
+                        <span class="p-2 bg-white rounded-lg text-indigo-600 shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-6 3v-3m-3.6-7.5h13.2c.552 0 .998.446.998.998v10.004a1 1 0 01-1 .998H3.4a1 1 0 01-1-1V7.498c0-.552.446-.998.998-.998z"></path></svg></span>
+                        <div>
+                            <div class="text-[12px] text-slate-500">Total Amount</div>
+                            <div class="text-[17px] font-bold text-indigo-700" id="pm-total-amount">₹0.00</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-indigo-50 rounded-lg p-4">
+                        <span class="p-2 bg-white rounded-lg text-indigo-600 shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></span>
+                        <div>
+                            <div class="text-[12px] text-slate-500">Total Paid</div>
+                            <div class="text-[17px] font-bold text-emerald-600" id="pm-total-paid">₹0.00</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 bg-indigo-50 rounded-lg p-4">
+                        <span class="p-2 bg-white rounded-lg text-indigo-600 shadow-sm"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a2 2 0 00-2-2H5a2 2 0 00-2 2m18 0v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6m18 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v3m14 3h.01"></path></svg></span>
+                        <div>
+                            <div class="text-[12px] text-slate-500">Balance Due</div>
+                            <div class="text-[17px] font-bold text-rose-600" id="pm-balance-due">₹0.00</div>
+                        </div>
                     </div>
                 </div>
+
                 <div>
-                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Reference / Note <span class="text-slate-400">(optional)</span></label>
-                    <input type="text" id="paymentRef" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm" placeholder="Txn ID, cheque no, etc.">
+                    <h4 class="text-[13px] font-semibold text-slate-700 mb-2">Payment Details</h4>
+                    <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                        <table class="w-full text-left whitespace-nowrap">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-[12px] font-semibold text-slate-700">
+                                <tr>
+                                    <th class="px-3 py-2 w-10 text-center">#</th>
+                                    <th class="px-3 py-2">Payment Type</th>
+                                    <th class="px-3 py-2">Reference / Note</th>
+                                    <th class="px-3 py-2 text-right">Amount (₹)</th>
+                                    <th class="px-3 py-2 w-12 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payment-rows-body" class="text-[13px] text-slate-700 divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <button type="button" onclick="addPaymentRow()" class="mt-3 px-4 py-2 text-[13px] font-medium border border-indigo-200 rounded-md text-indigo-600 bg-white hover:bg-indigo-50 flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Add Payment
+                    </button>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 max-w-xs ml-auto space-y-2 text-[13px]">
+                    <div class="flex justify-between"><span class="text-slate-500">Total Amount</span><span class="font-semibold text-slate-800" id="pm-summary-total">₹0.00</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Total Paid</span><span class="font-semibold text-emerald-600" id="pm-summary-paid">₹0.00</span></div>
+                    <div class="border-t border-slate-200 pt-2 flex justify-between"><span class="text-slate-600 font-medium">Balance Due</span><span class="font-bold text-rose-600" id="pm-summary-balance">₹0.00</span></div>
+                </div>
+
+                <div>
+                    <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Note (Optional)</label>
+                    <input type="text" id="paymentNote" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm" placeholder="Add a note or reference...">
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
                 <button onclick="closePaymentModal()" class="px-4 py-2 text-[13px] font-medium border border-slate-300 rounded text-slate-700 bg-white shadow-sm">Cancel</button>
-                <button onclick="savePayment()" class="px-4 py-2 text-[13px] font-medium rounded bg-indigo-600 text-white shadow-sm hover:bg-indigo-700">Save Payment</button>
+                <button onclick="savePayment()" id="btn-save-payment" class="px-4 py-2 text-[13px] font-medium rounded bg-indigo-600 text-white shadow-sm hover:bg-indigo-700">Save Payment</button>
             </div>
         </div>
     </div>
@@ -834,6 +867,8 @@
         let customersById = {};
         let lastSelectedCustomerId = '';
         let paymentInfo = null;
+        let pendingPaymentRows = [];
+        const PAYMENT_TYPES = ['Cash', 'Bank Transfer', 'UPI', 'Debit Card', 'Credit Card', 'Cheque'];
         let itemsBySection = { product: {}, purchase: {}, return: {} };
         let itemOptionsBySection = { product: '', purchase: '', return: '' };
         let serviceMasterById = {};
@@ -2044,27 +2079,145 @@
         function openReturnModal() { document.getElementById('returnModal').classList.remove('hidden'); }
         function closeReturnModal() { document.getElementById('returnModal').classList.add('hidden'); }
 
+        function paymentTotalAmount() {
+            return parseAmount(document.getElementById('sum-grandtotal').innerText);
+        }
+
+        function paymentRowsSum(excludeIndex) {
+            return pendingPaymentRows.reduce((sum, r, i) => i === excludeIndex ? sum : sum + (parseFloat(r.amount) || 0), 0);
+        }
+
         function openPaymentModal() {
-            if (paymentInfo) {
-                document.getElementById('paymentType').value = paymentInfo.type;
-                document.getElementById('paymentAmount').value = paymentInfo.amount;
-                document.getElementById('paymentRef').value = paymentInfo.reference || '';
+            const total = paymentTotalAmount();
+            if (paymentInfo && paymentInfo.rows && paymentInfo.rows.length) {
+                pendingPaymentRows = paymentInfo.rows.map(r => ({ ...r }));
             } else {
-                document.getElementById('paymentAmount').value = parseAmount(document.getElementById('sum-grandtotal').innerText);
+                pendingPaymentRows = [{ type: 'Cash', reference: '', amount: total }];
             }
+            document.getElementById('paymentNote').value = paymentInfo ? (paymentInfo.note || '') : '';
+            renderPaymentRows();
             document.getElementById('paymentModal').classList.remove('hidden');
         }
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
+        function addPaymentRow() {
+            const remaining = Math.max(0, +(paymentTotalAmount() - paymentRowsSum()).toFixed(2));
+            pendingPaymentRows.push({ type: 'Cash', reference: '', amount: remaining });
+            renderPaymentRows();
+        }
+
+        function removePaymentRow(index) {
+            pendingPaymentRows.splice(index, 1);
+            renderPaymentRows();
+        }
+
+        function updatePaymentRowAmount(index, inputEl) {
+            const total = paymentTotalAmount();
+            const othersSum = paymentRowsSum(index);
+            let value = parseFloat(inputEl.value);
+            if (isNaN(value) || value < 0) value = 0;
+            const max = Math.max(0, +(total - othersSum).toFixed(2));
+            if (value > max + 0.001) {
+                value = max;
+                inputEl.value = value.toFixed(2);
+                showToast('Payment amount cannot exceed the balance due.', 'error');
+            }
+            pendingPaymentRows[index].amount = value;
+            updatePaymentTotalsDisplay();
+        }
+
+        function renderPaymentRows() {
+            const tbody = document.getElementById('payment-rows-body');
+            tbody.innerHTML = '';
+            pendingPaymentRows.forEach((row, index) => {
+                const tr = document.createElement('tr');
+
+                const tdNum = document.createElement('td');
+                tdNum.className = 'px-3 py-2 text-center text-slate-400';
+                tdNum.textContent = index + 1;
+
+                const tdType = document.createElement('td');
+                tdType.className = 'px-3 py-2';
+                const select = document.createElement('select');
+                select.className = 'w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
+                PAYMENT_TYPES.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t;
+                    if (t === row.type) opt.selected = true;
+                    select.appendChild(opt);
+                });
+                select.addEventListener('change', () => { pendingPaymentRows[index].type = select.value; });
+                tdType.appendChild(select);
+
+                const tdRef = document.createElement('td');
+                tdRef.className = 'px-3 py-2';
+                const refInput = document.createElement('input');
+                refInput.type = 'text';
+                refInput.value = row.reference || '';
+                refInput.placeholder = 'Reference / note';
+                refInput.className = 'w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
+                refInput.addEventListener('input', () => { pendingPaymentRows[index].reference = refInput.value; });
+                tdRef.appendChild(refInput);
+
+                const tdAmt = document.createElement('td');
+                tdAmt.className = 'px-3 py-2';
+                const amtInput = document.createElement('input');
+                amtInput.type = 'number';
+                amtInput.step = '0.01';
+                amtInput.min = '0';
+                amtInput.value = row.amount;
+                amtInput.className = 'w-full text-right bg-white border border-slate-300 rounded-md px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
+                amtInput.addEventListener('input', () => updatePaymentRowAmount(index, amtInput));
+                tdAmt.appendChild(amtInput);
+
+                const tdAct = document.createElement('td');
+                tdAct.className = 'px-3 py-2 text-center';
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.className = 'text-red-500 hover:text-red-700';
+                delBtn.innerHTML = '<svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>';
+                delBtn.addEventListener('click', () => removePaymentRow(index));
+                tdAct.appendChild(delBtn);
+
+                tr.appendChild(tdNum);
+                tr.appendChild(tdType);
+                tr.appendChild(tdRef);
+                tr.appendChild(tdAmt);
+                tr.appendChild(tdAct);
+                tbody.appendChild(tr);
+            });
+            updatePaymentTotalsDisplay();
+        }
+
+        function updatePaymentTotalsDisplay() {
+            const total = paymentTotalAmount();
+            const paid = +paymentRowsSum().toFixed(2);
+            const balance = Math.max(0, +(total - paid).toFixed(2));
+            ['pm-total-amount', 'pm-summary-total'].forEach(id => document.getElementById(id).innerText = formatCurrency(total));
+            ['pm-total-paid', 'pm-summary-paid'].forEach(id => document.getElementById(id).innerText = formatCurrency(paid));
+            ['pm-balance-due', 'pm-summary-balance'].forEach(id => document.getElementById(id).innerText = formatCurrency(balance));
+            const saveBtn = document.getElementById('btn-save-payment');
+            if (saveBtn) saveBtn.disabled = paid > total + 0.001;
+        }
+
         function savePayment() {
+            const total = paymentTotalAmount();
+            const paid = +paymentRowsSum().toFixed(2);
+            if (paid > total + 0.001) {
+                showToast('Total paid cannot exceed the invoice total.', 'error');
+                return;
+            }
             paymentInfo = {
-                type: document.getElementById('paymentType').value,
-                amount: parseFloat(document.getElementById('paymentAmount').value) || 0,
-                reference: document.getElementById('paymentRef').value.trim()
+                rows: pendingPaymentRows.map(r => ({ type: r.type, reference: (r.reference || '').trim(), amount: parseFloat(r.amount) || 0 })),
+                note: document.getElementById('paymentNote').value.trim(),
+                totalPaid: paid,
+                balanceDue: Math.max(0, +(total - paid).toFixed(2))
             };
             const summary = document.getElementById('payment-summary');
             summary.classList.remove('hidden');
-            summary.innerText = `Payment: ${paymentInfo.type} — ${formatCurrency(paymentInfo.amount)}${paymentInfo.reference ? ' (' + paymentInfo.reference + ')' : ''}`;
+            const modeList = paymentInfo.rows.filter(r => r.amount > 0).map(r => `${r.type}: ${formatCurrency(r.amount)}`).join(', ');
+            summary.innerText = `Payment: ${modeList || 'None'} — Paid ${formatCurrency(paymentInfo.totalPaid)}${paymentInfo.balanceDue > 0 ? ', Due ' + formatCurrency(paymentInfo.balanceDue) : ''}`;
             closePaymentModal();
         }
 
