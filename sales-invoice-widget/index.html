@@ -1935,11 +1935,10 @@
         function fetchPastPurchases(customerId) {
             const cfg = ITEM_SOURCES.return;
             const all = Object.values(itemsBySection.return);
-            const forCustomer = all.filter(r => {
+            return all.filter(r => {
                 const recCust = rawId(r[cfg.customerField]);
-                return !recCust || String(recCust) === String(customerId);
+                return recCust && String(recCust) === String(customerId);
             });
-            return forCustomer.length ? forCustomer : all;
         }
 
         function triggerSalesReturn() {
