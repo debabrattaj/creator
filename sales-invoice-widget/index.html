@@ -242,11 +242,12 @@
                             <thead class="bg-slate-50 border-b border-slate-200 text-[12px] font-semibold text-slate-700">
                                 <tr>
                                     <th class="w-10 text-center">#</th>
-                                    <th>Service Type</th>
-                                    <th>Description</th>
-                                    <th>Qty</th>
-                                    <th>Rate</th>
-                                    <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
+                                    <th>Service Name</th>
+                                    <th>Service RT</th>
+                                    <th>Disc Type</th>
+                                    <th>Disc %</th>
+                                    <th>Disc RT</th>
+                                    <th class="bg-indigo-50 font-bold text-indigo-800">Service AMT</th>
                                     <th class="w-10 text-center">Act</th>
                                 </tr>
                             </thead>
@@ -519,9 +520,16 @@
                     <option value="Repair">Repair</option>
                 </select>
             </td>
-            <td><input type="text" class="input-svc-desc" placeholder="Details"></td>
-            <td><input type="number" class="input-svc-qty calc-svc-trigger" value="1"></td>
             <td><input type="number" class="input-svc-rate calc-svc-trigger" value="0"></td>
+            <td>
+                <select class="input-svc-disc-type" onchange="updateSvcDiscFieldVisibility(this)">
+                    <option value="">-Select-</option>
+                    <option value="Percentage">Percentage</option>
+                    <option value="Rate">Rate</option>
+                </select>
+            </td>
+            <td><input type="number" class="input-svc-disc-pct" value="0" readonly oninput="updateSvcDiscFromPercent(this)"></td>
+            <td><input type="number" class="input-svc-disc-rt" value="0" readonly oninput="updateSvcDiscFromRate(this)"></td>
             <td><input type="number" class="input-svc-linetotal font-bold text-indigo-700 bg-indigo-50" readonly value="0"></td>
             <td class="text-center">
                 <button onclick="removeRow(this)" class="text-red-500 hover:text-red-700"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
@@ -1214,6 +1222,11 @@
                 if (rows.length) data[ITEM_SOURCES[section].subformName] = rows;
             });
 
+            if (activeSections.service) {
+                const serviceRows = collectServiceRows();
+                if (serviceRows.length) data['Service_Information'] = serviceRows;
+            }
+
             console.log('Sales_Invoice payload being sent:', JSON.stringify(data));
             return data;
         }
@@ -1247,6 +1260,24 @@
                         }
                     }
                 });
+                return row;
+            }).filter(Boolean);
+        }
+
+        function collectServiceRows() {
+            const tbody = document.getElementById('tbody-service');
+            return Array.from(tbody.children).map(tr => {
+                const select = tr.querySelector('.input-svc-type');
+                const serviceId = select ? select.value : '';
+                if (!serviceId) return null;
+
+                const row = { Service_Name: serviceId };
+                row.Service_Rate = getVal(tr, '.input-svc-rate');
+                const discType = tr.querySelector('.input-svc-disc-type').value;
+                if (discType) row.Discount_Type = discType;
+                row.Discount_percnt = getVal(tr, '.input-svc-disc-pct');
+                row.Discount_Rate = getVal(tr, '.input-svc-disc-rt');
+                row.Service_Amount = getVal(tr, '.input-svc-linetotal');
                 return row;
             }).filter(Boolean);
         }
@@ -1683,12 +1714,60 @@
             calculateInvoiceTotals();
         }
 
+        function svcDiscAmount(tr) {
+            const discType = tr.querySelector('.input-svc-disc-type').value;
+            if (discType === 'Percentage') {
+                return getVal(tr, '.input-svc-rate') * getVal(tr, '.input-svc-disc-pct') / 100;
+            }
+            if (discType === 'Rate') {
+                return getVal(tr, '.input-svc-disc-rt');
+            }
+            return 0;
+        }
+
         function calcServiceRow(inputElem) {
             const tr = inputElem.closest('tr');
-            const qty = getVal(tr, '.input-svc-qty');
             const rate = getVal(tr, '.input-svc-rate');
-            tr.querySelector('.input-svc-linetotal').value = (qty * rate).toFixed(2);
+            const discAmt = svcDiscAmount(tr);
+            tr.querySelector('.input-svc-linetotal').value = (rate - discAmt).toFixed(2);
             calculateInvoiceTotals();
+        }
+
+        function updateSvcDiscFieldVisibility(selectEl) {
+            const tr = selectEl.closest('tr');
+            const pctInput = tr.querySelector('.input-svc-disc-pct');
+            const rtInput = tr.querySelector('.input-svc-disc-rt');
+            const val = selectEl.value;
+
+            pctInput.value = '0';
+            rtInput.value = '0';
+
+            if (val) {
+                if (val === 'Percentage') {
+                    pctInput.readOnly = false;
+                    rtInput.readOnly = true;
+                } else {
+                    rtInput.readOnly = false;
+                    pctInput.readOnly = true;
+                }
+            } else {
+                pctInput.readOnly = true;
+                rtInput.readOnly = true;
+            }
+
+            calcServiceRow(selectEl);
+        }
+
+        function updateSvcDiscFromPercent(pctInput) {
+            const tr = pctInput.closest('tr');
+            tr.querySelector('.input-svc-disc-rt').value = '0';
+            calcServiceRow(pctInput);
+        }
+
+        function updateSvcDiscFromRate(rtInput) {
+            const tr = rtInput.closest('tr');
+            tr.querySelector('.input-svc-disc-pct').value = '0';
+            calcServiceRow(rtInput);
         }
 
         function firstFieldValue(record, candidates) {
@@ -1704,15 +1783,12 @@
             const record = serviceMasterById[selectEl.value];
             if (!record) return;
 
-            const desc = firstFieldValue(record, SERVICE_MASTER_CONFIG.FIELDS.descriptionCandidates);
-            tr.querySelector('.input-svc-desc').value = desc;
-
             const rate = firstFieldValue(record, SERVICE_MASTER_CONFIG.FIELDS.rateCandidates);
             if (rate && !isNaN(parseFloat(rate))) {
                 tr.querySelector('.input-svc-rate').value = parseFloat(rate);
             }
 
-            calcServiceRow(tr.querySelector('.input-svc-qty'));
+            calcServiceRow(tr.querySelector('.input-svc-rate'));
         }
 
         function calculateInvoiceTotals() {
