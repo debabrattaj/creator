@@ -800,7 +800,7 @@
                 autofill: [],
                 save: [
                     { field: "Item_Detail", srcId: "Item_Detail" },
-                    { field: "Design_Style", srcId: "Design_Style" },
+                    { field: "Design_Style", srcId: "Design" },
                     { field: "Purity", srcId: "Purity" },
                     { field: "Qty", srcNum: "Qty" },
                     { field: "Gross_Weight", srcNum: "Gross_Weight" },
@@ -816,9 +816,9 @@
                     { field: "PS_Weight", srcNum: "PS_Weight" },
                     { field: "PS_Rate", srcNum: "PS_Rate" },
                     { field: "PS_Amount", srcNum: "PS_Amount" },
-                    { field: "Disc_Type", srcText: "Disc_Type" },
-                    { field: "Disc_RT", srcNum: "Disc_RT" },
-                    { field: "Discount", srcNum: "Discount" },
+                    { field: "Disc_Type", srcText: "Discount_Type" },
+                    { field: "Disc_RT", srcNum: "Discount_Rate" },
+                    { field: "Discount", srcNum: "Discount_percnt" },
                     { field: "Discount_Amount", srcNum: "Discount_Amount" },
                     { field: "Service_Item", srcText: "Service_Item" },
                     { field: "Service_Rate", srcNum: "Service_Rate" },
@@ -2087,7 +2087,7 @@
             const amount = returnItemAmount(record);
             tr.querySelector('.input-ret-inv').value = returnItemInvoice(record);
             tr.querySelector('.input-ret-item').value = itemLabel('return', record) || record.ID;
-            tr.querySelector('.input-ret-design').value = zohoValueToText(record.Design_Style);
+            tr.querySelector('.input-ret-design').value = zohoValueToText(record.Design);
             tr.querySelector('.input-ret-purity').value = zohoValueToText(record.Purity);
             tr.querySelector('.input-ret-qty').value = numOr(record[cfg.qtyField], 1);
             tr.querySelector('.input-ret-gwt').value = numOr(record.Gross_Weight, 0);
@@ -2107,9 +2107,9 @@
             tr.querySelector('.input-ret-tch-rt').value = numOr(record.Service_Rate, 0);
             tr.querySelector('.input-ret-tch-amt').value = numOr(record.Service_Amount, 0);
 
-            tr.querySelector('.input-ret-disc-type').value = zohoValueToText(record.Disc_Type);
-            tr.querySelector('.input-ret-disc-pct').value = numOr(record.Discount, 0);
-            tr.querySelector('.input-ret-disc-rt').value = numOr(record.Disc_RT, 0);
+            tr.querySelector('.input-ret-disc-type').value = zohoValueToText(record.Discount_Type);
+            tr.querySelector('.input-ret-disc-pct').value = numOr(record.Discount_percnt, 0);
+            tr.querySelector('.input-ret-disc-rt').value = numOr(record.Discount_Rate, 0);
             tr.querySelector('.input-ret-disc-amt').value = numOr(record.Discount_Amount, 0);
 
             tr.querySelector('.input-ret-linetotal').value = amount.toFixed(2);
