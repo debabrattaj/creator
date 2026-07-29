@@ -297,15 +297,15 @@
                                     <th>NWT</th>
                                     <th>RATE</th>
                                     <th>AMOUNT</th>
-                                    <th class="col-dmd col-hidden">DMD WT</th>
-                                    <th class="col-dmd col-hidden">DMD RT</th>
-                                    <th class="col-dmd col-hidden">DMD AMT</th>
-                                    <th class="col-cs col-hidden">CS WT</th>
-                                    <th class="col-cs col-hidden">CS RT</th>
-                                    <th class="col-cs col-hidden">CS AMT</th>
-                                    <th class="col-ps col-hidden">PS WT</th>
-                                    <th class="col-ps col-hidden">PS RT</th>
-                                    <th class="col-ps col-hidden">PS AMT</th>
+                                    <th class="col-dmd">DMD WT</th>
+                                    <th class="col-dmd">DMD RT</th>
+                                    <th class="col-dmd">DMD AMT</th>
+                                    <th class="col-cs">CS WT</th>
+                                    <th class="col-cs">CS RT</th>
+                                    <th class="col-cs">CS AMT</th>
+                                    <th class="col-ps">PS WT</th>
+                                    <th class="col-ps">PS RT</th>
+                                    <th class="col-ps">PS AMT</th>
                                     <th>TCH</th>
                                     <th>TCH %</th>
                                     <th>TCH RT</th>
@@ -584,17 +584,17 @@
             <td><input type="number" class="input-ret-rate" readonly></td>
             <td><input type="number" class="input-ret-amount" readonly></td>
 
-            <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-wt" readonly></td>
-            <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-rt" readonly></td>
-            <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-amt" readonly></td>
+            <td class="col-dmd"><input type="number" class="input-ret-dmd-wt" readonly></td>
+            <td class="col-dmd"><input type="number" class="input-ret-dmd-rt" readonly></td>
+            <td class="col-dmd"><input type="number" class="input-ret-dmd-amt" readonly></td>
 
-            <td class="col-cs col-hidden"><input type="number" class="input-ret-cs-wt" readonly></td>
-            <td class="col-cs col-hidden"><input type="number" class="input-ret-cs-rt" readonly></td>
-            <td class="col-cs col-hidden"><input type="number" class="input-ret-cs-amt" readonly></td>
+            <td class="col-cs"><input type="number" class="input-ret-cs-wt" readonly></td>
+            <td class="col-cs"><input type="number" class="input-ret-cs-rt" readonly></td>
+            <td class="col-cs"><input type="number" class="input-ret-cs-amt" readonly></td>
 
-            <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-wt" readonly></td>
-            <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-rt" readonly></td>
-            <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-amt" readonly></td>
+            <td class="col-ps"><input type="number" class="input-ret-ps-wt" readonly></td>
+            <td class="col-ps"><input type="number" class="input-ret-ps-rt" readonly></td>
+            <td class="col-ps"><input type="number" class="input-ret-ps-amt" readonly></td>
 
             <td><input type="text" class="input-ret-tch-type" readonly></td>
             <td><input type="number" class="input-ret-tch-pct" readonly></td>
@@ -1617,7 +1617,7 @@
             types.forEach(type => {
                 const el = document.getElementById(`chk-${type}`);
                 const isChecked = el ? el.checked : false;
-                document.querySelectorAll(`.col-${type}`).forEach(col => {
+                document.querySelectorAll(`#section-product-wrapper .col-${type}`).forEach(col => {
                     if (isChecked) col.classList.remove('col-hidden');
                     else col.classList.add('col-hidden');
                 });
