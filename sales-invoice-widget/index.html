@@ -298,6 +298,9 @@
                                     <th>Disc RT</th>
                                     <th>Disc AMT</th>
                                     <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
+                                    <th>Sales Return</th>
+                                    <th>Product Information (Sales Invoice)</th>
+                                    <th>Customer</th>
                                     <th class="w-10 text-center">Act</th>
                                 </tr>
                             </thead>
@@ -586,6 +589,9 @@
             <td><input type="number" class="input-ret-disc-amt" readonly></td>
 
             <td><input type="number" class="input-ret-linetotal font-bold text-indigo-700 bg-indigo-50" readonly></td>
+            <td><input type="text" class="input-ret-sales-return" readonly placeholder="Auto"></td>
+            <td><input type="text" class="input-ret-src-product" readonly></td>
+            <td><input type="text" class="input-ret-customer" readonly></td>
             <td class="text-center">
                 <button onclick="removeRow(this)" class="text-red-500 hover:text-red-700"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
             </td>
@@ -799,7 +805,9 @@
                     { field: "Service_Rate", srcNum: "Service_Rate" },
                     { field: "Service_Amount", srcNum: "Service_Amount" },
                     { field: "Service_percnt", srcNum: "Service_percnt" },
-                    { field: "Line_Total", srcNum: "Line_Total" }
+                    { field: "Line_Total", srcNum: "Line_Total" },
+                    { field: "Product_Information_Sales_Invoice", srcRecordId: true },
+                    { field: "Customer", currentCustomer: true }
                 ]
             }
         };
@@ -1270,6 +1278,9 @@
                 cfg.save.forEach(map => {
                     if (map.srcRecordId) {
                         row[map.field] = src.ID;
+                    } else if (map.currentCustomer) {
+                        const custId = document.getElementById('customerSelect').value;
+                        if (custId) row[map.field] = custId;
                     } else if (map.srcId) {
                         const id = rawId(src[map.srcId]);
                         if (id) row[map.field] = id;
@@ -2006,6 +2017,10 @@
             tr.querySelector('.input-ret-disc-amt').value = numOr(record.Discount_Amount, 0);
 
             tr.querySelector('.input-ret-linetotal').value = amount.toFixed(2);
+
+            tr.querySelector('.input-ret-src-product').value = itemLabel('return', record) || record.ID;
+            const customer = customersById[document.getElementById('customerSelect').value];
+            tr.querySelector('.input-ret-customer').value = customer ? (customer[CUSTOMER_CONFIG.FIELDS.name] || '') : '';
 
             document.getElementById('tbody-return').appendChild(clone);
             updateRowIndices('return');
