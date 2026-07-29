@@ -26,9 +26,25 @@
         }
         table input:focus, table select:focus { border-color: #4f46e5; outline: 1px solid #4f46e5; }
         table input[readonly] { background-color: #f8fafc; color: #64748b; }
+
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            min-width: 260px; max-width: 380px;
+            padding: 12px 16px; border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 13px; font-weight: 500; color: #fff;
+            display: flex; align-items: center; gap: 8px;
+            opacity: 0; transform: translateX(20px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast-success { background-color: #16a34a; }
+        .toast-error { background-color: #dc2626; }
     </style>
 </head>
 <body class="p-4 md:p-6 text-slate-800">
+
+    <div id="toast-container"></div>
 
     <div class="max-w-[1440px] mx-auto">
         <div class="flex justify-between items-center mb-6">
@@ -1200,7 +1216,7 @@
                         await linkProductRowsToInvoice(newId);
                     }
 
-                    alert('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.');
+                    showToast('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.', 'success');
                 } else {
                     throw new Error((response && (response.message || JSON.stringify(response))) || 'Unknown error while saving invoice.');
                 }
@@ -1433,7 +1449,6 @@
             tbody.innerHTML = '';
             updateRowIndices('return');
             calculateInvoiceTotals();
-            alert('Customer changed — previously added Sales Return items were cleared since they belonged to the old customer.');
         }
 
         function syncProductCustomerColumn() {
@@ -1944,6 +1959,21 @@
 
         function formatCurrency(num) {
             return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(num);
+        }
+
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type === 'error' ? 'error' : 'success'}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
 
         function fetchPastPurchases(customerId) {
