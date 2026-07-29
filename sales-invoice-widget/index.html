@@ -78,18 +78,6 @@
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-                        <div>
-                            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Invoice No</label>
-                            <input type="text" id="invoiceNo" readonly class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none text-slate-500 shadow-sm cursor-not-allowed">
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Invoice Date</label>
-                            <input type="date" id="invoiceDate" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Due Date</label>
-                            <input type="date" id="dueDate" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm">
-                        </div>
                         <div class="relative" id="customerDropdownWrap">
                             <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Customer</label>
                             <select id="customerSelect" onchange="handleCustomerChange()" class="hidden">
@@ -105,6 +93,18 @@
                                     Add New Customer
                                 </button>
                             </div>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Invoice No</label>
+                            <input type="text" id="invoiceNo" readonly class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-sm focus:outline-none text-slate-500 shadow-sm cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Invoice Date</label>
+                            <input type="date" id="invoiceDate" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Due Date</label>
+                            <input type="date" id="dueDate" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-slate-700 shadow-sm">
                         </div>
 
                         <div>
