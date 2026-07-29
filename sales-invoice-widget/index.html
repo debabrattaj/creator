@@ -1195,6 +1195,11 @@
                     if (savedInvoiceNo) {
                         document.getElementById('invoiceNo').value = savedInvoiceNo;
                     }
+
+                    if (newId) {
+                        await linkProductRowsToInvoice(newId);
+                    }
+
                     alert('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.');
                 } else {
                     throw new Error((response && (response.message || JSON.stringify(response))) || 'Unknown error while saving invoice.');
@@ -1205,6 +1210,39 @@
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerText = originalLabel;
+            }
+        }
+
+        // The parent Sales_Invoice's ID doesn't exist until after the record is
+        // saved, so Product_Information rows can't carry it in the initial
+        // addRecord payload. This follow-up fetches the newly created invoice
+        // (to get each subform row's own ID) then updates each row's
+        // Sales_Invoice lookup field to point back at the parent.
+        // ASSUMPTION: Product_Information has a Lookup field named
+        // "Sales_Invoice" pointing to Sales_Invoice - create it in Zoho
+        // Creator's form builder if it doesn't already exist.
+        async function linkProductRowsToInvoice(invoiceId) {
+            try {
+                const detail = await ZOHO.CREATOR.API.getRecordById({
+                    appName: SAVE_INVOICE_CONFIG.APP_NAME,
+                    reportName: INVOICE_NUMBER_CONFIG.REPORT_NAME,
+                    id: invoiceId,
+                    fieldConfig: "all"
+                });
+                const productRows = (detail && detail.data && detail.data.Product_Information) || [];
+                for (const row of productRows) {
+                    if (!row.ID) continue;
+                    await ZOHO.CREATOR.API.updateRecord({
+                        appName: SAVE_INVOICE_CONFIG.APP_NAME,
+                        formName: "Product_Information",
+                        id: row.ID,
+                        data: {
+                            data: { Sales_Invoice: invoiceId }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to link Product Information rows back to the saved invoice', err);
             }
         }
 
