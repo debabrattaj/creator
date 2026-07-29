@@ -273,7 +273,13 @@
                                     <th class="w-10 text-center">#</th>
                                     <th>Original Invoice #</th>
                                     <th>Item Detail</th>
+                                    <th>Design Style</th>
+                                    <th>Purity</th>
                                     <th>Qty</th>
+                                    <th>GWT</th>
+                                    <th>NWT</th>
+                                    <th>RATE</th>
+                                    <th>AMOUNT</th>
                                     <th class="col-dmd col-hidden">DMD WT</th>
                                     <th class="col-dmd col-hidden">DMD RT</th>
                                     <th class="col-dmd col-hidden">DMD AMT</th>
@@ -283,7 +289,14 @@
                                     <th class="col-ps col-hidden">PS WT</th>
                                     <th class="col-ps col-hidden">PS RT</th>
                                     <th class="col-ps col-hidden">PS AMT</th>
-                                    <th>Return Amount</th>
+                                    <th>TCH</th>
+                                    <th>TCH %</th>
+                                    <th>TCH RT</th>
+                                    <th>TCH AMT</th>
+                                    <th>Disc Type</th>
+                                    <th>Disc %</th>
+                                    <th>Disc RT</th>
+                                    <th>Disc AMT</th>
                                     <th class="bg-indigo-50 font-bold text-indigo-800">Line Total</th>
                                     <th class="w-10 text-center">Act</th>
                                 </tr>
@@ -542,7 +555,13 @@
             <td class="text-center row-idx"></td>
             <td><input type="text" class="input-ret-inv" readonly></td>
             <td><input type="text" class="input-ret-item" readonly></td>
+            <td><input type="text" class="input-ret-design" readonly></td>
+            <td><input type="text" class="input-ret-purity" readonly></td>
             <td><input type="number" class="input-ret-qty" readonly></td>
+            <td><input type="number" class="input-ret-gwt" readonly></td>
+            <td><input type="number" class="input-ret-nwt" readonly></td>
+            <td><input type="number" class="input-ret-rate" readonly></td>
+            <td><input type="number" class="input-ret-amount" readonly></td>
 
             <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-wt" readonly></td>
             <td class="col-dmd col-hidden"><input type="number" class="input-ret-dmd-rt" readonly></td>
@@ -556,7 +575,16 @@
             <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-rt" readonly></td>
             <td class="col-ps col-hidden"><input type="number" class="input-ret-ps-amt" readonly></td>
 
-            <td><input type="number" class="input-ret-amt" readonly></td>
+            <td><input type="text" class="input-ret-tch-type" readonly></td>
+            <td><input type="number" class="input-ret-tch-pct" readonly></td>
+            <td><input type="number" class="input-ret-tch-rt" readonly></td>
+            <td><input type="number" class="input-ret-tch-amt" readonly></td>
+
+            <td><input type="text" class="input-ret-disc-type" readonly></td>
+            <td><input type="number" class="input-ret-disc-pct" readonly></td>
+            <td><input type="number" class="input-ret-disc-rt" readonly></td>
+            <td><input type="number" class="input-ret-disc-amt" readonly></td>
+
             <td><input type="number" class="input-ret-linetotal font-bold text-indigo-700 bg-indigo-50" readonly></td>
             <td class="text-center">
                 <button onclick="removeRow(this)" class="text-red-500 hover:text-red-700"><svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
@@ -1952,7 +1980,13 @@
             const amount = returnItemAmount(record);
             tr.querySelector('.input-ret-inv').value = returnItemInvoice(record);
             tr.querySelector('.input-ret-item').value = itemLabel('return', record) || record.ID;
+            tr.querySelector('.input-ret-design').value = zohoValueToText(record.Design_Style);
+            tr.querySelector('.input-ret-purity').value = zohoValueToText(record.Purity);
             tr.querySelector('.input-ret-qty').value = numOr(record[cfg.qtyField], 1);
+            tr.querySelector('.input-ret-gwt').value = numOr(record.Gross_Weight, 0);
+            tr.querySelector('.input-ret-nwt').value = numOr(record.Net_Weight, 0);
+            tr.querySelector('.input-ret-rate').value = numOr(record.Board_Rate, 0);
+            tr.querySelector('.input-ret-amount').value = numOr(record.Board_Amount, 0);
 
             ['dmd', 'cs', 'ps'].forEach(type => {
                 const prefix = type.toUpperCase();
@@ -1961,7 +1995,16 @@
                 tr.querySelector(`.input-ret-${type}-amt`).value = numOr(record[`${prefix}_Amount`], 0);
             });
 
-            tr.querySelector('.input-ret-amt').value = amount;
+            tr.querySelector('.input-ret-tch-type').value = zohoValueToText(record.Service_Item);
+            tr.querySelector('.input-ret-tch-pct').value = numOr(record.Service_percnt, 0);
+            tr.querySelector('.input-ret-tch-rt').value = numOr(record.Service_Rate, 0);
+            tr.querySelector('.input-ret-tch-amt').value = numOr(record.Service_Amount, 0);
+
+            tr.querySelector('.input-ret-disc-type').value = zohoValueToText(record.Disc_Type);
+            tr.querySelector('.input-ret-disc-pct').value = numOr(record.Discount, 0);
+            tr.querySelector('.input-ret-disc-rt').value = numOr(record.Disc_RT, 0);
+            tr.querySelector('.input-ret-disc-amt').value = numOr(record.Discount_Amount, 0);
+
             tr.querySelector('.input-ret-linetotal').value = amount.toFixed(2);
 
             document.getElementById('tbody-return').appendChild(clone);
