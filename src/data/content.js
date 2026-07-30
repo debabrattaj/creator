@@ -11,6 +11,20 @@ export const CONTACT = {
   mapQuery: 'Somu Avenue Bishwanath Nagar Gothapatna Bhubaneswar',
 }
 
+// Contact form -> email delivery, via Formspree (https://formspree.io).
+// The site is static with no backend, so a third-party form endpoint is
+// what actually delivers submissions to an inbox.
+//
+// One-time setup (~2 minutes):
+//   1. Go to https://formspree.io and sign up free with debabrattaj@gmail.com
+//   2. Create a new form, verify it via the confirmation email
+//   3. Copy the endpoint it gives you (looks like https://formspree.io/f/xxxxxxxx)
+//   4. Paste it below, replacing the placeholder
+//   5. Rebuild and redeploy
+// Until this is set to a real endpoint, the contact form will show an error
+// on submit instead of silently failing.
+export const FORMSPREE_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'
+
 export const NAV_LINKS = [
   { label: 'Services', href: '/#services' },
   { label: 'Why Us', href: '/#why-us' },

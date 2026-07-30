@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CONTACT } from '../data/content'
+import { CONTACT, FORMSPREE_ENDPOINT } from '../data/content'
 import { Icon } from './Icons'
 import { SectionHeading } from './Services'
 
@@ -14,18 +14,46 @@ const SERVICE_OPTIONS = [
   'Not sure yet',
 ]
 
+const INITIAL_FORM = {
+  name: '',
+  email: '',
+  phone: '',
+  company: '',
+  service: SERVICE_OPTIONS[0],
+  message: '',
+}
+
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', phone: '', service: SERVICE_OPTIONS[0], message: '' })
+  const [form, setForm] = useState(INITIAL_FORM)
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
 
   const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
-  const waMessage = encodeURIComponent(
-    `Hi ZohoGeeks, I'm ${form.name || '[your name]'}.\nInterested in: ${form.service}\nPhone: ${form.phone || '[your phone]'}\n\n${form.message || 'I would like a free consultation.'}`
-  )
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    window.open(`${CONTACT.whatsappLink}?text=${waMessage}`, '_blank', 'noopener,noreferrer')
+    setStatus('sending')
+
+    try {
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _subject: 'New Lead',
+          'Full Name': form.name,
+          Email: form.email,
+          Phone: form.phone || 'Not provided',
+          Company: form.company || 'Not provided',
+          'Interested In': form.service,
+          Message: form.message || 'No additional details provided',
+        }),
+      })
+
+      if (!res.ok) throw new Error('Form submission failed')
+      setStatus('sent')
+      setForm(INITIAL_FORM)
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
@@ -81,13 +109,34 @@ export default function Contact() {
                   className="input"
                 />
               </Field>
-              <Field label="Phone number">
+              <Field label="Email">
                 <input
                   required
+                  type="email"
+                  value={form.email}
+                  onChange={update('email')}
+                  placeholder="you@company.com"
+                  className="input"
+                />
+              </Field>
+            </div>
+
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              <Field label="Phone number (optional)">
+                <input
                   type="tel"
                   value={form.phone}
                   onChange={update('phone')}
                   placeholder="10-digit mobile number"
+                  className="input"
+                />
+              </Field>
+              <Field label="Company (optional)">
+                <input
+                  type="text"
+                  value={form.company}
+                  onChange={update('company')}
+                  placeholder="Your company name"
                   className="input"
                 />
               </Field>
@@ -119,14 +168,29 @@ export default function Contact() {
 
             <button
               type="submit"
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-accent-500/30 transition hover:brightness-110 active:scale-[0.99]"
+              disabled={status === 'sending'}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-accent-500/30 transition hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <Icon name="whatsapp" className="h-4 w-4" />
-              Send via WhatsApp
+              <Icon name="mail" className="h-4 w-4" />
+              {status === 'sending' ? 'Sending…' : 'Send Enquiry'}
             </button>
-            <p className="mt-3 text-center text-xs text-brand-950/40">
-              We'll open WhatsApp with your details pre-filled — nothing is sent automatically.
-            </p>
+
+            {status === 'sent' && (
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-sm font-semibold text-emerald-600">
+                <Icon name="check" className="h-4 w-4" />
+                Thanks — your enquiry is on its way. We'll get back within one business day.
+              </p>
+            )}
+            {status === 'error' && (
+              <p className="mt-3 text-center text-sm font-semibold text-red-600">
+                Something went wrong sending that. Please call or WhatsApp us instead — details on the left.
+              </p>
+            )}
+            {status !== 'sent' && status !== 'error' && (
+              <p className="mt-3 text-center text-xs text-brand-950/40">
+                Your enquiry goes straight to our team's inbox — nothing is shared elsewhere.
+              </p>
+            )}
           </form>
         </div>
       </div>
