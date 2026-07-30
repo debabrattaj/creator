@@ -1199,24 +1199,24 @@
 
         async function saveInvoice() {
             if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
-                alert('Save is only available when this widget is running inside Zoho Creator.');
+                showToast('Save is only available when this widget is running inside Zoho Creator.', 'error');
                 return;
             }
 
             const customerId = document.getElementById('customerSelect').value;
             if (!customerId) {
-                alert('Please select a Customer before saving.');
+                showToast('Please select a Customer before saving.', 'error');
                 return;
             }
             if (!document.getElementById('invoiceDate').value) {
-                alert('Please set the Invoice Date.');
+                showToast('Please set the Invoice Date.', 'error');
                 return;
             }
             const hasItems = ['purchase', 'product', 'service', 'return'].some(section =>
                 activeSections[section] && document.getElementById(`tbody-${section}`).children.length > 0
             );
             if (!hasItems) {
-                alert('Please add at least one item before saving.');
+                showToast('Please add at least one item before saving.', 'error');
                 return;
             }
 
@@ -1256,7 +1256,7 @@
                 }
             } catch (err) {
                 console.error('Failed to save invoice', err);
-                alert('Failed to save invoice: ' + (err && err.message ? err.message : err));
+                showToast('Failed to save invoice: ' + (err && err.message ? err.message : err), 'error');
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerText = originalLabel;
