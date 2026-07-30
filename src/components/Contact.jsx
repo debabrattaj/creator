@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CONTACT, FORMSPREE_ENDPOINT } from '../data/content'
+import { CONTACT, LEAD_API_ENDPOINT } from '../data/content'
 import { Icon } from './Icons'
 import { SectionHeading } from './Services'
 
@@ -21,6 +21,7 @@ const INITIAL_FORM = {
   company: '',
   service: SERVICE_OPTIONS[0],
   message: '',
+  website: '', // honeypot — real visitors never fill this in
 }
 
 export default function Contact() {
@@ -34,21 +35,15 @@ export default function Contact() {
     setStatus('sending')
 
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
+      const res = await fetch(LEAD_API_ENDPOINT, {
         method: 'POST',
         headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          _subject: 'New Lead',
-          'Full Name': form.name,
-          Email: form.email,
-          Phone: form.phone || 'Not provided',
-          Company: form.company || 'Not provided',
-          'Interested In': form.service,
-          Message: form.message || 'No additional details provided',
-        }),
+        body: JSON.stringify(form),
       })
 
-      if (!res.ok) throw new Error('Form submission failed')
+      const data = await res.json().catch(() => null)
+      if (!res.ok || !data?.ok) throw new Error('Form submission failed')
+
       setStatus('sent')
       setForm(INITIAL_FORM)
     } catch {
@@ -98,6 +93,19 @@ export default function Contact() {
             onSubmit={handleSubmit}
             className="lg:col-span-3 rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
           >
+            {/* Honeypot field for basic bot/spam protection — kept off-screen
+                rather than display:none, since some bots skip hidden fields */}
+            <input
+              type="text"
+              name="website"
+              value={form.website}
+              onChange={update('website')}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
+
             <div className="grid gap-5 sm:grid-cols-2">
               <Field label="Full name">
                 <input

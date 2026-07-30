@@ -42,12 +42,12 @@ RewriteRule ^(.+)/$ /%1 [L,R=301]
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
-  # Allow: self-hosted assets, Google Fonts, the Google Maps embed on the
-  # contact section, and the Formspree endpoint the contact form submits
-  # to. If you add new third-party scripts/widgets later (analytics, chat
-  # widgets, etc.), their domains need to be added here too, or the
-  # browser will silently block them.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://www.google.com; connect-src 'self' https://formspree.io; base-uri 'self'; object-src 'none'"
+  # Allow: self-hosted assets, Google Fonts, and the Google Maps embed on
+  # the contact section. The contact form's lead API lives under this
+  # same domain (/api/...), so connect-src 'self' already covers it — if
+  # you ever move that API to a separate subdomain, add it here too, or
+  # the browser will silently block the form submission.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://www.google.com; connect-src 'self'; base-uri 'self'; object-src 'none'"
 </IfModule>
 
 # ---- 7. Compression ----
