@@ -3,7 +3,7 @@ import { Icon } from './Icons'
 
 export default function Services() {
   return (
-    <section id="services" className="bg-white py-20 sm:py-28">
+    <section id="services" className="scroll-mt-20 bg-white py-20 sm:py-28">
       <div className="container-app">
         <SectionHeading
           eyebrow="Services"

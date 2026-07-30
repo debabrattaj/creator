@@ -29,7 +29,7 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" className="relative overflow-hidden bg-brand-950 py-20 sm:py-28">
+    <section id="contact" className="scroll-mt-20 relative overflow-hidden bg-brand-950 py-20 sm:py-28">
       <div className="pointer-events-none absolute inset-0 bg-dot-grid opacity-30" />
       <div className="pointer-events-none absolute -bottom-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-600/30 blur-3xl" />
 

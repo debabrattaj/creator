@@ -7,7 +7,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
-    <section id="faq" className="bg-brand-50/50 py-20 sm:py-28">
+    <section id="faq" className="scroll-mt-20 bg-brand-50/50 py-20 sm:py-28">
       <div className="container-app">
         <SectionHeading
           eyebrow="FAQ"

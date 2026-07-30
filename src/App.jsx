@@ -1,34 +1,25 @@
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import TrustStrip from './components/TrustStrip'
-import Services from './components/Services'
-import WhyUs from './components/WhyUs'
-import Process from './components/Process'
-import Pricing from './components/Pricing'
-import Trust from './components/Trust'
-import FAQ from './components/FAQ'
-import Contact from './components/Contact'
 import Footer from './components/Footer'
 import WhatsAppFloat from './components/WhatsAppFloat'
 import MobileActionBar from './components/MobileActionBar'
-import SEOSchema from './components/SEOSchema'
+import ScrollToHash from './components/ScrollToHash'
+import Home from './pages/Home'
+import BlogIndex from './pages/BlogIndex'
+import BlogPost from './pages/BlogPost'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
     <div className="min-h-screen bg-white">
-      <SEOSchema />
+      <ScrollToHash />
       <Navbar />
-      <main>
-        <Hero />
-        <TrustStrip />
-        <Services />
-        <WhyUs />
-        <Process />
-        <Pricing />
-        <Trust />
-        <FAQ />
-        <Contact />
-      </main>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Footer />
       <WhatsAppFloat />
       <MobileActionBar />

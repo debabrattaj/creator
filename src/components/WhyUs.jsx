@@ -4,7 +4,7 @@ import { SectionHeading } from './Services'
 
 export default function WhyUs() {
   return (
-    <section id="why-us" className="bg-brand-50/50 py-20 sm:py-28">
+    <section id="why-us" className="scroll-mt-20 bg-brand-50/50 py-20 sm:py-28">
       <div className="container-app">
         <SectionHeading
           eyebrow="Why ZohoGeeks"

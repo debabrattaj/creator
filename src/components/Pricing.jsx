@@ -1,10 +1,11 @@
+import { Link } from 'react-router-dom'
 import { PACKAGES, CONTACT } from '../data/content'
 import { Icon } from './Icons'
 import { SectionHeading } from './Services'
 
 export default function Pricing() {
   return (
-    <section id="packages" className="bg-brand-50/50 py-20 sm:py-28">
+    <section id="packages" className="scroll-mt-20 bg-brand-50/50 py-20 sm:py-28">
       <div className="container-app">
         <SectionHeading
           eyebrow="Packages"
@@ -48,8 +49,8 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <a
-                href="#contact"
+              <Link
+                to="/#contact"
                 className={`mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition ${
                   pkg.highlight
                     ? 'bg-white text-brand-900 hover:bg-white/90'
@@ -58,7 +59,7 @@ export default function Pricing() {
               >
                 Get Custom Quote
                 <Icon name="arrow-right" className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
           ))}
         </div>

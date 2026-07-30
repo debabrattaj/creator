@@ -3,7 +3,7 @@ import { SectionHeading } from './Services'
 
 export default function Process() {
   return (
-    <section id="process" className="bg-white py-20 sm:py-28">
+    <section id="process" className="scroll-mt-20 bg-white py-20 sm:py-28">
       <div className="container-app">
         <SectionHeading
           eyebrow="How We Work"

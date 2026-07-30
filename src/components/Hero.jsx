@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { CONTACT } from '../data/content'
 import { Icon } from './Icons'
 
@@ -38,13 +39,13 @@ export default function Hero() {
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-              <a
-                href="#contact"
+              <Link
+                to="/#contact"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-accent-500/30 transition hover:brightness-110 active:scale-[0.98]"
               >
                 Get Free Consultation
                 <Icon name="arrow-right" className="h-4 w-4" />
-              </a>
+              </Link>
               <a
                 href={CONTACT.whatsappLink}
                 target="_blank"

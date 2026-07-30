@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { NAV_LINKS, CONTACT } from '../data/content'
 import { Icon } from './Icons'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { pathname } = useLocation()
+  const hasDarkHero = pathname === '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
@@ -20,7 +23,7 @@ export default function Navbar() {
     }
   }, [open])
 
-  const solid = scrolled || open
+  const solid = !hasDarkHero || scrolled || open
 
   return (
     <header
@@ -29,26 +32,26 @@ export default function Navbar() {
       }`}
     >
       <nav className="container-app flex h-16 sm:h-18 items-center justify-between">
-        <a href="#top" className="flex items-center gap-2 shrink-0" onClick={() => setOpen(false)}>
+        <Link to="/" className="flex items-center gap-2 shrink-0" onClick={() => setOpen(false)}>
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-accent-500 font-display text-sm font-extrabold text-white">
             ZG
           </span>
           <span className={`font-display text-lg font-bold transition-colors ${solid ? 'text-brand-950' : 'text-white'}`}>
             Zoho<span className="text-accent-500">Geeks</span>
           </span>
-        </a>
+        </Link>
 
         <ul className="hidden lg:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <a
-                href={link.href}
+              <Link
+                to={link.href}
                 className={`text-sm font-semibold transition-colors hover:text-accent-500 ${
                   solid ? 'text-brand-950/70' : 'text-white/80'
                 }`}
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -63,12 +66,12 @@ export default function Navbar() {
             <Icon name="phone" className="h-4 w-4" />
             {CONTACT.phoneDisplay}
           </a>
-          <a
-            href="#contact"
+          <Link
+            to="/#contact"
             className="rounded-full bg-brand-900 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-900/20 transition hover:bg-brand-800"
           >
             Get Free Consultation
-          </a>
+          </Link>
         </div>
 
         <button
@@ -93,13 +96,13 @@ export default function Navbar() {
         <ul className="container-app flex flex-col gap-1 py-6">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <a
-                href={link.href}
+              <Link
+                to={link.href}
                 onClick={() => setOpen(false)}
                 className="block rounded-lg px-3 py-3.5 text-base font-semibold text-brand-950 active:bg-brand-50"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -110,13 +113,13 @@ export default function Navbar() {
           >
             <Icon name="phone" className="h-4 w-4" /> Call {CONTACT.phoneDisplay}
           </a>
-          <a
-            href="#contact"
+          <Link
+            to="/#contact"
             onClick={() => setOpen(false)}
             className="flex items-center justify-center rounded-full bg-brand-900 px-5 py-3.5 text-sm font-semibold text-white"
           >
             Get Free Consultation
-          </a>
+          </Link>
         </div>
       </div>
     </header>

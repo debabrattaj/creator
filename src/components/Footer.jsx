@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { CONTACT, NAV_LINKS, SERVICES } from '../data/content'
 import { Icon } from './Icons'
 
@@ -37,9 +38,9 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className="text-sm text-white/50 hover:text-white">
+                  <Link to={link.href} className="text-sm text-white/50 hover:text-white">
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -50,9 +51,9 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {SERVICES.slice(0, 6).map((s) => (
                 <li key={s.title}>
-                  <a href="#services" className="text-sm text-white/50 hover:text-white">
+                  <Link to="/#services" className="text-sm text-white/50 hover:text-white">
                     {s.title}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
