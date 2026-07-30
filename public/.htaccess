@@ -1,11 +1,61 @@
-Options -MultiViews
+# ------------------------------------------------------------------
+# ZohoGeeks — Apache configuration
+# ------------------------------------------------------------------
+
+Options -MultiViews -Indexes
+
 RewriteEngine On
 RewriteBase /
 
-# Canonicalize www -> non-www, preserving the path and query string
+# ---- 1. Force HTTPS ----
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ---- 2. Canonicalize www -> non-www, preserving path and query string ----
 RewriteCond %{HTTP_HOST} ^www\.zohogeeks\.in$ [NC]
 RewriteRule ^(.*)$ https://zohogeeks.in/$1 [L,R=301]
 
+# ---- 3. Strip trailing slash from sub-paths (root "/" is left alone) ----
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/(.+)/$
+RewriteRule ^(.+)/$ /%1 [L,R=301]
+
+# ---- 4. Block access to hidden/system files (.htaccess, .env, .git, etc.) ----
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# ---- 5. Security headers ----
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Allow: self-hosted assets, Google Fonts, and the Google Maps embed on
+  # the contact section. If you add new third-party scripts/widgets later
+  # (analytics, chat widgets, etc.), their domains need to be added here
+  # too, or the browser will silently block them.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://www.google.com; connect-src 'self'; base-uri 'self'; object-src 'none'"
+</IfModule>
+
+# ---- 6. Compression ----
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# ---- 7. Browser caching ----
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# ---- 8. SPA fallback (must stay last) ----
 RewriteRule ^index\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
