@@ -24,22 +24,16 @@ export default function Hero() {
             Zoho Implementation & Consulting Studio
           </div>
 
-          <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-6xl">
+          <h1 className="mt-6 font-display text-5xl font-extrabold leading-[1.1] text-white sm:text-6xl lg:text-7xl">
             Automate your business with{' '}
             <span className="text-gradient bg-gradient-to-r from-accent-400 to-brand-300">Zoho</span>
           </h1>
 
-          <p className="mt-5 font-display text-lg font-bold text-white/90 sm:text-xl">
+          <p className="mt-6 font-display text-xl font-bold text-white/90 sm:text-2xl">
             Empowering Businesses Through Expert Zoho Implementation
           </p>
 
-          <p className="mx-auto mt-5 max-w-xl text-base text-white/70 sm:text-lg">
-            ZohoGeeks helps growing businesses implement, customize and automate
-            Zoho CRM, Books, People and the full Zoho One suite — configured
-            around how your team actually works, not a generic template.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               to="/#contact"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-accent-500 to-accent-600 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-accent-500/30 transition hover:brightness-110 active:scale-[0.98]"
