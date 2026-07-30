@@ -17,7 +17,7 @@ export default function ComparisonsTeaser() {
           {COMPARISON_LIST.map((c) => (
             <Link
               key={c.slug}
-              to={`/${c.slug}`}
+              to={`/blog/${c.slug}`}
               className="group flex items-center justify-between gap-3 rounded-2xl border border-brand-100 bg-white px-6 py-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               <span className="font-display text-sm font-bold text-brand-950 transition-colors group-hover:text-brand-700">

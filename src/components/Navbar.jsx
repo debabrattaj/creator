@@ -11,7 +11,7 @@ import { Icon } from './Icons'
 const DARK_HERO_PATHS = [
   '/',
   ...INDUSTRY_LIST.map((ind) => `/${ind.slug}`),
-  ...COMPARISON_LIST.map((c) => `/${c.slug}`),
+  ...COMPARISON_LIST.map((c) => `/blog/${c.slug}`),
 ]
 
 export default function Navbar() {

@@ -73,7 +73,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-2.5">
               {COMPARISON_LIST.map((c) => (
                 <li key={c.slug}>
-                  <Link to={`/${c.slug}`} className="text-sm text-white/50 hover:text-white">
+                  <Link to={`/blog/${c.slug}`} className="text-sm text-white/50 hover:text-white">
                     Zoho vs {c.competitor}
                   </Link>
                 </li>

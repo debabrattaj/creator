@@ -1,16 +1,22 @@
 import { useParams, Link, Navigate } from 'react-router-dom'
 import { POSTS, formatDate } from '../data/posts'
+import { COMPARISON_LIST } from '../data/comparisons'
 import { CONTACT } from '../data/content'
 import PostContent from '../components/blog/PostContent'
 import BlogPostSchema from '../components/blog/BlogPostSchema'
 import SEOHead from '../components/SEOHead'
 import { Icon } from '../components/Icons'
+import ComparisonPage from './ComparisonPage'
 
 export default function BlogPost() {
   const { slug } = useParams()
   const post = POSTS.find((p) => p.slug === slug)
 
-  if (!post) return <Navigate to="/blog" replace />
+  if (!post) {
+    const comparison = COMPARISON_LIST.find((c) => c.slug === slug)
+    if (comparison) return <ComparisonPage data={comparison} />
+    return <Navigate to="/blog" replace />
+  }
 
   const related = POSTS.filter((p) => p.slug !== post.slug).slice(0, 2)
 

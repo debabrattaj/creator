@@ -21,7 +21,7 @@ export default function ComparisonSchema({ data }) {
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${SITE_URL}/${data.slug}`,
+      '@id': `${SITE_URL}/blog/${data.slug}`,
     },
   }
 

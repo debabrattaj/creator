@@ -5,6 +5,8 @@ export const COMPARISONS = {
     metaTitle: 'Zoho CRM vs Salesforce',
     metaDescription:
       'An honest comparison of Zoho CRM and Salesforce — pricing positioning, customization depth, ease of setup and which is the better fit for your business.',
+    date: '2026-07-15',
+    readTime: '7 min read',
     eyebrow: 'Zoho CRM vs Salesforce',
     heroHeadline: 'Zoho CRM vs Salesforce: which one actually fits your team?',
     heroSubheadline:
@@ -80,6 +82,8 @@ export const COMPARISONS = {
     metaTitle: 'Zoho CRM vs Microsoft Dynamics 365',
     metaDescription:
       'Zoho CRM vs Microsoft Dynamics 365 compared — pricing, setup complexity, ecosystem fit and which is the better fit depending on whether your business already runs on Microsoft.',
+    date: '2026-06-28',
+    readTime: '7 min read',
     eyebrow: 'Zoho CRM vs Microsoft Dynamics 365',
     heroHeadline: 'Zoho CRM vs Microsoft Dynamics 365: does your stack decide it for you?',
     heroSubheadline:
@@ -155,6 +159,8 @@ export const COMPARISONS = {
     metaTitle: 'Zoho CRM vs HubSpot',
     metaDescription:
       'Zoho CRM vs HubSpot compared — free tier limits, marketing automation depth, pricing as you scale, and which is the better fit for sales-led vs marketing-led businesses.',
+    date: '2026-06-12',
+    readTime: '6 min read',
     eyebrow: 'Zoho CRM vs HubSpot',
     heroHeadline: 'Zoho CRM vs HubSpot: sales-led operations vs inbound marketing',
     heroSubheadline:
@@ -229,6 +235,8 @@ export const COMPARISONS = {
     metaTitle: 'Zoho CRM vs Pipedrive',
     metaDescription:
       'Zoho CRM vs Pipedrive compared — simplicity vs breadth, pricing, and whether a focused sales pipeline tool or a full connected business suite fits your business better.',
+    date: '2026-05-28',
+    readTime: '6 min read',
     eyebrow: 'Zoho CRM vs Pipedrive',
     heroHeadline: 'Zoho CRM vs Pipedrive: simple pipeline tool or connected business suite?',
     heroSubheadline:
@@ -303,6 +311,8 @@ export const COMPARISONS = {
     metaTitle: 'Zoho CRM vs Odoo',
     metaDescription:
       'Zoho CRM vs Odoo compared — open-source flexibility vs managed SaaS simplicity, hosting and maintenance trade-offs, and which fits your technical resources.',
+    date: '2026-05-10',
+    readTime: '7 min read',
     eyebrow: 'Zoho CRM vs Odoo',
     heroHeadline: 'Zoho CRM vs Odoo: managed SaaS or self-hosted open source?',
     heroSubheadline:
@@ -377,6 +387,8 @@ export const COMPARISONS = {
     metaTitle: 'Zoho CRM vs Bitrix24',
     metaDescription:
       'Zoho CRM vs Bitrix24 compared — free tier generosity vs CRM depth, and whether an all-in-one bundled tool or a purpose-built CRM suite fits your business better.',
+    date: '2026-04-25',
+    readTime: '6 min read',
     eyebrow: 'Zoho CRM vs Bitrix24',
     heroHeadline: 'Zoho CRM vs Bitrix24: purpose-built CRM or all-in-one bundle?',
     heroSubheadline:

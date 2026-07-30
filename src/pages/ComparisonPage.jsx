@@ -10,7 +10,7 @@ import ComparisonSchema from '../components/ComparisonSchema'
 export default function ComparisonPage({ data }) {
   return (
     <>
-      <SEOHead title={data.metaTitle} description={data.metaDescription} path={`/${data.slug}`} />
+      <SEOHead title={data.metaTitle} description={data.metaDescription} path={`/blog/${data.slug}`} />
       <ComparisonSchema data={data} />
 
       <main>
@@ -20,7 +20,14 @@ export default function ComparisonPage({ data }) {
           <div className="pointer-events-none absolute -top-32 -right-32 h-80 w-80 rounded-full bg-brand-600/40 blur-3xl" />
           <div className="pointer-events-none absolute top-1/2 -left-24 h-72 w-72 rounded-full bg-accent-500/20 blur-3xl" />
 
-          <div className="container-app relative text-center">
+          <div className="container-app relative flex flex-col items-center text-center">
+            <Link
+              to="/blog"
+              className="mb-6 inline-flex items-center gap-2 self-start text-sm font-semibold text-white/60 hover:text-white"
+            >
+              <Icon name="arrow-right" className="h-4 w-4 rotate-180" />
+              Back to Blog
+            </Link>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold text-white/80 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
               {data.eyebrow}

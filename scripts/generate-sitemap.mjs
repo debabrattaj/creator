@@ -27,9 +27,10 @@ const industryUrls = INDUSTRY_LIST.map((ind) => ({
 }))
 
 const comparisonUrls = COMPARISON_LIST.map((c) => ({
-  loc: `/${c.slug}`,
+  loc: `/blog/${c.slug}`,
   changefreq: 'monthly',
   priority: '0.7',
+  lastmod: c.date,
 }))
 
 const urls = [...staticUrls, ...industryUrls, ...comparisonUrls, ...postUrls]
