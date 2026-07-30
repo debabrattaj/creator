@@ -1,6 +1,11 @@
 Options -MultiViews
 RewriteEngine On
 RewriteBase /
+
+# Canonicalize www -> non-www, preserving the path and query string
+RewriteCond %{HTTP_HOST} ^www\.zohogeeks\.in$ [NC]
+RewriteRule ^(.*)$ https://zohogeeks.in/$1 [L,R=301]
+
 RewriteRule ^index\.html$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
