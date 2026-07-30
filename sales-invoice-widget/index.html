@@ -1246,7 +1246,11 @@
                         await linkProductRowsToInvoice(newId);
                     }
 
-                    showToast('Invoice saved successfully' + (newId ? ` (ID: ${newId})` : '') + '.', 'success');
+                    const customerName = (customersById[customerId] && customersById[customerId][CUSTOMER_CONFIG.FIELDS.name]) || customerId;
+                    showToast(`Invoice saved successfully for ${customerName}.`, 'success');
+
+                    setTimeout(() => { location.reload(); }, 1500);
+                    return;
                 } else {
                     throw new Error((response && (response.message || JSON.stringify(response))) || 'Unknown error while saving invoice.');
                 }
