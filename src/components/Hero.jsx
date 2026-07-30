@@ -26,9 +26,9 @@ export default function Hero() {
             </div>
 
             <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-[3.4rem]">
-              Turn Zoho into your
+              Stop losing deals
               <span className="block text-gradient bg-gradient-to-r from-accent-400 to-brand-300">
-                unfair sales &amp; ops advantage
+                to a CRM nobody actually uses
               </span>
             </h1>
 
