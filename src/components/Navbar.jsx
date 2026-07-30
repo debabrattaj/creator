@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { NAV_LINKS, CONTACT } from '../data/content'
+import { INDUSTRY_LIST } from '../data/industries'
+import { COMPARISON_LIST } from '../data/comparisons'
 import { Icon } from './Icons'
+
+// Every route whose page opens on a dark hero section (needs light nav text
+// before scrolling). Home plus any industry/comparison landing page — derived
+// from the data files so a new page here doesn't silently break the navbar.
+const DARK_HERO_PATHS = [
+  '/',
+  ...INDUSTRY_LIST.map((ind) => `/${ind.slug}`),
+  ...COMPARISON_LIST.map((c) => `/${c.slug}`),
+]
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
-  const DARK_HERO_PATHS = ['/', '/zoho-crm-for-real-estate', '/zoho-crm-for-jewellery']
   const hasDarkHero = DARK_HERO_PATHS.includes(pathname)
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { POSTS } from '../src/data/posts.js'
 import { INDUSTRY_LIST } from '../src/data/industries.js'
+import { COMPARISON_LIST } from '../src/data/comparisons.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const SITE_URL = 'https://zohogeeks.in'
@@ -25,7 +26,13 @@ const industryUrls = INDUSTRY_LIST.map((ind) => ({
   priority: '0.8',
 }))
 
-const urls = [...staticUrls, ...industryUrls, ...postUrls]
+const comparisonUrls = COMPARISON_LIST.map((c) => ({
+  loc: `/${c.slug}`,
+  changefreq: 'monthly',
+  priority: '0.7',
+}))
+
+const urls = [...staticUrls, ...industryUrls, ...comparisonUrls, ...postUrls]
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

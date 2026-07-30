@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { CONTACT, NAV_LINKS, SERVICES } from '../data/content'
 import { INDUSTRY_LIST } from '../data/industries'
+import { COMPARISON_LIST } from '../data/comparisons'
 import { Icon } from './Icons'
 
 export default function Footer() {
@@ -9,7 +10,7 @@ export default function Footer() {
   return (
     <footer className="bg-brand-950 pt-16 pb-28 text-white/70 sm:pb-16">
       <div className="container-app">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <div className="flex items-center gap-2">
               <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-accent-500 font-display text-sm font-extrabold text-white">
@@ -61,6 +62,19 @@ export default function Footer() {
                 <li key={ind.slug}>
                   <Link to={`/${ind.slug}`} className="text-sm text-white/50 hover:text-white">
                     Zoho CRM for {ind.industry}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-display text-sm font-bold uppercase tracking-wide text-white">Compare</h4>
+            <ul className="mt-4 space-y-2.5">
+              {COMPARISON_LIST.map((c) => (
+                <li key={c.slug}>
+                  <Link to={`/${c.slug}`} className="text-sm text-white/50 hover:text-white">
+                    Zoho vs {c.competitor}
                   </Link>
                 </li>
               ))}

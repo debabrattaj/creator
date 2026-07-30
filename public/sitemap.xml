@@ -21,6 +21,36 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://zohogeeks.in/zoho-vs-salesforce</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://zohogeeks.in/zoho-vs-microsoft-dynamics-365</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://zohogeeks.in/zoho-vs-hubspot</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://zohogeeks.in/zoho-vs-pipedrive</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://zohogeeks.in/zoho-vs-odoo</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://zohogeeks.in/zoho-vs-bitrix24</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://zohogeeks.in/blog/zoho-crm-implementation-checklist</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
