@@ -3,20 +3,21 @@ import { FAQS } from '../data/content'
 import { Icon } from './Icons'
 import { SectionHeading } from './Services'
 
-export default function FAQ() {
+export default function FAQ({
+  items = FAQS,
+  eyebrow = 'FAQ',
+  title = 'Questions we hear before every project',
+  desc = "Can't find your answer? Reach out directly and we'll get back within one business day.",
+}) {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
     <section id="faq" className="scroll-mt-20 bg-brand-50/50 py-20 sm:py-28">
       <div className="container-app">
-        <SectionHeading
-          eyebrow="FAQ"
-          title="Questions we hear before every project"
-          desc="Can't find your answer? Reach out directly and we'll get back within one business day."
-        />
+        <SectionHeading eyebrow={eyebrow} title={title} desc={desc} />
 
         <div className="mx-auto mt-12 max-w-3xl space-y-3">
-          {FAQS.map((item, i) => {
+          {items.map((item, i) => {
             const isOpen = openIndex === i
             return (
               <div

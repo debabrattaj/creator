@@ -1,6 +1,7 @@
 import Hero from '../components/Hero'
 import TrustStrip from '../components/TrustStrip'
 import Services from '../components/Services'
+import IndustriesTeaser from '../components/IndustriesTeaser'
 import WhyUs from '../components/WhyUs'
 import Process from '../components/Process'
 import Pricing from '../components/Pricing'
@@ -23,6 +24,7 @@ export default function Home() {
         <Hero />
         <TrustStrip />
         <Services />
+        <IndustriesTeaser />
         <WhyUs />
         <Process />
         <Pricing />

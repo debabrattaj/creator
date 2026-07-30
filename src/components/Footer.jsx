@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CONTACT, NAV_LINKS, SERVICES } from '../data/content'
+import { INDUSTRY_LIST } from '../data/industries'
 import { Icon } from './Icons'
 
 export default function Footer() {
@@ -49,10 +50,17 @@ export default function Footer() {
           <div>
             <h4 className="font-display text-sm font-bold uppercase tracking-wide text-white">Services</h4>
             <ul className="mt-4 space-y-2.5">
-              {SERVICES.slice(0, 6).map((s) => (
+              {SERVICES.slice(0, 5).map((s) => (
                 <li key={s.title}>
                   <Link to="/#services" className="text-sm text-white/50 hover:text-white">
                     {s.title}
+                  </Link>
+                </li>
+              ))}
+              {INDUSTRY_LIST.map((ind) => (
+                <li key={ind.slug}>
+                  <Link to={`/${ind.slug}`} className="text-sm text-white/50 hover:text-white">
+                    Zoho CRM for {ind.industry}
                   </Link>
                 </li>
               ))}

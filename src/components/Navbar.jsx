@@ -7,7 +7,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
-  const hasDarkHero = pathname === '/'
+  const DARK_HERO_PATHS = ['/', '/zoho-crm-for-real-estate', '/zoho-crm-for-jewellery']
+  const hasDarkHero = DARK_HERO_PATHS.includes(pathname)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8)
