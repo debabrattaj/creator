@@ -9,6 +9,14 @@ export const COMPARISONS = {
     heroHeadline: 'Zoho CRM vs Salesforce: which one actually fits your team?',
     heroSubheadline:
       "Salesforce is the industry benchmark for enterprise customization. Zoho CRM is built for businesses that want to move fast without an army of certified admins. Here's an honest breakdown, not a sales pitch.",
+    spotlight: {
+      title: 'The AppExchange question nobody asks upfront',
+      paragraphs: [
+        "The base license comparison between Zoho CRM and Salesforce is closer than most vendor pitches admit — both handle pipeline stages, activity tracking and reporting competently out of the box. The real gap opens up the moment you need something beyond that base: say, a WhatsApp integration for your sales team, a proposal/e-signature tool, and territory-based lead routing.",
+        "On Salesforce, each of those is typically a separate AppExchange listing — its own vendor, its own monthly cost, its own admin configuration, and its own version of \"is this still supported\" risk two years from now. On Zoho, most of that already ships inside Zoho One or as a native Deluge-scripted workflow, which is why the sticker-price comparison between the two products understates the real cost difference for a mid-sized team.",
+        "None of this makes Salesforce the wrong choice — if you're running a 200-person sales org across four regions with dedicated RevOps headcount, AppExchange's depth is exactly what you're paying for. But for most businesses evaluating this comparison, the honest question isn't \"which CRM has more features\" — it's \"how many separate vendors am I willing to manage to get the features I actually need.\"",
+      ],
+    },
     quickVerdict: {
       zohoTitle: 'Zoho CRM is the better fit if…',
       zohoPoints: [
@@ -59,6 +67,10 @@ export const COMPARISONS = {
         q: 'Is Salesforce overkill for a small business?',
         a: "Often, yes. Salesforce's strengths — deep customization, a massive admin/consultant ecosystem — matter most at enterprise scale. Most small businesses get there faster and cheaper with Zoho CRM.",
       },
+      {
+        q: 'Why does Salesforce end up costing more than its sticker price suggests?',
+        a: "Mainly the AppExchange effect: the base license is competitively priced, but most real deployments end up adding several separately-priced AppExchange apps to cover integrations and workflows that ship natively inside Zoho One. It's worth pricing out your actual required add-ons before comparing base license costs alone.",
+      },
     ],
   },
 
@@ -72,6 +84,14 @@ export const COMPARISONS = {
     heroHeadline: 'Zoho CRM vs Microsoft Dynamics 365: does your stack decide it for you?',
     heroSubheadline:
       "Dynamics 365 shines when your business already runs on Microsoft 365, Teams and Azure. Zoho CRM shines as a faster, self-contained alternative. Here's how they actually compare.",
+    spotlight: {
+      title: 'One question decides this comparison before features even matter',
+      paragraphs: [
+        'Picture two businesses evaluating the same shortlist. The first runs entirely on Microsoft — every email is Outlook, every meeting is Teams, every report gets exported to Power BI, and IT already has an Azure tenant with single sign-on configured. The second business has no particular tool loyalty; people use whatever email client came with their laptop and collaborate over WhatsApp and Google Docs.',
+        "For the first business, Dynamics 365 has a structural advantage that no feature checklist captures well: a lead logged in the CRM shows up in the same Outlook inbox, the same Teams channel, the same Power BI dashboard the team already checks daily. That kind of ambient integration is genuinely hard to replicate, and it's the actual reason Dynamics 365 wins deals — not because its CRM engine is inherently more powerful.",
+        "For the second business, that advantage evaporates entirely, and what's left is Dynamics 365's more complex, module-based licensing and typically longer implementation timeline against Zoho CRM's faster, self-contained setup. If you're reading this comparison trying to weigh CRM features against each other, you're probably asking the wrong question — ask which ecosystem your team already lives in instead.",
+      ],
+    },
     quickVerdict: {
       zohoTitle: 'Zoho CRM is the better fit if…',
       zohoPoints: [
@@ -122,6 +142,10 @@ export const COMPARISONS = {
         q: 'Does Zoho CRM support GST-compliant billing like Dynamics 365 does for India?',
         a: 'Yes, Zoho CRM connects natively to Zoho Books for GST-compliant invoicing. Dynamics 365 supports Indian GST too, typically through localization add-ons or partner configuration.',
       },
+      {
+        q: 'We already use Microsoft 365 — does that automatically mean we should pick Dynamics 365?',
+        a: "Not automatically, but it's the single most important factor to weigh. If Outlook, Teams and SharePoint are where your team already works daily, Dynamics 365's native integration is a real, ongoing advantage. If your Microsoft 365 usage is fairly light, that advantage matters less than Zoho CRM's simpler setup and licensing.",
+      },
     ],
   },
 
@@ -135,6 +159,14 @@ export const COMPARISONS = {
     heroHeadline: 'Zoho CRM vs HubSpot: sales-led operations vs inbound marketing',
     heroSubheadline:
       "HubSpot built its name on inbound marketing. Zoho CRM built its name on breadth — sales, finance, HR and support in one connected suite. Here's how they actually compare for a growing business.",
+    spotlight: {
+      title: "The contact-based pricing trap",
+      paragraphs: [
+        "Here's the trajectory we see most often: a business signs up for HubSpot's free CRM, likes it, and moves to Marketing Hub Starter once they want email sequences and basic automation. The list grows — every trade show scan, every webinar signup, every newsletter subscriber gets added as a marketing contact, whether or not they're an active lead.",
+        "HubSpot's Marketing Hub pricing is tied directly to that marketing contact count, and it's not always obvious which of your contacts count against the tier until you're already near a threshold. A business that felt comfortably priced at 1,000 contacts can find itself facing a meaningfully higher bill at 5,000 — not because they added five times the value, but because their list simply grew the way lists do.",
+        "Zoho CRM sidesteps this entirely by pricing per user rather than per contact, so your database can grow to any size without triggering a pricing tier change. That's not automatically \"better\" — if inbound content and marketing automation genuinely are your growth engine, HubSpot's tools are more polished for that specific job, and the pricing model is a fair trade for it. But if you're sales-led and marketing is secondary, paying a contact tax on a growing database is a cost worth modeling out before you commit.",
+      ],
+    },
     quickVerdict: {
       zohoTitle: 'Zoho CRM is the better fit if…',
       zohoPoints: [
@@ -184,6 +216,10 @@ export const COMPARISONS = {
         q: 'Should a sales-focused business choose Zoho or HubSpot?',
         a: "If your growth engine is inbound content and marketing, HubSpot's strengths matter more. If your business runs on structured sales processes connected to finance and operations, Zoho CRM's broader suite is usually the better fit.",
       },
+      {
+        q: "How do I avoid being surprised by HubSpot's contact-based pricing later?",
+        a: "Model your expected contact list growth over the next 12-24 months against HubSpot's published contact tiers before committing, not just your current list size. A business growing its database quickly can outgrow a comfortable-looking tier faster than expected.",
+      },
     ],
   },
 
@@ -197,6 +233,14 @@ export const COMPARISONS = {
     heroHeadline: 'Zoho CRM vs Pipedrive: simple pipeline tool or connected business suite?',
     heroSubheadline:
       "Pipedrive is deliberately minimal — a clean visual sales pipeline and little else. Zoho CRM trades some of that simplicity for breadth. Here's how to decide which trade-off is right for you.",
+    spotlight: {
+      title: 'When simplicity is genuinely the right answer',
+      paragraphs: [
+        "It's worth making the honest case for Pipedrive before defaulting to \"the bigger suite wins.\" A two-person founder-led sales team that will never touch marketing automation, never issue a GST invoice from the CRM, and never need an HR or helpdesk module gets real value from Pipedrive's minimalism — every screen is a sales pipeline, every feature exists because a salesperson asked for it, and the learning curve is close to zero.",
+        "Zoho CRM in that exact scenario would arguably be over-provisioned — you'd be looking at modules and settings that don't apply to a two-person team yet, and \"more capable\" isn't the same as \"better for you right now.\" This is the honest exception to most CRM comparisons: sometimes the tool with fewer features is the correct tool, not the compromise.",
+        "The trade-off shows up at the inflection point most growing businesses eventually hit — the day someone asks \"can the CRM also handle our invoicing\" or \"can support tickets link back to the deal.\" Pipedrive's answer is generally a third-party integration; Zoho's is a native module already sitting in the same suite. Whether that inflection point matters to you today, or ever, is really the only question this comparison should turn on.",
+      ],
+    },
     quickVerdict: {
       zohoTitle: 'Zoho CRM is the better fit if…',
       zohoPoints: [
@@ -246,6 +290,10 @@ export const COMPARISONS = {
         q: 'Can I migrate from Pipedrive to Zoho CRM easily?',
         a: 'Yes. We handle exporting your Pipedrive deals, contacts and pipeline stages, cleaning the data, and mapping it into Zoho CRM with equivalent (and typically more advanced) automation.',
       },
+      {
+        q: 'Is Pipedrive ever the better long-term choice, not just the simpler starting point?',
+        a: "For a small, purely sales-focused team that's confident it will never need marketing automation, finance integration or a helpdesk, yes — Pipedrive's simplicity is a genuine long-term fit, not just a stepping stone.",
+      },
     ],
   },
 
@@ -259,6 +307,14 @@ export const COMPARISONS = {
     heroHeadline: 'Zoho CRM vs Odoo: managed SaaS or self-hosted open source?',
     heroSubheadline:
       "Odoo gives you full code-level control if you're willing to own the hosting and maintenance. Zoho CRM gives you a fully managed suite with zero infrastructure to look after. Here's the real trade-off.",
+    spotlight: {
+      title: "The self-hosting cost nobody puts in the comparison chart",
+      paragraphs: [
+        "Odoo Community's price tag of zero is real, and for a business with a developer on staff who's comfortable with Linux, PostgreSQL and Python, it's a genuinely compelling starting point. But \"free\" only describes the license — it says nothing about the server it needs to run on, the person who patches it when a security update lands, or the afternoon lost when a module upgrade breaks a customization that worked fine on the previous version.",
+        "We've seen this play out the same way more than once: a business adopts Odoo Community to avoid subscription costs, it works well for a year, and then the one person who understood the server setup leaves. What was \"free\" becomes an unplanned consulting engagement to stabilize a system nobody in-house can safely touch anymore. That's not a knock on Odoo's software — it's a genuine and often underestimated cost of the self-hosted model.",
+        "Zoho CRM's subscription cost is the mirror image of that trade-off: you're paying, in part, for the fact that nobody on your team ever needs to think about a server. Whether that trade makes sense depends entirely on whether you have real in-house technical capacity today, and whether you'll still have it in three years when the person who set things up has moved on.",
+      ],
+    },
     quickVerdict: {
       zohoTitle: 'Zoho CRM is the better fit if…',
       zohoPoints: [
@@ -308,6 +364,10 @@ export const COMPARISONS = {
         q: 'Is Odoo or Zoho better for GST compliance in India?',
         a: "Zoho Books provides native GST-ready invoicing out of the box. Odoo supports Indian GST too, but typically needs specific localization modules configured correctly, often with a local implementation partner.",
       },
+      {
+        q: 'What happens if the person who set up our Odoo instance leaves the company?',
+        a: "This is the real risk of self-hosting without a dedicated team: if nobody else understands the server setup, module customizations and upgrade history, you may need external consulting help to safely maintain or upgrade the system. It's worth having more than one person familiar with the setup, or budgeting for ongoing support.",
+      },
     ],
   },
 
@@ -321,6 +381,14 @@ export const COMPARISONS = {
     heroHeadline: 'Zoho CRM vs Bitrix24: purpose-built CRM or all-in-one bundle?',
     heroSubheadline:
       "Bitrix24 bundles a CRM with a social intranet, website builder and more under a very generous free tier. Zoho CRM trades that breadth for a deeper, more purpose-built CRM. Here's how they compare.",
+    spotlight: {
+      title: "What \"free\" actually covers, and where it stops",
+      paragraphs: [
+        "Bitrix24's free plan genuinely supports a large number of users, which is unusual and makes it an easy first pick for a cash-strapped early team — most competitors cap free users in the single digits. That generosity is real, not a bait-and-switch.",
+        "What the free tier doesn't advertise as loudly is where its ceiling sits: storage limits that a growing deal history and attached files hit faster than expected, automation rules capped well below what a serious sales process needs, and a CRM feature set that's intentionally the shallowest of the tools bundled into the platform — because Bitrix24's core pitch is breadth (intranet, website builder, tasks, CRM together), not CRM depth specifically.",
+        "The practical pattern we see: a team outgrows the free tier's limits around the same time they realize they need CRM-specific depth — territory rules, advanced automation, AI-assisted lead scoring — that Bitrix24 was never trying to be the best at. At that point the choice isn't really \"free vs. paid\" anymore, it's \"generalist bundle vs. purpose-built CRM,\" and that's a different, more honest question than the pricing page alone answers.",
+      ],
+    },
     quickVerdict: {
       zohoTitle: 'Zoho CRM is the better fit if…',
       zohoPoints: [
@@ -369,6 +437,10 @@ export const COMPARISONS = {
       {
         q: 'What does Bitrix24 include that Zoho CRM does not?',
         a: "Bitrix24 bundles a social intranet and website builder alongside its CRM, which Zoho doesn't replicate directly (though Zoho One includes its own broader suite of 45+ specialized business apps instead of an intranet/website builder combo).",
+      },
+      {
+        q: "What happens when we outgrow Bitrix24's free tier limits?",
+        a: 'Storage and automation limits are usually the first thing a growing team hits. At that point you either upgrade to a paid Bitrix24 tier or evaluate a purpose-built CRM like Zoho — worth deciding based on whether you need more of Bitrix24\'s bundled tools, or specifically deeper CRM functionality.',
       },
     ],
   },

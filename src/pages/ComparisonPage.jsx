@@ -94,6 +94,30 @@ export default function ComparisonPage({ data }) {
           </div>
         </section>
 
+        {/* Spotlight — a unique analytical take, not a bulleted checklist */}
+        {data.spotlight && (
+          <section className="bg-brand-950 py-20 sm:py-28">
+            <div className="container-app">
+              <div className="mx-auto max-w-2xl">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs font-bold uppercase tracking-widest text-accent-400">
+                  Beyond the Feature List
+                </span>
+                <Icon name="quote" className="mt-6 h-8 w-8 text-accent-500/60" />
+                <h2 className="mt-4 font-display text-2xl font-extrabold leading-snug text-white sm:text-3xl">
+                  {data.spotlight.title}
+                </h2>
+                <div className="mt-6 space-y-5">
+                  {data.spotlight.paragraphs.map((para, i) => (
+                    <p key={i} className="text-base leading-[1.8] text-white/70">
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Comparison table */}
         <section className="bg-brand-50/50 py-20 sm:py-28">
           <div className="container-app">
