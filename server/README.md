@@ -62,8 +62,14 @@ one of:
   if your host supports setting env vars for PHP (cPanel → MultiPHP
   INI Editor, or a `.user.ini` file) — otherwise just edit the
   `$fromAddress` default directly in the script.
-- To also CC someone on every lead notification, set the
-  `CC_RECIPIENT` environment variable to their email address (same
-  method as `FROM_ADDRESS` above), or just edit the `$ccRecipient`
-  default directly in the script. Leave it unset/empty and no `Cc:`
-  header is sent at all — this is off by default.
+- Every lead notification is CC'd to `debabrattaj@gmail.com` by
+  default (hardcoded as the `$ccRecipient` fallback, since env vars
+  aren't reliably picked up on all shared hosts). Override it per
+  environment with the `CC_RECIPIENT` env var, edit the default
+  directly in the script for a different address, or set
+  `CC_RECIPIENT` to an empty string to disable the `Cc:` header
+  entirely.
+- If a CC'd Gmail address isn't receiving anything (even after
+  checking spam), it's almost always missing SPF/DKIM on the sending
+  domain rather than a script bug — check cPanel's "Email
+  Deliverability" tool for `zohogeeks.in`.

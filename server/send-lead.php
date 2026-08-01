@@ -13,7 +13,7 @@ declare(strict_types=1);
  */
 
 $leadRecipient = getenv('LEAD_RECIPIENT') ?: 'info@zohogeeks.in';
-$ccRecipient = getenv('CC_RECIPIENT') ?: ''; // optional, e.g. 'debabrattaj@gmail.com'
+$ccRecipient = getenv('CC_RECIPIENT') ?: 'debabrattaj@gmail.com'; // set CC_RECIPIENT to override, or leave empty string to disable
 $fromAddress = getenv('FROM_ADDRESS') ?: 'info@zohogeeks.in';
 $fromName = 'ZohoGeeks Website';
 
