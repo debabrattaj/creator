@@ -1,9 +1,10 @@
-# Lead notification API
+# Lead notification API (CGI)
 
-A small Flask app with one job: receive contact-form submissions from
-zohogeeks.in and email them to debabrattaj@gmail.com. This is separate
-from the static site in `dist/` — it needs its own deployment via
-cPanel's Python App feature.
+A single Python script with one job: receive contact-form submissions
+from zohogeeks.in and email them to debabrattaj@gmail.com. Pure
+standard library — no `pip install`, no virtualenv, no framework.
+This is separate from the static site in `dist/`; it's a small
+executable file dropped into your host's `cgi-bin` directory.
 
 ## 1. Get a Gmail App Password
 
@@ -11,88 +12,105 @@ Gmail no longer allows plain account passwords for SMTP. You need an
 App Password instead:
 
 1. Turn on 2-Step Verification on the Gmail account you want to send
-   *from* (this can be a different address than debabrattaj@gmail.com —
-   e.g. a dedicated address like `noreply.zohogeeks@gmail.com` if you'd
-   rather not use a personal account for this)
+   *from* (can be a different address than debabrattaj@gmail.com —
+   e.g. a dedicated `noreply.zohogeeks@gmail.com` if you'd rather not
+   use a personal account for this)
 2. Go to https://myaccount.google.com/apppasswords
 3. Create an app password (name it something like "ZohoGeeks Website")
-4. Copy the 16-character password — you'll paste it into cPanel below,
-   not into any code file
+4. Copy the 16-character password — you'll set it as an environment
+   variable in step 4 below, not paste it into any code file
 
-## 2. Set up the Python app in cPanel
+## 2. Upload the script
 
-1. In cPanel, open **Setup Python App**
-2. Click **Create Application**
-3. Python version: 3.9 or newer
-4. Application root: something like `zohogeeks-api` (a folder outside
-   `public_html`, cPanel creates it for you)
-5. Application URL: pick a path under your domain, e.g.
-   `zohogeeks.in/api` — this determines the final endpoint URL
-6. Click Create
+Upload `send-lead.py` to `public_html/cgi-bin/` (most cPanel accounts
+already have this directory with CGI execution enabled by default).
+If yours doesn't have a `cgi-bin` folder, create one, and if requests
+to it 403, you may need to enable `Options +ExecCGI` for it — ask your
+host or check cPanel's "Cgi/Perl/Python Scripts" or similar setting.
 
-## 3. Upload the app files
+**Upload as plain text / binary mode, not "auto-detect"** — some FTP
+clients convert line endings on upload, which breaks the shebang line
+(the very first line of the script) and the script silently fails to
+run.
 
-Upload `app.py`, `passenger_wsgi.py`, and `requirements.txt` from this
-folder into the **Application root** directory cPanel just created
-(via File Manager or FTP).
+## 3. Make it executable
 
-## 4. Install dependencies
+Via cPanel File Manager: right-click the file → Permissions → set to
+`755` (or check all three "Execute" boxes).
 
-Back in **Setup Python App**, find your app and copy the "Enter to the
-virtual environment" command it gives you — run it via cPanel's
-Terminal, then:
+Via terminal/SSH if you have it:
+```bash
+chmod 755 public_html/cgi-bin/send-lead.py
+```
+
+## 4. Point the shebang at your host's Python
+
+The first line of the script is `#!/usr/bin/env python3`, which works
+on most hosts. If the script 500s with no useful error, SSH in (or use
+cPanel's Terminal) and run:
 
 ```bash
-pip install -r requirements.txt
+which python3
 ```
+
+and if it prints something other than resolving cleanly through `env`
+(rare, but happens on some restricted CGI setups), replace the first
+line of `send-lead.py` with that exact path, e.g. `#!/usr/bin/python3`.
 
 ## 5. Set environment variables
 
-Still in **Setup Python App**, find the **Environment variables**
-section for your app and add:
+CGI scripts inherit environment variables from the web server process,
+not a `.env` file. In cPanel, this usually means one of:
+
+- **cPanel → Environment Variables** (if your host exposes this for
+  CGI, not just for "Setup Python App"), or
+- A wrapper: create `public_html/cgi-bin/send-lead.sh` that exports
+  the variables and then execs the Python script, and point your host
+  at the `.sh` file instead — ask your host's support which pattern
+  they support, since cPanel CGI environment variable handling varies
+  by provider.
+
+Either way, set:
 
 | Variable | Value |
 |---|---|
 | `GMAIL_ADDRESS` | the Gmail address you created the app password for |
 | `GMAIL_APP_PASSWORD` | the 16-character app password from step 1 |
-| `LEAD_RECIPIENT` | `debabrattaj@gmail.com` (optional — this is already the default) |
+| `LEAD_RECIPIENT` | `debabrattaj@gmail.com` (optional — already the default) |
 
-Click **Restart** on the app after saving these.
+**Never hardcode these into `send-lead.py` directly** — if your host
+genuinely gives you no way to set environment variables for CGI
+scripts, tell me and I'll adjust the script to read from a config file
+instead (kept outside `public_html` so it isn't web-accessible), which
+works everywhere but is a slightly weaker setup than real env vars.
 
-## 6. Get the final URL and update the site
+## 6. Verify it's working
 
-Your endpoint will be something like:
+Visit `https://zohogeeks.in/cgi-bin/send-lead.py` directly in a
+browser — it should return `{"ok": true, "service": "zohogeeks-lead-api"}`.
+If you get a 500 error, check your host's error log (cPanel → Errors,
+or `public_html/cgi-bin/error_log` if one gets created) — it'll show
+the actual Python traceback.
 
-```
-https://zohogeeks.in/api/send-lead
-```
-
-(exact URL depends on the "Application URL" you set in step 2, with
-`/send-lead` appended — the route defined in `app.py`)
-
-Send me that URL and I'll set it as `LEAD_API_ENDPOINT` in
-`src/data/content.js` and rebuild the site.
-
-## 7. Verify it's working
-
-Visit `https://zohogeeks.in/api/health` directly in a browser — it
-should return `{"ok": true}`. If it doesn't load at all, the Python
-app isn't running yet (check cPanel's app status/logs). Once that
-works, submit the actual contact form on the site and check the inbox.
+Once the health check works, submit the real contact form on the site
+and check the inbox. The site already expects this exact URL by
+default (`LEAD_API_ENDPOINT` in `src/data/content.js`) — no further
+changes needed on the frontend side unless you deploy it somewhere
+else.
 
 ## Notes
 
-- This app only accepts requests from `zohogeeks.in` and
-  `www.zohogeeks.in` (CORS-restricted) and rate-limits to 5 submissions
-  per minute per visitor, as basic abuse protection.
-- Never commit real credentials into `app.py` or any file in this
-  repo — they belong in cPanel's environment variables only.
-- If `/api` is set up as a path under the same domain (recommended,
-  and what the site currently expects), cPanel automatically creates
-  its own `.htaccess` inside that subdirectory when you set up the
-  Python App, which routes requests to Passenger before the static
-  site's own `.htaccess` rules ever see them — so no changes are
-  needed there. If you instead point `/api` at a separate subdomain
-  (e.g. `api.zohogeeks.in`), tell me so I can add it to the site's
-  Content-Security-Policy `connect-src`, or the browser will silently
+- Rate-limited to 5 submissions per minute per visitor IP (tracked via
+  a small file in `/tmp`, since each CGI request is a fresh process
+  with no shared memory) — basic abuse protection since this endpoint
+  is publicly reachable.
+- Includes a honeypot field (`website`) that real visitors never fill
+  in; submissions with it set are silently dropped.
+- Same-origin by design (the site calls `/cgi-bin/...` on its own
+  domain), so no CORS headers are needed. If you ever move this to a
+  different subdomain, tell me — the site's Content-Security-Policy
+  `connect-src` would need updating, or the browser will silently
   block the form submission.
+- If outbound port 587 is blocked by your host (uncommon, but some
+  hosts restrict it), the script also reads `SMTP_HOST` / `SMTP_PORT`
+  environment variables if you need to point it at a different relay.

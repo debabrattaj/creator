@@ -11,12 +11,13 @@ export const CONTACT = {
   mapQuery: 'Somu Avenue Bishwanath Nagar Gothapatna Bhubaneswar',
 }
 
-// Contact form -> email delivery, via the small Flask app in /server.
-// See server/README.md for the full cPanel deployment walkthrough.
-// Once deployed, replace this with the real endpoint, e.g.
-// 'https://zohogeeks.in/api/send-lead'. Until then, the contact form
-// will show an error on submit instead of silently failing.
-export const LEAD_API_ENDPOINT = 'https://zohogeeks.in/api/send-lead'
+// Contact form -> email delivery, via the CGI script in /server.
+// See server/README.md for the full cgi-bin deployment walkthrough.
+// This already matches the recommended deployment path -- change it
+// only if send-lead.py ends up somewhere other than cgi-bin/. Until
+// it's deployed, the contact form will show an error on submit
+// instead of silently failing.
+export const LEAD_API_ENDPOINT = 'https://zohogeeks.in/cgi-bin/send-lead.py'
 
 export const NAV_LINKS = [
   { label: 'Services', href: '/#services' },
