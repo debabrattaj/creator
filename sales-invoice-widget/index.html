@@ -68,7 +68,7 @@
 
             <div class="xl:col-span-3 space-y-6">
                 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200" id="invoice-details-card">
                     <div class="flex items-center gap-2 mb-6">
                         <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -188,6 +188,24 @@
                             <tbody class="text-[13px] text-slate-700 divide-y divide-slate-100" id="tbody-purchase"></tbody>
                         </table>
                     </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-purchase">
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Gross Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="gwt">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Stone Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="stone">0.000 ct</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Net Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="nwt">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Net Pure Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="pure">0.000 GMS</div>
+                        </div>
+                    </div>
                 </div>
 
                                 <div id="section-product-wrapper" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 transition-all duration-300">
@@ -241,6 +259,28 @@
                             <tbody class="text-[13px] text-slate-700 divide-y divide-slate-100" id="tbody-product"></tbody>
                         </table>
                     </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-product">
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Quantity</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="qty">0 Nos</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Gross Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="gwt">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">PS Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="ps">0.000 ct</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Net Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="nwt">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Net Pure Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="pure">0.000 GMS</div>
+                        </div>
+                    </div>
                 </div>
 
                                 <div id="section-service-wrapper" class="hidden bg-white p-6 rounded-xl shadow-sm border border-slate-200 transition-all duration-300">
@@ -269,6 +309,16 @@
                             </thead>
                             <tbody class="text-[13px] text-slate-700 divide-y divide-slate-100" id="tbody-service"></tbody>
                         </table>
+                    </div>
+                    <div class="grid grid-cols-2 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-service">
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Services</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="count">0 Nos</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Service Amount</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="amt">₹0.00</div>
+                        </div>
                     </div>
                 </div>
 
@@ -322,6 +372,28 @@
                             </thead>
                             <tbody class="text-[13px] text-slate-700 divide-y divide-slate-100" id="tbody-return"></tbody>
                         </table>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-5 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-return">
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Quantity</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="qty">0 Nos</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Gross Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="gwt">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">PS Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="ps">0.000 ct</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Net Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="nwt">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Net Pure Weight</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="pure">0.000 GMS</div>
+                        </div>
                     </div>
                 </div>
 
@@ -385,6 +457,40 @@
                         <div class="mt-4 pt-5 border-t border-slate-200 text-center">
                             <div class="text-indigo-600 font-medium text-[13px] mb-1">Grand Total</div>
                             <div class="text-[22px] font-bold text-indigo-700 tracking-tight" id="sum-grandtotal">₹ 0.00</div>
+                        </div>
+                    </div>
+
+                                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="text-[14px] font-semibold text-slate-800 mb-4">Receipt Summary</h3>
+                        <div class="space-y-2.5 text-[13px]">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Receipt Amount</span>
+                                <span class="font-semibold text-slate-800" id="rs-receipt-amount">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Receipt Balance</span>
+                                <span class="font-semibold text-slate-800" id="rs-receipt-balance">—</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Total Tax</span>
+                                <span class="font-semibold text-emerald-600" id="rs-total-tax">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Net Total</span>
+                                <span class="font-semibold text-slate-800" id="rs-net-total">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Sub Total</span>
+                                <span class="font-semibold text-slate-800" id="rs-sub-total">₹0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">Bill Discount</span>
+                                <span class="font-semibold text-slate-800"><span id="rs-bill-discount-pct">0.00%</span> / <span id="rs-bill-discount-amt">₹0.00</span></span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2.5 border-t border-slate-100">
+                                <span class="text-slate-600">Round Off</span>
+                                <span class="font-semibold text-slate-800" id="rs-round-off">₹0.00</span>
+                            </div>
                         </div>
                     </div>
 
@@ -1526,6 +1632,26 @@
             updateCustomerDropdownLabel();
         }
 
+        let sectionOrder = ['purchase', 'product', 'service', 'return'];
+
+        function bringSectionToFront(sectionName) {
+            sectionOrder = sectionOrder.filter(s => s !== sectionName);
+            sectionOrder.unshift(sectionName);
+            reorderSections();
+        }
+
+        function reorderSections() {
+            const wrapperIds = { purchase: 'section-purchase-wrapper', product: 'section-product-wrapper', service: 'section-service-wrapper', return: 'section-return-wrapper' };
+            let insertAfter = document.getElementById('invoice-details-card');
+            if (!insertAfter) return;
+            sectionOrder.forEach(name => {
+                const el = document.getElementById(wrapperIds[name]);
+                if (!el) return;
+                insertAfter.after(el);
+                insertAfter = el;
+            });
+        }
+
         function toggleSection(sectionName) {
             activeSections[sectionName] = !activeSections[sectionName];
             const btn = document.getElementById('btn-' + sectionName);
@@ -1545,6 +1671,7 @@
                     if (document.getElementById(`tbody-${sectionName}`).children.length === 0 && sectionName !== 'return') {
                         addItem(sectionName);
                     }
+                    bringSectionToFront(sectionName);
                 } else {
                     wrapperDiv.classList.add('hidden');
                 }
@@ -1997,10 +2124,96 @@
 
             const grandTotal = taxableAfterDisc + cgst + sgst;
             document.getElementById('sum-grandtotal').innerText = formatCurrency(grandTotal);
+
+            document.getElementById('rs-sub-total').innerText = formatCurrency(taxable);
+            document.getElementById('rs-net-total').innerText = formatCurrency(taxableAfterDisc);
+            document.getElementById('rs-total-tax').innerText = formatCurrency(cgst + sgst);
+            document.getElementById('rs-round-off').innerText = formatCurrency(0);
+            document.getElementById('rs-receipt-amount').innerText = formatDrCr(grandTotal);
+
+            const discPct = taxable !== 0 ? (globalDiscount / taxable) * 100 : 0;
+            document.getElementById('rs-bill-discount-pct').innerText = discPct.toFixed(2) + '%';
+            document.getElementById('rs-bill-discount-amt').innerText = formatCurrency(globalDiscount);
+
+            const custId = document.getElementById('customerSelect').value;
+            const custRecord = customersById[custId];
+            const balanceEl = document.getElementById('rs-receipt-balance');
+            if (custId && custRecord) {
+                const openingBalance = parseFloat(custRecord[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
+                balanceEl.innerText = formatDrCr(openingBalance + grandTotal);
+            } else {
+                balanceEl.innerText = '—';
+            }
+
+            updateAllSectionSummaries();
         }
 
         function formatCurrency(num) {
             return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(num);
+        }
+
+        function formatDrCr(num) {
+            return `${formatCurrency(Math.abs(num))} ${num < 0 ? 'Cr' : 'Dr'}`;
+        }
+
+        function sumFieldValue(tbody, selector) {
+            let total = 0;
+            tbody.querySelectorAll(selector).forEach(el => { total += parseFloat(el.value) || 0; });
+            return total;
+        }
+
+        function sumPureWeight(tbody, nwtSelector, puritySelector) {
+            let total = 0;
+            Array.from(tbody.children).forEach(tr => {
+                const nwtEl = tr.querySelector(nwtSelector);
+                const purityEl = tr.querySelector(puritySelector);
+                const nwt = parseFloat(nwtEl && nwtEl.value) || 0;
+                const purity = parseFloat(purityEl && purityEl.value) || 0;
+                total += nwt * (purity / 100);
+            });
+            return total;
+        }
+
+        function setMetric(wrap, name, text) {
+            const el = wrap.querySelector(`[data-metric="${name}"]`);
+            if (el) el.textContent = text;
+        }
+
+        function updateSectionSummary(section) {
+            const tbody = document.getElementById(`tbody-${section}`);
+            const wrap = document.getElementById(`summary-${section}`);
+            if (!tbody || !wrap) return;
+
+            if (section === 'product' || section === 'return') {
+                const prefix = section === 'return' ? '.input-ret-' : '.input-';
+                const qty = sumFieldValue(tbody, `${prefix}qty`);
+                const gwt = sumFieldValue(tbody, `${prefix}gwt`);
+                const ps = sumFieldValue(tbody, `${prefix}ps-wt`);
+                const nwt = sumFieldValue(tbody, `${prefix}nwt`);
+                const pure = sumPureWeight(tbody, `${prefix}nwt`, `${prefix}purity`);
+                setMetric(wrap, 'qty', `${qty} Nos`);
+                setMetric(wrap, 'gwt', `${gwt.toFixed(3)} GMS`);
+                setMetric(wrap, 'ps', `${ps.toFixed(3)} ct`);
+                setMetric(wrap, 'nwt', `${nwt.toFixed(3)} GMS`);
+                setMetric(wrap, 'pure', `${pure.toFixed(3)} GMS`);
+            } else if (section === 'purchase') {
+                const gwt = sumFieldValue(tbody, '.input-gwt');
+                const stone = sumFieldValue(tbody, '.input-cs-wt');
+                const nwt = sumFieldValue(tbody, '.input-nwt');
+                const pure = sumPureWeight(tbody, '.input-nwt', '.input-purity');
+                setMetric(wrap, 'gwt', `${gwt.toFixed(3)} GMS`);
+                setMetric(wrap, 'stone', `${stone.toFixed(3)} ct`);
+                setMetric(wrap, 'nwt', `${nwt.toFixed(3)} GMS`);
+                setMetric(wrap, 'pure', `${pure.toFixed(3)} GMS`);
+            } else if (section === 'service') {
+                const amt = sumFieldValue(tbody, '.input-svc-linetotal');
+                setMetric(wrap, 'count', `${tbody.children.length} Nos`);
+                setMetric(wrap, 'amt', formatCurrency(amt));
+            }
+        }
+
+        function updateAllSectionSummaries() {
+            ['product', 'purchase', 'service', 'return'].forEach(updateSectionSummary);
         }
 
         function showToast(message, type) {
