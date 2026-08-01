@@ -1,20 +1,22 @@
 # Lead notification API (CGI)
 
 A single Python script with one job: receive contact-form submissions
-from zohogeeks.in and email them to debabrattaj@gmail.com. Pure
-standard library — no `pip install`, no virtualenv, no framework.
-This is separate from the static site in `dist/`; it's a small
-executable file dropped into your host's `cgi-bin` directory.
+from zohogeeks.in and email them to info@zohogeeks.in. Pure standard
+library — no `pip install`, no virtualenv, no framework. This is
+separate from the static site in `dist/`; it's a small executable
+file dropped into your host's `cgi-bin` directory.
 
 ## 1. Get a Gmail App Password
 
-Gmail no longer allows plain account passwords for SMTP. You need an
-App Password instead:
+The script still sends *via* Gmail SMTP even though it delivers *to*
+info@zohogeeks.in — sender and recipient are independent. Gmail no
+longer allows plain account passwords for SMTP, so you need an App
+Password:
 
 1. Turn on 2-Step Verification on the Gmail account you want to send
-   *from* (can be a different address than debabrattaj@gmail.com —
-   e.g. a dedicated `noreply.zohogeeks@gmail.com` if you'd rather not
-   use a personal account for this)
+   *from* — this can be any Gmail address, e.g. a dedicated
+   `noreply.zohogeeks@gmail.com` if you'd rather not use a personal
+   account for this
 2. Go to https://myaccount.google.com/apppasswords
 3. Create an app password (name it something like "ZohoGeeks Website")
 4. Copy the 16-character password — you'll set it as an environment
@@ -76,7 +78,7 @@ Either way, set:
 |---|---|
 | `GMAIL_ADDRESS` | the Gmail address you created the app password for |
 | `GMAIL_APP_PASSWORD` | the 16-character app password from step 1 |
-| `LEAD_RECIPIENT` | `debabrattaj@gmail.com` (optional — already the default) |
+| `LEAD_RECIPIENT` | `info@zohogeeks.in` (optional — already the default) |
 
 **Never hardcode these into `send-lead.py` directly** — if your host
 genuinely gives you no way to set environment variables for CGI

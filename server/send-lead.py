@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CGI script: receives contact-form submissions from zohogeeks.in and
-emails them to debabrattaj@gmail.com via Gmail SMTP.
+emails them to info@zohogeeks.in, sent via Gmail SMTP.
 
 Deploy as: public_html/cgi-bin/send-lead.py (must be executable, see
 README.md in this folder for the full setup walkthrough).
@@ -22,7 +22,7 @@ GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-LEAD_RECIPIENT = os.environ.get("LEAD_RECIPIENT", "debabrattaj@gmail.com")
+LEAD_RECIPIENT = os.environ.get("LEAD_RECIPIENT", "info@zohogeeks.in")
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 REQUIRED_FIELDS = ["name", "email", "service"]
