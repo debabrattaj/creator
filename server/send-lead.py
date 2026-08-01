@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 CGI script: receives contact-form submissions from zohogeeks.in and
-emails them to info@zohogeeks.in, sent via Gmail SMTP.
+emails them to info@zohogeeks.in, sent via that same cPanel mailbox's
+own SMTP -- no third-party email service involved.
 
 Deploy as: public_html/cgi-bin/send-lead.py (must be executable, see
 README.md in this folder for the full setup walkthrough).
@@ -18,10 +19,15 @@ import time
 from email.mime.text import MIMEText
 from email.utils import formataddr
 
-GMAIL_ADDRESS = os.environ.get("GMAIL_ADDRESS", "")
-GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
-SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+SMTP_USERNAME = os.environ.get("SMTP_USERNAME", "")  # e.g. info@zohogeeks.in
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")  # that mailbox's own password
+SMTP_HOST = os.environ.get("SMTP_HOST", "mail.zohogeeks.in")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+# Some cPanel mail servers require implicit SSL on port 465 instead of
+# STARTTLS on 587 -- check cPanel's "Connect Devices" page for the
+# account to see which your host actually wants, and set both
+# SMTP_PORT=465 and SMTP_USE_SSL=true together if so.
+SMTP_USE_SSL = os.environ.get("SMTP_USE_SSL", "false").lower() == "true"
 LEAD_RECIPIENT = os.environ.get("LEAD_RECIPIENT", "info@zohogeeks.in")
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -83,6 +89,18 @@ def check_rate_limit(ip):
     return allowed
 
 
+def send_via_smtp(msg):
+    if SMTP_USE_SSL:
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.send_message(msg)
+    else:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+            server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.send_message(msg)
+
+
 def main():
     method = os.environ.get("REQUEST_METHOD", "")
 
@@ -119,7 +137,7 @@ def main():
     if not EMAIL_RE.match(email):
         respond("400 Bad Request", {"ok": False, "error": "Invalid email address"})
 
-    if not GMAIL_ADDRESS or not GMAIL_APP_PASSWORD:
+    if not SMTP_USERNAME or not SMTP_PASSWORD:
         respond("500 Internal Server Error", {"ok": False, "error": "Server email is not configured"})
 
     body = (
@@ -133,21 +151,19 @@ def main():
 
     msg = MIMEText(body, "plain", "utf-8")
     msg["Subject"] = "New Lead"
-    msg["From"] = formataddr(("ZohoGeeks Website", GMAIL_ADDRESS))
+    msg["From"] = formataddr(("ZohoGeeks Website", SMTP_USERNAME))
     msg["To"] = LEAD_RECIPIENT
     msg["Reply-To"] = email
-    # Honored by Outlook, Apple Mail, Thunderbird. Gmail's own web UI does
-    # not render a priority flag for any sender regardless of headers --
-    # that's an Outlook/Exchange-specific UI convention.
+    # Honored by Outlook, Apple Mail, Thunderbird -- Gmail's own web UI does
+    # not render a priority flag for any sender regardless of headers,
+    # that's an Outlook/Exchange-specific UI convention, and it may or may
+    # not render in webmail depending on which client cPanel gives you.
     msg["X-Priority"] = "1"
     msg["X-MSMail-Priority"] = "High"
     msg["Importance"] = "High"
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
-            server.starttls()
-            server.login(GMAIL_ADDRESS, GMAIL_APP_PASSWORD)
-            server.send_message(msg)
+        send_via_smtp(msg)
     except Exception:
         respond("502 Bad Gateway", {"ok": False, "error": "Failed to send email"})
 
