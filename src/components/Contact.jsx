@@ -67,8 +67,11 @@ export default function Contact() {
         <div className="mt-14 grid gap-8 lg:grid-cols-5 lg:gap-10">
           {/* Contact info */}
           <div className="lg:col-span-2 space-y-4">
-            <ContactCard icon="phone" title="Call us" value={CONTACT.phoneDisplay} href={`tel:+91${CONTACT.phoneRaw}`} />
-            <ContactCard icon="whatsapp" title="WhatsApp" value={CONTACT.phoneDisplay} href={CONTACT.whatsappLink} />
+            <CallWhatsAppCard
+              value={CONTACT.phoneDisplay}
+              callHref={`tel:+91${CONTACT.phoneRaw}`}
+              whatsappHref={CONTACT.whatsappLink}
+            />
             <ContactCard icon="mail" title="Email us" value={CONTACT.email} href={`mailto:${CONTACT.email}`} />
             <ContactCard
               icon="map-pin"
@@ -222,6 +225,35 @@ function ContactCard({ icon, title, value, href }) {
         <span className="mt-0.5 block text-sm font-semibold text-white">{value}</span>
       </span>
     </a>
+  )
+}
+
+function CallWhatsAppCard({ value, callHref, whatsappHref }) {
+  return (
+    <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/10 text-accent-400">
+        <Icon name="phone" className="h-5 w-5" />
+      </span>
+      <span className="flex-1">
+        <span className="block text-xs font-semibold uppercase tracking-wide text-white/40">Call / WhatsApp</span>
+        <span className="mt-0.5 block text-sm font-semibold text-white">{value}</span>
+        <span className="mt-2 flex gap-4">
+          <a href={callHref} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/70 transition hover:text-accent-400">
+            <Icon name="phone" className="h-3.5 w-3.5" />
+            Call
+          </a>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/70 transition hover:text-accent-400"
+          >
+            <Icon name="whatsapp" className="h-3.5 w-3.5" />
+            WhatsApp
+          </a>
+        </span>
+      </span>
+    </div>
   )
 }
 
