@@ -62,3 +62,8 @@ one of:
   if your host supports setting env vars for PHP (cPanel → MultiPHP
   INI Editor, or a `.user.ini` file) — otherwise just edit the
   `$fromAddress` default directly in the script.
+- To also CC someone on every lead notification, set the
+  `CC_RECIPIENT` environment variable to their email address (same
+  method as `FROM_ADDRESS` above), or just edit the `$ccRecipient`
+  default directly in the script. Leave it unset/empty and no `Cc:`
+  header is sent at all — this is off by default.

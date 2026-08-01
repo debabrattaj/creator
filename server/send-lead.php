@@ -13,6 +13,7 @@ declare(strict_types=1);
  */
 
 $leadRecipient = getenv('LEAD_RECIPIENT') ?: 'info@zohogeeks.in';
+$ccRecipient = getenv('CC_RECIPIENT') ?: ''; // optional, e.g. 'debabrattaj@gmail.com'
 $fromAddress = getenv('FROM_ADDRESS') ?: 'info@zohogeeks.in';
 $fromName = 'ZohoGeeks Website';
 
@@ -132,6 +133,9 @@ $headers = [
     'Importance: High',
     'Content-Type: text/plain; charset=UTF-8',
 ];
+if ($ccRecipient !== '') {
+    $headers[] = 'Cc: ' . $ccRecipient;
+}
 
 $sent = @mail($leadRecipient, 'New Lead', $body, implode("\r\n", $headers));
 
