@@ -55,13 +55,6 @@
                 </h1>
                 <p class="text-sm text-slate-500 mt-1">Create and manage your sales invoices</p>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="cancelInvoice()" class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm">Cancel</button>
-                <button id="btn-save-invoice" onclick="saveInvoice()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">Save Invoice</button>
-                <button class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
-                    Print <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
@@ -188,7 +181,11 @@
                             <tbody class="text-[13px] text-slate-700 divide-y divide-slate-100" id="tbody-purchase"></tbody>
                         </table>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-purchase">
+                    <div class="grid grid-cols-2 sm:grid-cols-5 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-purchase">
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Quantity</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="qty">0 Nos</div>
+                        </div>
                         <div class="p-3 bg-slate-50">
                             <div class="text-[11px] font-medium text-slate-500">Gross Weight</div>
                             <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="gwt">0.000 GMS</div>
@@ -511,6 +508,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 mt-6 pt-5 border-t border-slate-200">
+            <button onclick="cancelInvoice()" class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm">Cancel</button>
+            <button id="btn-save-invoice" onclick="saveInvoice()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">Save Invoice</button>
+            <button class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
+                Print <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
         </div>
     </div>
 
@@ -2201,6 +2206,7 @@
                 const stone = sumFieldValue(tbody, '.input-cs-wt');
                 const nwt = sumFieldValue(tbody, '.input-nwt');
                 const pure = sumPureWeight(tbody, '.input-nwt', '.input-purity');
+                setMetric(wrap, 'qty', `${tbody.children.length} Nos`);
                 setMetric(wrap, 'gwt', `${gwt.toFixed(3)} GMS`);
                 setMetric(wrap, 'stone', `${stone.toFixed(3)} ct`);
                 setMetric(wrap, 'nwt', `${nwt.toFixed(3)} GMS`);
