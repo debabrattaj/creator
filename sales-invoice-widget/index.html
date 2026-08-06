@@ -2172,13 +2172,13 @@
                 totals[section] = sum;
             });
 
-            document.getElementById(`sum-product`).innerText = formatCurrency(totals.product) + ' Dr';
-            document.getElementById(`sum-service`).innerText = formatCurrency(totals.service) + ' Dr';
-            document.getElementById(`sum-purchase`).innerText = formatCurrency(totals.purchase) + ' Cr';
-            document.getElementById(`sum-return`).innerText = formatCurrency(totals.return) + ' Cr';
+            document.getElementById(`sum-product`).innerText = formatCurrency(Math.abs(totals.product)) + ' Dr';
+            document.getElementById(`sum-service`).innerText = formatCurrency(Math.abs(totals.service)) + ' Dr';
+            document.getElementById(`sum-purchase`).innerText = formatCurrency(Math.abs(totals.purchase)) + ' Cr';
+            document.getElementById(`sum-return`).innerText = formatCurrency(Math.abs(totals.return)) + ' Cr';
 
-            const debits = totals.product + totals.service;
-            const credits = totals.purchase + totals.return;
+            const debits = Math.abs(totals.product) + Math.abs(totals.service);
+            const credits = Math.abs(totals.purchase) + Math.abs(totals.return);
             const taxable = debits - credits;
             lastSubTotal = taxable;
 
