@@ -2232,7 +2232,9 @@
             const creditBox = document.getElementById('rs-customer-credit-box');
             if (custId && custRecord) {
                 const openingBalance = parseFloat(custRecord[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
-                balanceEl.innerText = formatDrCr(openingBalance + grandTotal);
+                const grandTotalSign = grandTotal < 0 ? -1 : 1;
+                const receiptBalance = grandTotalSign * (Math.abs(grandTotal) - Math.abs(openingBalance));
+                balanceEl.innerText = formatDrCr(receiptBalance);
 
                 if (openingBalance !== 0) {
                     creditBox.classList.remove('hidden');
