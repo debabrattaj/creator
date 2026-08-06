@@ -410,25 +410,25 @@
                         <div class="space-y-3 text-[13px] text-slate-600 mb-4">
                             <div class="flex justify-between font-medium text-slate-700">
                                 <span>(+) Total Product</span>
-                                <span id="sum-product">₹ 0.00</span>
+                                <span id="sum-product">₹0.00 Dr</span>
                             </div>
                             <div class="flex justify-between font-medium text-slate-700">
                                 <span>(+) Total Service</span>
-                                <span id="sum-service">₹ 0.00</span>
+                                <span id="sum-service">₹0.00 Dr</span>
                             </div>
                             <div class="flex justify-between font-medium text-red-600">
                                 <span>(-) Old Gold Purchase</span>
-                                <span id="sum-purchase">₹ 0.00</span>
+                                <span id="sum-purchase">₹0.00 Cr</span>
                             </div>
                             <div class="flex justify-between font-medium text-red-600">
                                 <span>(-) Sales Return</span>
-                                <span id="sum-return">₹ 0.00</span>
+                                <span id="sum-return">₹0.00 Cr</span>
                             </div>
                         </div>
 
-                        <div class="mt-4 pt-5 border-t border-slate-200 text-center">
-                            <div class="text-indigo-600 font-medium text-[13px] mb-1">Grand Total</div>
-                            <div class="text-[22px] font-bold text-indigo-700 tracking-tight" id="sum-grandtotal">₹ 0.00</div>
+                        <div class="pt-3 border-t border-slate-200 flex justify-between font-semibold text-slate-800">
+                            <span>Sub Total</span>
+                            <span id="sum-subtotal">₹0.00 Dr</span>
                         </div>
                     </div>
 
@@ -455,13 +455,65 @@
                                 <span class="text-slate-600">Sub Total</span>
                                 <span class="font-semibold text-slate-800" id="rs-sub-total">₹0.00</span>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-600">Bill Discount</span>
-                                <span class="font-semibold text-slate-800"><span id="rs-bill-discount-pct">0.00%</span> / <span id="rs-bill-discount-amt">₹0.00</span></span>
+
+                            <div class="pt-2.5 border-t border-slate-100">
+                                <div class="flex items-center gap-1 mb-1.5">
+                                    <span class="text-slate-600">Bill Discount</span>
+                                    <svg class="w-3.5 h-3.5 text-slate-400" title="Enter a discount % or amount - the other field updates automatically" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex items-center border border-slate-300 rounded px-2 py-1.5 bg-white shadow-sm flex-1">
+                                        <input type="number" id="bill-discount-pct" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" step="0.01" oninput="updateDiscountFromPercent()">
+                                        <span class="text-slate-400 ml-1">%</span>
+                                    </div>
+                                    <div class="flex items-center border border-slate-300 rounded px-2 py-1.5 bg-white shadow-sm flex-1">
+                                        <span class="text-slate-400 mr-1">₹</span>
+                                        <input type="number" id="global-discount" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="updateDiscountFromAmount()">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center pt-2.5 border-t border-slate-100">
-                                <span class="text-slate-600">Round Off</span>
-                                <span class="font-semibold text-slate-800" id="rs-round-off">₹0.00</span>
+
+                            <div class="pt-2.5 border-t border-slate-100">
+                                <div class="flex items-center gap-1 mb-1.5">
+                                    <input type="checkbox" id="chk-round-off" class="rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 w-3.5 h-3.5" checked onchange="calculateInvoiceTotals()">
+                                    <span class="text-slate-600 ml-1">Round Off</span>
+                                    <svg class="w-3.5 h-3.5 text-slate-400" title="Rounds Grand Total to the nearest rupee. Click Dr/Cr to flip which side the adjustment applies to." fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex items-center border border-slate-300 rounded px-2 py-1.5 bg-slate-50 shadow-sm flex-1">
+                                        <span class="text-slate-400 mr-1">₹</span>
+                                        <input type="text" id="rs-round-off-amt" class="w-full outline-none text-right text-slate-500 bg-transparent p-0 border-0" value="0.00" readonly>
+                                    </div>
+                                    <button type="button" id="rs-round-off-dircode" onclick="toggleRoundOffDirection()" class="px-3 py-1.5 text-[12px] font-semibold rounded border border-indigo-200 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Dr</button>
+                                </div>
+                            </div>
+
+                            <div id="rs-customer-credit-box" class="hidden flex items-center justify-between px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
+                                <span class="text-[12px] font-medium text-amber-800 flex items-center gap-1" id="rs-customer-credit-label">Customer Credit (CR)</span>
+                                <span class="text-[13px] font-bold text-amber-800" id="rs-customer-credit-amt">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-5 border-t border-slate-200 text-center">
+                            <div class="text-indigo-600 font-medium text-[13px] mb-1">Grand Total</div>
+                            <div class="text-[22px] font-bold text-indigo-700 tracking-tight" id="sum-grandtotal">₹ 0.00</div>
+                            <div id="grandtotal-rounded-note" class="hidden text-[11px] text-slate-400 mt-0.5">(Rounded)</div>
+                        </div>
+                    </div>
+
+                                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-[14px] font-semibold text-slate-800 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> Additional Charges
+                            </h3>
+                            <button type="button" onclick="toggleAdditionalCharges()" id="btn-add-charges" class="px-3 py-1.5 text-[12px] font-medium border border-indigo-200 rounded-md text-indigo-600 bg-white hover:bg-indigo-50 flex items-center gap-1.5 shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Add Charges
+                            </button>
+                        </div>
+                        <div id="additional-charges-body" class="hidden mt-4">
+                            <div class="flex items-center border border-slate-300 rounded px-3 py-2 bg-white shadow-sm">
+                                <span class="text-slate-400 mr-1">₹</span>
+                                <input type="number" id="global-charges" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
                             </div>
                         </div>
                     </div>
@@ -469,24 +521,6 @@
                                         <div>
                         <h3 class="text-[14px] font-semibold text-slate-800 mb-3">Quick Actions</h3>
                         <div class="space-y-2">
-                            <div class="flex items-center justify-between px-4 py-2.5 bg-indigo-50 rounded-lg">
-                                <span class="text-indigo-700 text-[13px] font-medium flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg> Discount
-                                </span>
-                                <div class="flex items-center border border-indigo-200 rounded px-2 py-1 bg-white w-24">
-                                    <span class="text-slate-400 mr-1">₹</span>
-                                    <input type="number" id="global-discount" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between px-4 py-2.5 bg-indigo-50 rounded-lg">
-                                <span class="text-indigo-700 text-[13px] font-medium flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> Add. Charges
-                                </span>
-                                <div class="flex items-center border border-indigo-200 rounded px-2 py-1 bg-white w-24">
-                                    <span class="text-slate-400 mr-1">₹</span>
-                                    <input type="number" id="global-charges" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
-                                </div>
-                            </div>
                             <button onclick="openPaymentModal()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payment
                             </button>
@@ -2094,63 +2128,121 @@
             calcServiceRow(tr.querySelector('.input-svc-rate'));
         }
 
+        let roundOffOverrideDirection = null; // null = auto-computed; 'Dr'/'Cr' once the user manually flips it
+
+        function toggleRoundOffDirection() {
+            const current = document.getElementById('rs-round-off-dircode').textContent.trim();
+            roundOffOverrideDirection = current === 'Dr' ? 'Cr' : 'Dr';
+            calculateInvoiceTotals();
+        }
+
+        function toggleAdditionalCharges() {
+            const body = document.getElementById('additional-charges-body');
+            body.classList.toggle('hidden');
+        }
+
+        function updateDiscountFromPercent() {
+            const pct = parseFloat(document.getElementById('bill-discount-pct').value) || 0;
+            const base = Math.abs(lastSubTotal);
+            document.getElementById('global-discount').value = (base * pct / 100).toFixed(2);
+            calculateInvoiceTotals();
+        }
+
+        function updateDiscountFromAmount() {
+            calculateInvoiceTotals();
+        }
+
+        let lastSubTotal = 0;
+
         function calculateInvoiceTotals() {
             let totals = { product: 0, service: 0, purchase: 0, return: 0 };
-            
+
             ['product', 'service', 'purchase', 'return'].forEach(section => {
                 if(!activeSections[section]) return;
                 const tbody = document.getElementById(`tbody-${section}`);
                 if (!tbody) return;
-                
+
                 let sum = 0;
-                const totalSelector = section === 'service' ? '.input-svc-linetotal' : 
+                const totalSelector = section === 'service' ? '.input-svc-linetotal' :
                                      section === 'return' ? '.input-ret-linetotal' : '.input-linetotal';
-                                     
+
                 Array.from(tbody.querySelectorAll(totalSelector)).forEach(input => {
                     sum += parseFloat(input.value) || 0;
                 });
                 totals[section] = sum;
             });
 
-            document.getElementById(`sum-product`).innerText = formatCurrency(totals.product);
-            document.getElementById(`sum-service`).innerText = formatCurrency(totals.service);
-            document.getElementById(`sum-purchase`).innerText = formatCurrency(totals.purchase);
-            document.getElementById(`sum-return`).innerText = formatCurrency(totals.return);
+            document.getElementById(`sum-product`).innerText = formatCurrency(totals.product) + ' Dr';
+            document.getElementById(`sum-service`).innerText = formatCurrency(totals.service) + ' Dr';
+            document.getElementById(`sum-purchase`).innerText = formatCurrency(totals.purchase) + ' Cr';
+            document.getElementById(`sum-return`).innerText = formatCurrency(totals.return) + ' Cr';
 
             const debits = totals.product + totals.service;
             const credits = totals.purchase + totals.return;
-            let taxable = debits - credits;
+            const taxable = debits - credits;
+            lastSubTotal = taxable;
+
+            document.getElementById('sum-subtotal').innerText = formatDrCr(taxable);
+            document.getElementById('rs-sub-total').innerText = formatDrCr(taxable);
+            document.getElementById('rs-receipt-amount').innerText = formatDrCr(taxable);
 
             const globalDiscount = parseFloat(document.getElementById('global-discount').value) || 0;
             const globalCharges = parseFloat(document.getElementById('global-charges').value) || 0;
-            
+
+            const discPct = taxable !== 0 ? (globalDiscount / Math.abs(taxable)) * 100 : 0;
+            document.getElementById('bill-discount-pct').value = discPct.toFixed(2);
+
             const taxableAfterDisc = taxable - globalDiscount + globalCharges;
             const taxBase = Math.max(taxableAfterDisc, 0);
 
             const cgst = taxBase * 0.015;
             const sgst = taxBase * 0.015;
-
-            const grandTotal = taxableAfterDisc + cgst + sgst;
-            document.getElementById('sum-grandtotal').innerText = formatCurrency(grandTotal);
-
-            document.getElementById('rs-sub-total').innerText = formatCurrency(taxable);
-            document.getElementById('rs-net-total').innerText = formatCurrency(taxableAfterDisc);
+            document.getElementById('rs-net-total').innerText = formatDrCr(taxableAfterDisc);
             document.getElementById('rs-total-tax').innerText = formatCurrency(cgst + sgst);
-            document.getElementById('rs-round-off').innerText = formatCurrency(0);
-            document.getElementById('rs-receipt-amount').innerText = formatDrCr(grandTotal);
 
-            const discPct = taxable !== 0 ? (globalDiscount / taxable) * 100 : 0;
-            document.getElementById('rs-bill-discount-pct').innerText = discPct.toFixed(2) + '%';
-            document.getElementById('rs-bill-discount-amt').innerText = formatCurrency(globalDiscount);
+            const preRoundTotal = taxableAfterDisc + cgst + sgst;
+            const roundEnabled = document.getElementById('chk-round-off').checked;
+
+            let grandTotal = preRoundTotal;
+            let roundOffAmount = 0;
+            let roundOffDirection = 'Dr';
+
+            if (roundEnabled) {
+                const rounded = Math.round(preRoundTotal);
+                const diff = rounded - preRoundTotal;
+                const naturalDirection = diff >= 0 ? 'Dr' : 'Cr';
+                roundOffDirection = roundOffOverrideDirection || naturalDirection;
+                roundOffAmount = Math.abs(diff);
+                const signedRoundOff = (roundOffDirection === 'Dr' ? 1 : -1) * roundOffAmount;
+                grandTotal = preRoundTotal + signedRoundOff;
+            } else {
+                roundOffOverrideDirection = null;
+            }
+
+            document.getElementById('rs-round-off-amt').value = roundOffAmount.toFixed(2);
+            document.getElementById('rs-round-off-dircode').textContent = roundOffDirection;
+            document.getElementById('grandtotal-rounded-note').classList.toggle('hidden', !roundEnabled);
+
+            document.getElementById('sum-grandtotal').innerText = formatDrCr(grandTotal);
 
             const custId = document.getElementById('customerSelect').value;
             const custRecord = customersById[custId];
             const balanceEl = document.getElementById('rs-receipt-balance');
+            const creditBox = document.getElementById('rs-customer-credit-box');
             if (custId && custRecord) {
                 const openingBalance = parseFloat(custRecord[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
                 balanceEl.innerText = formatDrCr(openingBalance + grandTotal);
+
+                if (openingBalance !== 0) {
+                    creditBox.classList.remove('hidden');
+                    document.getElementById('rs-customer-credit-label').textContent = openingBalance < 0 ? 'Customer Credit (CR)' : 'Customer Balance (DR)';
+                    document.getElementById('rs-customer-credit-amt').textContent = formatDrCr(openingBalance);
+                } else {
+                    creditBox.classList.add('hidden');
+                }
             } else {
                 balanceEl.innerText = '—';
+                creditBox.classList.add('hidden');
             }
 
             updateAllSectionSummaries();
