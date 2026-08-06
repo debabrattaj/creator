@@ -1251,6 +1251,14 @@
             return String(value).trim();
         }
 
+        function formatBalanceNature(value) {
+            const text = zohoValueToText(value).toLowerCase();
+            if (!text) return '';
+            if (text.startsWith('cr')) return 'Cr';
+            if (text.startsWith('dr') || text.startsWith('de')) return 'Dr';
+            return zohoValueToText(value);
+        }
+
         function isZohoId(value) {
             return /^\d{10,}$/.test(String(value).trim());
         }
@@ -1581,7 +1589,7 @@
                     ? "text-red-600 font-bold text-[15px]"
                     : "text-indigo-600 font-bold text-[15px]";
 
-                const nature = zohoValueToText(customer[CUSTOMER_CONFIG.FIELDS.balanceNature]);
+                const nature = formatBalanceNature(customer[CUSTOMER_CONFIG.FIELDS.balanceNature]);
                 if (nature) {
                     natureSpan.textContent = nature;
                     natureSpan.classList.remove('hidden');
