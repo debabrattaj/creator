@@ -2186,14 +2186,47 @@
             document.getElementById('rs-sub-total').innerText = formatDrCr(taxable);
             document.getElementById('rs-receipt-amount').innerText = formatDrCr(taxable);
 
+            // Receipt Balance = Receipt Amount (Sub Total) net of the customer's
+            // existing Customer Credit - computed here (before discount/round
+            // off) since Grand Total is now derived FROM Receipt Balance, not
+            // the other way round.
+            const custId = document.getElementById('customerSelect').value;
+            const custRecord = customersById[custId];
+            const balanceEl = document.getElementById('rs-receipt-balance');
+            const creditBox = document.getElementById('rs-customer-credit-box');
+            let openingBalance = 0;
+            let receiptBalance = taxable;
+
+            if (custId && custRecord) {
+                openingBalance = parseFloat(custRecord[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
+                const taxableSignForBalance = taxable < 0 ? -1 : 1;
+                receiptBalance = taxableSignForBalance * (Math.abs(taxable) - Math.abs(openingBalance));
+                balanceEl.innerText = formatDrCr(receiptBalance);
+
+                if (openingBalance !== 0) {
+                    creditBox.classList.remove('hidden');
+                    document.getElementById('rs-customer-credit-label').textContent = 'Customer Credit';
+                    const nature = formatBalanceNature(custRecord[CUSTOMER_CONFIG.FIELDS.balanceNature]) || (openingBalance < 0 ? 'Cr' : 'Dr');
+                    document.getElementById('rs-customer-credit-amt').textContent = `${formatCurrency(Math.abs(openingBalance))} ${nature}`;
+                } else {
+                    creditBox.classList.add('hidden');
+                }
+            } else {
+                balanceEl.innerText = '—';
+                creditBox.classList.add('hidden');
+            }
+
             const globalDiscount = parseFloat(document.getElementById('global-discount').value) || 0;
             const globalCharges = parseFloat(document.getElementById('global-charges').value) || 0;
 
             const discPct = taxable !== 0 ? (globalDiscount / Math.abs(taxable)) * 100 : 0;
             document.getElementById('bill-discount-pct').value = discPct.toFixed(2);
 
-            const taxableSign = taxable < 0 ? -1 : 1;
-            const taxableAfterDisc = taxableSign * Math.max(Math.abs(taxable) - globalDiscount + globalCharges, 0);
+            // Grand Total base = Receipt Balance (Sub Total net of Customer
+            // Credit), then Bill Discount is deducted and Additional Charges
+            // added, preserving Receipt Balance's own Dr/Cr direction.
+            const balanceSign = receiptBalance < 0 ? -1 : 1;
+            const taxableAfterDisc = balanceSign * Math.max(Math.abs(receiptBalance) - globalDiscount + globalCharges, 0);
 
             // Tax is intentionally disabled for now (kept at 0) until real GST
             // rates/rules are confirmed - see calculateInvoiceTotals().
@@ -2226,29 +2259,6 @@
             document.getElementById('grandtotal-rounded-note').classList.toggle('hidden', !roundEnabled);
 
             document.getElementById('sum-grandtotal').innerText = formatDrCr(grandTotal);
-
-            const custId = document.getElementById('customerSelect').value;
-            const custRecord = customersById[custId];
-            const balanceEl = document.getElementById('rs-receipt-balance');
-            const creditBox = document.getElementById('rs-customer-credit-box');
-            if (custId && custRecord) {
-                const openingBalance = parseFloat(custRecord[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
-                const grandTotalSign = grandTotal < 0 ? -1 : 1;
-                const receiptBalance = grandTotalSign * (Math.abs(grandTotal) - Math.abs(openingBalance));
-                balanceEl.innerText = formatDrCr(receiptBalance);
-
-                if (openingBalance !== 0) {
-                    creditBox.classList.remove('hidden');
-                    document.getElementById('rs-customer-credit-label').textContent = 'Customer Credit';
-                    const nature = formatBalanceNature(custRecord[CUSTOMER_CONFIG.FIELDS.balanceNature]) || (openingBalance < 0 ? 'Cr' : 'Dr');
-                    document.getElementById('rs-customer-credit-amt').textContent = `${formatCurrency(Math.abs(openingBalance))} ${nature}`;
-                } else {
-                    creditBox.classList.add('hidden');
-                }
-            } else {
-                balanceEl.innerText = '—';
-                creditBox.classList.add('hidden');
-            }
 
             updateAllSectionSummaries();
         }
