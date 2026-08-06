@@ -2210,8 +2210,12 @@
             document.getElementById('rs-receipt-amount').innerText = formatDrCr(invoiceBalance);
 
             // Receipt Balance (internal only, no longer displayed as its own
-            // row) = Invoice Balance net of the customer's Customer Credit -
-            // computed here since Grand Total is derived FROM it.
+            // row) = Invoice Balance combined with the customer's Customer
+            // Credit using standard signed (Dr=+/Cr=-) addition: same-nature
+            // amounts add together, opposite-nature amounts net against each
+            // other. The sign used is the TRUE Balance_Nature, not just the
+            // raw opening-balance number's own sign (a positive number can
+            // still be a Cr balance).
             const custId = document.getElementById('customerSelect').value;
             const custRecord = customersById[custId];
             const creditRow = document.getElementById('rs-customer-credit-row');
@@ -2220,12 +2224,12 @@
 
             if (custId && custRecord) {
                 openingBalance = parseFloat(custRecord[CUSTOMER_CONFIG.FIELDS.openingBalance]) || 0;
-                const balanceSignForNet = invoiceBalance < 0 ? -1 : 1;
-                receiptBalance = balanceSignForNet * (Math.abs(invoiceBalance) - Math.abs(openingBalance));
+                const nature = formatBalanceNature(custRecord[CUSTOMER_CONFIG.FIELDS.balanceNature]) || (openingBalance < 0 ? 'Cr' : 'Dr');
+                const signedOpeningBalance = (nature === 'Cr' ? -1 : 1) * Math.abs(openingBalance);
+                receiptBalance = invoiceBalance + signedOpeningBalance;
 
                 if (openingBalance !== 0) {
                     creditRow.classList.remove('hidden');
-                    const nature = formatBalanceNature(custRecord[CUSTOMER_CONFIG.FIELDS.balanceNature]) || (openingBalance < 0 ? 'Cr' : 'Dr');
                     document.getElementById('rs-customer-credit-amt').textContent = `${formatCurrency(Math.abs(openingBalance))} ${nature}`;
                 } else {
                     creditRow.classList.add('hidden');
