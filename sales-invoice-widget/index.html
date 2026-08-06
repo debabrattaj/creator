@@ -424,34 +424,6 @@
                                 <span>(-) Sales Return</span>
                                 <span id="sum-return">₹ 0.00</span>
                             </div>
-                            
-                            <div class="flex justify-between pt-2 border-t border-slate-100 font-semibold text-slate-800">
-                                <span>Net Taxable Amount</span>
-                                <span id="sum-taxable">₹ 0.00</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <span>(-) Discount</span>
-                                <div class="flex items-center border border-slate-200 rounded px-2 py-1 bg-white w-24">
-                                    <span class="text-slate-400 mr-1">₹</span>
-                                    <input type="number" id="global-discount" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
-                                </div>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>(+) Add. Charges</span>
-                                <div class="flex items-center border border-slate-200 rounded px-2 py-1 bg-white w-24">
-                                    <span class="text-slate-400 mr-1">₹</span>
-                                    <input type="number" id="global-charges" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
-                                </div>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>(+) CGST (1.5%)</span>
-                                <span id="sum-cgst">₹ 0.00</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>(+) SGST (1.5%)</span>
-                                <span id="sum-sgst">₹ 0.00</span>
-                            </div>
                         </div>
 
                         <div class="mt-4 pt-5 border-t border-slate-200 text-center">
@@ -497,12 +469,24 @@
                                         <div>
                         <h3 class="text-[14px] font-semibold text-slate-800 mb-3">Quick Actions</h3>
                         <div class="space-y-2">
-                            <button onclick="document.getElementById('global-discount').focus()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg> Apply Discount
-                            </button>
-                            <button onclick="document.getElementById('global-charges').focus()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> Add Charges
-                            </button>
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-indigo-50 rounded-lg">
+                                <span class="text-indigo-700 text-[13px] font-medium flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg> Discount
+                                </span>
+                                <div class="flex items-center border border-indigo-200 rounded px-2 py-1 bg-white w-24">
+                                    <span class="text-slate-400 mr-1">₹</span>
+                                    <input type="number" id="global-discount" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between px-4 py-2.5 bg-indigo-50 rounded-lg">
+                                <span class="text-indigo-700 text-[13px] font-medium flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> Add. Charges
+                                </span>
+                                <div class="flex items-center border border-indigo-200 rounded px-2 py-1 bg-white w-24">
+                                    <span class="text-slate-400 mr-1">₹</span>
+                                    <input type="number" id="global-charges" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
+                                </div>
+                            </div>
                             <button onclick="openPaymentModal()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payment
                             </button>
@@ -2137,8 +2121,6 @@
             const credits = totals.purchase + totals.return;
             let taxable = debits - credits;
 
-            document.getElementById('sum-taxable').innerText = formatCurrency(taxable);
-
             const globalDiscount = parseFloat(document.getElementById('global-discount').value) || 0;
             const globalCharges = parseFloat(document.getElementById('global-charges').value) || 0;
             
@@ -2147,9 +2129,6 @@
 
             const cgst = taxBase * 0.015;
             const sgst = taxBase * 0.015;
-
-            document.getElementById('sum-cgst').innerText = formatCurrency(cgst);
-            document.getElementById('sum-sgst').innerText = formatCurrency(sgst);
 
             const grandTotal = taxableAfterDisc + cgst + sgst;
             document.getElementById('sum-grandtotal').innerText = formatCurrency(grandTotal);
