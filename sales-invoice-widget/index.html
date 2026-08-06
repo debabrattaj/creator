@@ -115,7 +115,10 @@
                         </div>
                         <div>
                             <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Current Balance</label>
-                            <div class="text-slate-400 font-semibold py-1.5 text-[15px]" id="ui-current-balance">Select Customer...</div>
+                            <div class="flex items-center gap-2 py-1.5">
+                                <div class="text-slate-400 font-semibold text-[15px]" id="ui-current-balance">Select Customer...</div>
+                                <span id="ui-balance-nature" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"></span>
+                            </div>
                         </div>
                     </div>
 
@@ -820,7 +823,8 @@
             REPORT_NAME: "Customer_Report",
             FIELDS: {
                 name: "Customer_Name",
-                openingBalance: "Opening_Balance_in_Cash"
+                openingBalance: "Opening_Balance_in_Cash",
+                balanceNature: "Balance_Nature"
             }
         };
 
@@ -1566,6 +1570,7 @@
             updateCustomerDropdownLabel();
 
             const balanceDiv = document.getElementById('ui-current-balance');
+            const natureSpan = document.getElementById('ui-balance-nature');
             const customer = customersById[custId];
 
             if (custId && customer) {
@@ -1573,11 +1578,22 @@
                 const formattedBalance = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(bal);
                 balanceDiv.innerText = formattedBalance;
                 balanceDiv.className = bal < 0
-                    ? "text-red-600 font-bold py-1.5 text-[15px]"
-                    : "text-indigo-600 font-bold py-1.5 text-[15px]";
+                    ? "text-red-600 font-bold text-[15px]"
+                    : "text-indigo-600 font-bold text-[15px]";
+
+                const nature = zohoValueToText(customer[CUSTOMER_CONFIG.FIELDS.balanceNature]);
+                if (nature) {
+                    natureSpan.textContent = nature;
+                    natureSpan.classList.remove('hidden');
+                } else {
+                    natureSpan.textContent = '';
+                    natureSpan.classList.add('hidden');
+                }
             } else {
                 balanceDiv.innerText = "Select Customer...";
-                balanceDiv.className = "text-slate-400 font-semibold py-1.5 text-[15px]";
+                balanceDiv.className = "text-slate-400 font-semibold text-[15px]";
+                natureSpan.textContent = '';
+                natureSpan.classList.add('hidden');
             }
 
             syncProductCustomerColumn();
