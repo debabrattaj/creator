@@ -533,10 +533,12 @@
 
         <div class="flex items-center justify-end gap-3 mt-6 pt-5 border-t border-slate-200">
             <button onclick="cancelInvoice()" class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm">Cancel</button>
+            <button onclick="holdInvoice()" class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-indigo-600 hover:bg-slate-50 transition-all shadow-sm">Hold</button>
             <button id="btn-save-invoice" onclick="saveInvoice()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">Save Invoice</button>
             <button class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
                 Print <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
+            <button onclick="openPaymentModal()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-emerald-600 text-white shadow-md hover:bg-emerald-700 transition-all">Change</button>
         </div>
     </div>
 
@@ -1655,6 +1657,13 @@
             } catch (e) {
                 window.location.href = SALES_INVOICE_REPORT_URL;
             }
+        }
+
+        // Hold does not save anything to Zoho yet - no "held/parked invoice"
+        // storage or recall list has been specified. This is a placeholder
+        // until that behavior is defined.
+        function holdInvoice() {
+            showToast('Invoice held. (Hold does not save to Zoho yet - let me know how you want held invoices stored/recalled.)', 'success');
         }
 
         function openCustomerForm() {
