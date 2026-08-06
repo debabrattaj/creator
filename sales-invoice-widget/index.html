@@ -2194,10 +2194,11 @@
 
             const taxableSign = taxable < 0 ? -1 : 1;
             const taxableAfterDisc = taxableSign * Math.max(Math.abs(taxable) - globalDiscount + globalCharges, 0);
-            const taxBase = Math.max(taxableAfterDisc, 0);
 
-            const cgst = taxBase * 0.015;
-            const sgst = taxBase * 0.015;
+            // Tax is intentionally disabled for now (kept at 0) until real GST
+            // rates/rules are confirmed - see calculateInvoiceTotals().
+            const cgst = 0;
+            const sgst = 0;
             document.getElementById('rs-net-total').innerText = formatDrCr(taxableAfterDisc);
             document.getElementById('rs-total-tax').innerText = formatCurrency(cgst + sgst);
 
@@ -2239,7 +2240,8 @@
                 if (openingBalance !== 0) {
                     creditBox.classList.remove('hidden');
                     document.getElementById('rs-customer-credit-label').textContent = 'Customer Credit';
-                    document.getElementById('rs-customer-credit-amt').textContent = formatDrCr(openingBalance);
+                    const nature = formatBalanceNature(custRecord[CUSTOMER_CONFIG.FIELDS.balanceNature]) || (openingBalance < 0 ? 'Cr' : 'Dr');
+                    document.getElementById('rs-customer-credit-amt').textContent = `${formatCurrency(Math.abs(openingBalance))} ${nature}`;
                 } else {
                     creditBox.classList.add('hidden');
                 }
