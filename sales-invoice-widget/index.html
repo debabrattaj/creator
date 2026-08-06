@@ -489,7 +489,7 @@
                             </div>
 
                             <div id="rs-customer-credit-box" class="hidden flex items-center justify-between px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200">
-                                <span class="text-[12px] font-medium text-amber-800 flex items-center gap-1" id="rs-customer-credit-label">Customer Credit (CR)</span>
+                                <span class="text-[12px] font-medium text-amber-800 flex items-center gap-1" id="rs-customer-credit-label">Customer Credit</span>
                                 <span class="text-[13px] font-bold text-amber-800" id="rs-customer-credit-amt">₹0.00</span>
                             </div>
                         </div>
@@ -2192,7 +2192,8 @@
             const discPct = taxable !== 0 ? (globalDiscount / Math.abs(taxable)) * 100 : 0;
             document.getElementById('bill-discount-pct').value = discPct.toFixed(2);
 
-            const taxableAfterDisc = taxable - globalDiscount + globalCharges;
+            const taxableSign = taxable < 0 ? -1 : 1;
+            const taxableAfterDisc = taxableSign * Math.max(Math.abs(taxable) - globalDiscount + globalCharges, 0);
             const taxBase = Math.max(taxableAfterDisc, 0);
 
             const cgst = taxBase * 0.015;
@@ -2235,7 +2236,7 @@
 
                 if (openingBalance !== 0) {
                     creditBox.classList.remove('hidden');
-                    document.getElementById('rs-customer-credit-label').textContent = openingBalance < 0 ? 'Customer Credit (CR)' : 'Customer Balance (DR)';
+                    document.getElementById('rs-customer-credit-label').textContent = 'Customer Credit';
                     document.getElementById('rs-customer-credit-amt').textContent = formatDrCr(openingBalance);
                 } else {
                     creditBox.classList.add('hidden');
