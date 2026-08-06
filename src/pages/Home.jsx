@@ -5,7 +5,6 @@ import IndustriesTeaser from '../components/IndustriesTeaser'
 import WhyUs from '../components/WhyUs'
 import Process from '../components/Process'
 import Pricing from '../components/Pricing'
-import ComparisonsTeaser from '../components/ComparisonsTeaser'
 import Trust from '../components/Trust'
 import FAQ from '../components/FAQ'
 import Contact from '../components/Contact'
@@ -29,7 +28,6 @@ export default function Home() {
         <WhyUs />
         <Process />
         <Pricing />
-        <ComparisonsTeaser />
         <Trust />
         <FAQ />
         <Contact />
