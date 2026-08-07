@@ -870,6 +870,14 @@
             }
         };
 
+        const TAX_MASTER_CONFIG = {
+            REPORT_NAME: "Tax_Report",
+            FIELDS: {
+                name: "Name",
+                percent: "Percent"
+            }
+        };
+
         const ITEM_SOURCES = {
             product: {
                 reportName: "Item_Master_Report",
@@ -1004,6 +1012,7 @@
         let itemsBySection = { product: {}, purchase: {}, return: {} };
         let itemOptionsBySection = { product: '', purchase: '', return: '' };
         let serviceMasterById = {};
+        let taxesById = {};
         let serviceOptionsHtml = '';
 
         let activeSections = { purchase: false, product: false, service: false, return: false };
@@ -1028,7 +1037,8 @@
                 loadItemSource('product'),
                 loadItemSource('purchase'),
                 loadItemSource('return'),
-                loadServiceMaster()
+                loadServiceMaster(),
+                loadTaxMaster()
             ]);
 
             toggleSection('product');
@@ -1056,6 +1066,26 @@
                 });
             } catch (err) {
                 console.error('Failed to fetch services from "' + SERVICE_MASTER_CONFIG.REPORT_NAME + '".', err);
+            }
+        }
+
+        async function loadTaxMaster() {
+            taxesById = {};
+
+            if (typeof ZOHO === 'undefined' || !ZOHO.CREATOR || !ZOHO.CREATOR.API) {
+                return;
+            }
+
+            try {
+                const response = await ZOHO.CREATOR.API.getAllRecords({
+                    reportName: TAX_MASTER_CONFIG.REPORT_NAME,
+                    fieldConfig: "all"
+                });
+                const records = (response && response.code === 3000 && Array.isArray(response.data)) ? response.data : [];
+                if (records[0]) console.log('Sample tax record:', records[0]);
+                records.forEach(record => { taxesById[record.ID] = record; });
+            } catch (err) {
+                console.error('Failed to fetch taxes from "' + TAX_MASTER_CONFIG.REPORT_NAME + '".', err);
             }
         }
 
@@ -2161,22 +2191,11 @@
 
         let lastSubTotal = 0;
 
-        // Tax_Details is a multi-select field whose selected values are
-        // combined name+rate labels (e.g. "GST 3%", "CGST 1.5%") rather than
-        // a plain tax name paired with a separate rate field.
-        function parseTaxDetailEntries(rawValue) {
-            if (Array.isArray(rawValue)) {
-                return rawValue.map(v => zohoValueToText(v)).filter(Boolean);
-            }
-            if (rawValue && typeof rawValue === 'object') {
-                const text = zohoValueToText(rawValue);
-                return text ? [text] : [];
-            }
-            return String(rawValue || '').split(',').map(s => s.trim()).filter(Boolean);
-        }
-
+        // Fallback only: if a Tax_Details entry can't be resolved against
+        // taxesById (Tax_Report), try parsing its display text directly as a
+        // combined "Name Rate%" label (e.g. "GST 3%").
         function parseTaxNameAndRate(entry) {
-            const text = String(entry).trim();
+            const text = zohoValueToText(entry);
             const match = text.match(/^(.*?)\s*([\d.]+)\s*%?\s*$/);
             if (match) {
                 return { name: match[1].trim(), rate: parseFloat(match[2]) || 0 };
@@ -2184,6 +2203,9 @@
             return { name: text, rate: 0 };
         }
 
+        // Tax_Details is a multi-lookup field to Tax_Report, whose records
+        // have separate Name and Percent fields. Each entry is resolved by
+        // ID against taxesById (loaded via loadTaxMaster()).
         function computeProductTaxBreakdown() {
             const breakdown = {};
             const tbody = document.getElementById('tbody-product');
@@ -2192,7 +2214,9 @@
             Array.from(tbody.children).forEach(tr => {
                 const record = tr._srcRecord;
                 if (!record) return;
-                const entries = parseTaxDetailEntries(record.Tax_Details);
+                const rawTaxDetails = record.Tax_Details;
+                if (!rawTaxDetails) return;
+                const entries = Array.isArray(rawTaxDetails) ? rawTaxDetails : [rawTaxDetails];
                 if (!entries.length) return;
 
                 const lineTotalEl = tr.querySelector('.input-linetotal');
@@ -2200,7 +2224,17 @@
                 if (!lineTotal) return;
 
                 entries.forEach(entry => {
-                    const { name, rate } = parseTaxNameAndRate(entry);
+                    const taxId = rawId(entry);
+                    const taxRecord = taxId ? taxesById[taxId] : null;
+                    let name, rate;
+                    if (taxRecord) {
+                        name = zohoValueToText(taxRecord[TAX_MASTER_CONFIG.FIELDS.name]);
+                        rate = parseFloat(taxRecord[TAX_MASTER_CONFIG.FIELDS.percent]) || 0;
+                    } else {
+                        const parsed = parseTaxNameAndRate(entry);
+                        name = parsed.name;
+                        rate = parsed.rate;
+                    }
                     if (!name) return;
                     breakdown[name] = (breakdown[name] || 0) + (lineTotal * rate / 100);
                 });
