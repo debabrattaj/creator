@@ -2166,7 +2166,11 @@
         // a plain tax name paired with a separate rate field.
         function parseTaxDetailEntries(rawValue) {
             if (Array.isArray(rawValue)) {
-                return rawValue.map(v => String(v).trim()).filter(Boolean);
+                return rawValue.map(v => zohoValueToText(v)).filter(Boolean);
+            }
+            if (rawValue && typeof rawValue === 'object') {
+                const text = zohoValueToText(rawValue);
+                return text ? [text] : [];
             }
             return String(rawValue || '').split(',').map(s => s.trim()).filter(Boolean);
         }
