@@ -2161,6 +2161,25 @@
 
         let lastSubTotal = 0;
 
+        // Tax_Details is a multi-select field whose selected values are
+        // combined name+rate labels (e.g. "GST 3%", "CGST 1.5%") rather than
+        // a plain tax name paired with a separate rate field.
+        function parseTaxDetailEntries(rawValue) {
+            if (Array.isArray(rawValue)) {
+                return rawValue.map(v => String(v).trim()).filter(Boolean);
+            }
+            return String(rawValue || '').split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        function parseTaxNameAndRate(entry) {
+            const text = String(entry).trim();
+            const match = text.match(/^(.*?)\s*([\d.]+)\s*%?\s*$/);
+            if (match) {
+                return { name: match[1].trim(), rate: parseFloat(match[2]) || 0 };
+            }
+            return { name: text, rate: 0 };
+        }
+
         function computeProductTaxBreakdown() {
             const breakdown = {};
             const tbody = document.getElementById('tbody-product');
@@ -2169,16 +2188,17 @@
             Array.from(tbody.children).forEach(tr => {
                 const record = tr._srcRecord;
                 if (!record) return;
-                const taxDetailsText = zohoValueToText(record.Tax_Details);
-                if (!taxDetailsText) return;
+                const entries = parseTaxDetailEntries(record.Tax_Details);
+                if (!entries.length) return;
 
                 const lineTotalEl = tr.querySelector('.input-linetotal');
                 const lineTotal = parseFloat(lineTotalEl && lineTotalEl.value) || 0;
                 if (!lineTotal) return;
 
-                taxDetailsText.split(',').map(s => s.trim()).filter(Boolean).forEach(taxName => {
-                    const rate = parseFloat(record[`${taxName}_Rate`]) || 0;
-                    breakdown[taxName] = (breakdown[taxName] || 0) + (lineTotal * rate / 100);
+                entries.forEach(entry => {
+                    const { name, rate } = parseTaxNameAndRate(entry);
+                    if (!name) return;
+                    breakdown[name] = (breakdown[name] || 0) + (lineTotal * rate / 100);
                 });
             });
 
