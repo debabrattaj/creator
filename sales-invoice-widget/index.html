@@ -449,10 +449,6 @@
                                 <span class="text-green-600">Receipt Amount</span>
                                 <span class="font-semibold text-green-600" id="rs-receipt-amount">₹0.00</span>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-600">Round Off</span>
-                                <span class="font-semibold text-slate-800" id="rs-round-off-display">₹0.00</span>
-                            </div>
                             <div id="rs-customer-credit-row" class="hidden flex justify-between items-center">
                                 <span class="text-green-600">Customer Credit</span>
                                 <span class="font-semibold text-green-600" id="rs-customer-credit-amt">₹0.00</span>
@@ -2385,7 +2381,6 @@
 
             document.getElementById('rs-round-off-amt').value = roundOffAmount.toFixed(2);
             document.getElementById('rs-round-off-dircode').textContent = roundOffDirection;
-            document.getElementById('rs-round-off-display').textContent = `${formatCurrency(roundOffAmount)} ${roundOffDirection}`;
             document.getElementById('grandtotal-rounded-note').classList.toggle('hidden', !roundEnabled);
 
             document.getElementById('sum-grandtotal').innerText = formatDrCr(grandTotal);
