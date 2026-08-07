@@ -1966,7 +1966,13 @@
 
             updateRowIndices(section);
             toggleColumns();
-            if (section === 'product') syncProductCustomerColumn();
+            if (section === 'product') {
+                syncProductCustomerColumn();
+                // A cancelled tax should only stay hidden for the current set
+                // of items - adding another item brings all applicable taxes
+                // back into consideration.
+                cancelledTaxNames.clear();
+            }
         }
 
         function removeRow(btn) {
@@ -1974,6 +1980,7 @@
             const section = tr.getAttribute('data-section');
             tr.remove();
             updateRowIndices(section);
+            if (section === 'product') cancelledTaxNames.clear();
             calculateInvoiceTotals();
         }
 
@@ -2009,6 +2016,7 @@
                 return;
             }
             tr._srcRecord = record;
+            if (section === 'product') cancelledTaxNames.clear();
 
             ITEM_SOURCES[section].autofill.forEach(map => {
                 const el = tr.querySelector(map.sel);
