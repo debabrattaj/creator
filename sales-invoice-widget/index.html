@@ -416,15 +416,9 @@
                                 <span>Total Service</span>
                                 <span id="sum-service">₹0.00 Dr</span>
                             </div>
-                            <div class="flex justify-between font-medium text-slate-700">
-                                <span>CGST (1.5%)</span>
-                                <span id="sum-cgst">₹0.00 Dr</span>
-                            </div>
-                            <div class="flex justify-between font-medium text-slate-700">
-                                <span>SGST (1.5%)</span>
-                                <span id="sum-sgst">₹0.00 Dr</span>
-                            </div>
                         </div>
+
+                        <div id="tax-rows-container" class="space-y-3 text-[13px] text-slate-600 mb-3"></div>
 
                         <div class="py-3 border-t border-slate-200 flex justify-between font-semibold text-slate-800 text-[13px]">
                             <span>Total Tax Amount</span>
@@ -2167,6 +2161,57 @@
 
         let lastSubTotal = 0;
 
+        function computeProductTaxBreakdown() {
+            const breakdown = {};
+            const tbody = document.getElementById('tbody-product');
+            if (!tbody) return breakdown;
+
+            Array.from(tbody.children).forEach(tr => {
+                const record = tr._srcRecord;
+                if (!record) return;
+                const taxDetailsText = zohoValueToText(record.Tax_Details);
+                if (!taxDetailsText) return;
+
+                const lineTotalEl = tr.querySelector('.input-linetotal');
+                const lineTotal = parseFloat(lineTotalEl && lineTotalEl.value) || 0;
+                if (!lineTotal) return;
+
+                taxDetailsText.split(',').map(s => s.trim()).filter(Boolean).forEach(taxName => {
+                    const rate = parseFloat(record[`${taxName}_Rate`]) || 0;
+                    breakdown[taxName] = (breakdown[taxName] || 0) + (lineTotal * rate / 100);
+                });
+            });
+
+            return breakdown;
+        }
+
+        function renderTaxRows(breakdown) {
+            const container = document.getElementById('tax-rows-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const names = Object.keys(breakdown);
+            if (!names.length) {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between font-medium text-slate-400 italic';
+                row.innerHTML = '<span>No tax applicable</span><span>—</span>';
+                container.appendChild(row);
+                return;
+            }
+
+            names.forEach(name => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between font-medium text-slate-700';
+                const label = document.createElement('span');
+                label.textContent = name;
+                const value = document.createElement('span');
+                value.textContent = formatCurrency(breakdown[name]) + ' Dr';
+                row.appendChild(label);
+                row.appendChild(value);
+                container.appendChild(row);
+            });
+        }
+
         function calculateInvoiceTotals() {
             let totals = { product: 0, service: 0, purchase: 0, return: 0 };
 
@@ -2193,14 +2238,13 @@
             const debits = Math.abs(totals.product) + Math.abs(totals.service);
             const credits = Math.abs(totals.purchase) + Math.abs(totals.return);
 
-            // Tax is calculated on the sales side (Total Product + Total
-            // Service) only, at 1.5% CGST + 1.5% SGST, and folds into Invoice
-            // Balance alongside the debits/credits.
-            const cgst = debits * 0.015;
-            const sgst = debits * 0.015;
-            const totalTaxAmount = cgst + sgst;
-            document.getElementById('sum-cgst').innerText = formatCurrency(cgst) + ' Dr';
-            document.getElementById('sum-sgst').innerText = formatCurrency(sgst) + ' Dr';
+            // Tax is looked up per Product row from its selected item's
+            // Tax_Details field on Item_Master_Report (comma-separated tax
+            // names, e.g. "CGST, SGST" or just "GST"), with each tax's own
+            // rate read from a "<Name>_Rate" field on that same item record.
+            const taxBreakdown = computeProductTaxBreakdown();
+            const totalTaxAmount = Object.values(taxBreakdown).reduce((sum, amt) => sum + amt, 0);
+            renderTaxRows(taxBreakdown);
             document.getElementById('sum-totaltax').innerText = formatDrCr(totalTaxAmount);
 
             const invoiceBalance = (debits + totalTaxAmount) - credits;
