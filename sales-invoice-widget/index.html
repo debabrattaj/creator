@@ -503,44 +503,16 @@
                         </div>
                     </div>
 
-                                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-[14px] font-semibold text-slate-800 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg> Additional Charges
-                            </h3>
-                            <button type="button" onclick="toggleAdditionalCharges()" id="btn-add-charges" class="px-3 py-1.5 text-[12px] font-medium border border-indigo-200 rounded-md text-indigo-600 bg-white hover:bg-indigo-50 flex items-center gap-1.5 shadow-sm">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Add Charges
-                            </button>
-                        </div>
-                        <div id="additional-charges-body" class="hidden mt-4">
-                            <div class="flex items-center border border-slate-300 rounded px-3 py-2 bg-white shadow-sm">
-                                <span class="text-slate-400 mr-1">₹</span>
-                                <input type="number" id="global-charges" class="w-full outline-none text-right text-slate-800 bg-transparent p-0 border-0" value="0" oninput="calculateInvoiceTotals()">
-                            </div>
-                        </div>
-                    </div>
-
-                                        <div>
-                        <h3 class="text-[14px] font-semibold text-slate-800 mb-3">Quick Actions</h3>
-                        <div class="space-y-2">
-                            <button onclick="openPaymentModal()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payment
-                            </button>
-                            <div id="payment-summary" class="hidden text-[12px] text-slate-600 px-1 pt-1"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
         <div class="flex items-center justify-end gap-3 mt-6 pt-5 border-t border-slate-200">
             <button onclick="cancelInvoice()" class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm">Cancel</button>
-            <button onclick="holdInvoice()" class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-indigo-600 hover:bg-slate-50 transition-all shadow-sm">Hold</button>
             <button id="btn-save-invoice" onclick="saveInvoice()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">Save Invoice</button>
             <button class="px-4 py-2.5 text-sm font-medium border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm flex items-center gap-2">
                 Print <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
             </button>
-            <button onclick="openPaymentModal()" class="px-4 py-2.5 text-sm font-medium rounded-lg bg-emerald-600 text-white shadow-md hover:bg-emerald-700 transition-all">Change</button>
         </div>
     </div>
 
@@ -2381,7 +2353,8 @@
             }
 
             const globalDiscount = parseFloat(document.getElementById('global-discount').value) || 0;
-            const globalCharges = parseFloat(document.getElementById('global-charges').value) || 0;
+            // Additional Charges input was removed from the UI - kept at 0.
+            const globalCharges = 0;
 
             const discPct = invoiceBalance !== 0 ? (globalDiscount / Math.abs(invoiceBalance)) * 100 : 0;
             document.getElementById('bill-discount-pct').value = discPct.toFixed(2);
