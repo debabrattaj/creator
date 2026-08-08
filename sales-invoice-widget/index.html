@@ -259,7 +259,7 @@
                             <tbody class="text-[13px] text-slate-700 divide-y divide-slate-100" id="tbody-product"></tbody>
                         </table>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-5 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-product">
+                    <div class="grid grid-cols-2 sm:grid-cols-7 divide-x divide-slate-200 border border-slate-200 rounded-lg overflow-hidden" id="summary-product">
                         <div class="p-3 bg-slate-50">
                             <div class="text-[11px] font-medium text-slate-500">Quantity</div>
                             <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="qty">0 Nos</div>
@@ -279,6 +279,14 @@
                         <div class="p-3 bg-slate-50">
                             <div class="text-[11px] font-medium text-slate-500">Total Net Pure Weight</div>
                             <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="pure">0.000 GMS</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Service Amount</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="svcamt">0.00</div>
+                        </div>
+                        <div class="p-3 bg-slate-50">
+                            <div class="text-[11px] font-medium text-slate-500">Total Amount</div>
+                            <div class="text-[14px] font-semibold text-slate-800 mt-0.5" data-metric="netamt">0.00</div>
                         </div>
                     </div>
                 </div>
@@ -2473,6 +2481,13 @@
                 setMetric(wrap, 'ps', `${ps.toFixed(3)} ct`);
                 setMetric(wrap, 'nwt', `${nwt.toFixed(3)} GMS`);
                 setMetric(wrap, 'pure', `${pure.toFixed(3)} GMS`);
+
+                if (section === 'product') {
+                    const tchAmt = sumFieldValue(tbody, '.input-tch-amt');
+                    const lineTotal = sumFieldValue(tbody, '.input-linetotal');
+                    setMetric(wrap, 'svcamt', tchAmt.toFixed(2));
+                    setMetric(wrap, 'netamt', (lineTotal - tchAmt).toFixed(2));
+                }
             } else if (section === 'purchase') {
                 const gwt = sumFieldValue(tbody, '.input-gwt');
                 const stone = sumFieldValue(tbody, '.input-cs-wt');
