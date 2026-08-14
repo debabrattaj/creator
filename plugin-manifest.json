@@ -1,0 +1,24 @@
+{
+  "locale": ["en"],
+  "service": "CREATOR",
+  "storage": false,
+  "modules": {
+    "widgets": [
+      {
+        "name": "Barcode",
+        "url": "/widget.html",
+        "options": {
+          "height": "900px",
+          "width": "100%"
+        }
+      }
+    ]
+  },
+  "cspDomains": {
+    "connect-src": [],
+    "script-src": [],
+    "img-src": [],
+    "style-src": [],
+    "frame-src": []
+  }
+}

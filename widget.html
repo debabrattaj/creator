@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barcode</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://js.zohostatic.com/creator/widgets/version/2.0/widgetsdk-min.js"></script>
+</head>
+<body>
+  <div class="bc-app" id="bcApp">
+    <header class="bc-header">
+      <h1>Barcode Session</h1>
+      <p>Jewellery Retail Management</p>
+    </header>
+
+    <section class="bc-card bc-voucher">
+      <div class="bc-card-title"><span class="bc-accent"></span>Voucher Information</div>
+      <div class="bc-voucher-grid">
+        <label class="bc-field">
+          <span>Voucher Type</span>
+          <select id="voucherType">
+            <option>Purchase</option>
+            <option>Sales</option>
+            <option>Transfer</option>
+            <option>Return</option>
+          </select>
+        </label>
+        <label class="bc-field">
+          <span>Voucher Date</span>
+          <input type="date" id="voucherDate" />
+        </label>
+        <label class="bc-field">
+          <span>Supplier</span>
+          <select id="supplier"><option value="">Select Supplier</option></select>
+        </label>
+        <label class="bc-field">
+          <span>Invoice Number</span>
+          <input type="text" id="invoiceNumber" placeholder="INV-2026-001" />
+        </label>
+        <label class="bc-field">
+          <span>Rate Master</span>
+          <select id="rateMaster"><option>Standard Rate</option></select>
+        </label>
+        <label class="bc-field">
+          <span>Price Level</span>
+          <select id="priceLevel">
+            <option>Retail</option>
+            <option>Wholesale</option>
+            <option>Dealer</option>
+          </select>
+        </label>
+        <label class="bc-field">
+          <span>Session ID</span>
+          <input type="text" id="sessionId" readonly />
+        </label>
+        <div class="bc-voucher-actions">
+          <button class="bc-btn bc-btn-ghost" data-action="create-session">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Create New
+          </button>
+          <button class="bc-btn bc-btn-primary" data-action="generate">
+            <svg viewBox="0 0 24 24"><path d="M4 6v12M8 6v12M11 6v12M14 6v12M17 6v12M20 6v12"/></svg>Generate Barcodes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="bc-card bc-toolbar">
+      <button class="bc-btn bc-btn-primary" data-action="add">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add Barcode
+      </button>
+      <span class="bc-divider"></span>
+      <button class="bc-btn" data-action="print"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2M8 14h8v7H8z"/></svg>Print</button>
+      <button class="bc-btn" data-action="export"><svg viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4M4 18v2h16v-2"/></svg>Export</button>
+      <button class="bc-btn" data-action="import"><svg viewBox="0 0 24 24"><path d="M12 4v12M8 12l4 4 4-4M4 18v2h16v-2"/></svg>Import</button>
+      <div class="bc-search">
+        <input type="search" id="searchInput" placeholder="Search items..." />
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </div>
+      <button class="bc-btn" data-action="filter"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Filter</button>
+      <button class="bc-btn" data-action="sort"><svg viewBox="0 0 24 24"><path d="M4 7h12M4 12h8M4 17h4M17 5v14M14 16l3 3 3-3"/></svg>Sort</button>
+      <button class="bc-btn" data-action="columns"><svg viewBox="0 0 24 24"><path d="M4 4h6v16H4zM14 4h6v16h-6z"/></svg>Columns</button>
+      <span class="bc-divider"></span>
+      <button class="bc-btn" data-action="refresh"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.3 5.7M20 5v6h-6"/></svg>Refresh</button>
+      <button class="bc-btn" data-action="reset"><svg viewBox="0 0 24 24"><path d="M4 13a8 8 0 102.3-5.7M4 19v-6h6"/></svg>Reset</button>
+    </section>
+
+    <section class="bc-stats" id="statsRow"></section>
+
+    <section class="bc-card bc-table-card">
+      <div class="bc-table-scroll">
+        <table class="bc-table">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="bc-empty" id="emptyState" hidden>
+        <svg viewBox="0 0 24 24"><path d="M4 6v12M8 6v12M11 6v12M14 6v12M17 6v12M20 6v12"/></svg>
+        <p>No barcode items yet</p>
+        <button class="bc-btn bc-btn-primary" data-action="add">Add Barcode</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="bc-modal-root" id="modalRoot" hidden></div>
+  <div class="bc-toast-root" id="toastRoot"></div>
+  <div class="bc-loader" id="loader" hidden><div class="bc-spinner"></div></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
