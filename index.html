@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barcode</title>
+  <style>
+:root {
+  --bg: #f2f4f8;
+  --surface: #ffffff;
+  --border: #e5e8ef;
+  --border-strong: #d8dde7;
+  --text: #131a2b;
+  --text-muted: #6b7385;
+  --text-faint: #9aa1b1;
+  --primary: #3b53f5;
+  --primary-hover: #2f45de;
+  --danger: #e5484d;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 1px 3px rgba(16, 24, 40, .06);
+  --shadow-lg: 0 12px 32px rgba(16, 24, 40, .14);
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+.bc-app { padding: 22px 24px 32px; max-width: 1900px; margin: 0 auto; }
+
+/* ---------- header ---------- */
+.bc-header h1 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -.5px; }
+.bc-header p { margin: 4px 0 20px; color: var(--text-muted); font-size: 13px; }
+
+/* ---------- card ---------- */
+.bc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+
+.bc-card-title {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  font-size: 16px; font-weight: 650;
+}
+.bc-accent { width: 4px; height: 17px; border-radius: 3px; background: var(--primary); }
+
+/* ---------- voucher ---------- */
+.bc-voucher-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 22px;
+  padding: 20px 22px 24px;
+}
+
+.bc-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.bc-field > span { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+
+.bc-field input,
+.bc-field select {
+  height: 44px;
+  padding: 0 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+.bc-field select { appearance: none; padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7385' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; background-size: 16px;
+}
+.bc-field input:focus, .bc-field select:focus {
+  outline: none; border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 83, 245, .13);
+}
+.bc-field input[readonly] { background: #f6f7fa; color: var(--text-muted); }
+.bc-field input::placeholder { color: var(--text-faint); }
+
+.bc-voucher-actions {
+  display: flex; flex-direction: column; gap: 10px;
+  align-items: stretch; justify-content: flex-end;
+}
+
+/* ---------- buttons ---------- */
+.bc-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 42px; padding: 0 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: 500 13.5px/1 inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, border-color .15s, transform .05s;
+}
+.bc-btn:hover { background: #f7f8fb; border-color: #c6ccda; }
+.bc-btn:active { transform: translateY(1px); }
+
+.bc-btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+.bc-btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+.bc-btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; font-weight: 600; }
+.bc-btn-danger:hover { filter: brightness(.94); }
+
+.bc-btn-ghost { background: var(--surface); }
+
+.bc-icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0;
+  border: none; border-radius: 7px;
+  background: transparent; color: var(--text-muted);
+  cursor: pointer; transition: background .15s, color .15s;
+}
+.bc-icon-btn:hover { background: #eef0f6; color: var(--text); }
+.bc-edit:hover { color: var(--primary); }
+.bc-delete { color: var(--danger); }
+.bc-delete:hover { background: #fdecec; color: var(--danger); }
+
+/* ---------- toolbar ---------- */
+.bc-toolbar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 14px 18px;
+}
+.bc-divider { width: 1px; height: 26px; background: var(--border); }
+
+.bc-search { position: relative; flex: 1 1 220px; min-width: 200px; margin-left: auto; }
+.bc-search input {
+  width: 100%; height: 42px; padding: 0 38px 0 14px;
+  border: 1px solid var(--border-strong); border-radius: 10px;
+  font: inherit; background: var(--surface);
+}
+.bc-search input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 83, 245, .13); }
+.bc-search svg {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--text-faint); pointer-events: none;
+}
+
+/* ---------- stats ---------- */
+.bc-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.bc-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 20px 20px;
+  min-width: 0;
+}
+.bc-stat-icon {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.bc-stat-icon svg { width: 19px; height: 19px; }
+.bc-stat-label {
+  font-size: 11.5px; font-weight: 600; letter-spacing: .7px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+}
+.bc-stat-value {
+  font-size: 27px; font-weight: 700; letter-spacing: -.6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bc-unit { font-size: .6em; font-weight: 600; color: var(--text-muted); margin: 0 2px; }
+
+.bc-tone-blue   .bc-stat-icon { background: #e8edff; color: #3b53f5; }
+.bc-tone-violet .bc-stat-icon { background: #f0e9ff; color: #7c4dff; }
+.bc-tone-green  .bc-stat-icon { background: #e3f8ef; color: #10a37f; }
+.bc-tone-amber  .bc-stat-icon { background: #fff3e0; color: #f08c00; }
+.bc-tone-rose   .bc-stat-icon { background: #ffeaf0; color: #e5487a; }
+.bc-tone-indigo .bc-stat-icon { background: #e9edfb; color: #4457c7; }
+
+/* ---------- table ---------- */
+.bc-table-card { overflow: hidden; margin-bottom: 0; }
+.bc-table-scroll { overflow: auto; max-height: 60vh; }
+
+.bc-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+.bc-table th {
+  position: sticky; top: 0; z-index: 2;
+  background: #fafbfd;
+  padding: 14px 16px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .7px;
+  text-transform: uppercase; color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap; cursor: pointer; user-select: none;
+}
+.bc-table th:not([data-sort-key]) { cursor: default; }
+.bc-table th > span { vertical-align: middle; }
+.bc-caret { width: 13px; height: 13px; margin-left: 5px; color: var(--text-faint); vertical-align: middle; transition: transform .15s; }
+.bc-table th.bc-sorted { color: var(--primary); }
+.bc-table th.bc-sorted .bc-caret { color: var(--primary); }
+.bc-table th.bc-sorted.bc-asc .bc-caret { transform: rotate(180deg); }
+
+.bc-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f2f6;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.bc-table tbody tr:hover td { background: #f8f9fc; }
+.bc-table tbody tr:last-child td { border-bottom: none; }
+
+.bc-al-right { text-align: right; }
+.bc-al-center { text-align: center; }
+
+.bc-link { color: var(--primary); font-weight: 600; text-decoration: none; }
+.bc-link:hover { text-decoration: underline; }
+
+.bc-chip {
+  display: inline-block; padding: 4px 11px;
+  border-radius: 999px; background: #eef0f6;
+  font-size: 12px; font-weight: 500; color: #444d63;
+}
+
+.bc-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 64px 20px; color: var(--text-muted);
+}
+.bc-empty svg { width: 38px; height: 38px; color: var(--text-faint); }
+.bc-empty p { margin: 0; font-size: 14.5px; }
+
+/* ---------- modal ---------- */
+.bc-modal-root { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; }
+.bc-modal-backdrop { position: absolute; inset: 0; background: rgba(16, 24, 40, .45); }
+
+.bc-modal {
+  position: relative;
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  animation: bc-pop .16s ease-out;
+}
+@keyframes bc-pop { from { opacity: 0; transform: translateY(8px) scale(.985); } }
+
+.bc-modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; border-bottom: 1px solid var(--border);
+}
+.bc-modal-head h2 { margin: 0; font-size: 17px; font-weight: 650; }
+.bc-modal-body { padding: 22px; overflow: auto; }
+.bc-modal-foot {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 16px 22px; border-top: 1px solid var(--border);
+}
+
+.bc-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; }
+.bc-confirm { margin: 0; line-height: 1.6; }
+
+.bc-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+.bc-check { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 13.5px; }
+.bc-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+
+/* ---------- toast ---------- */
+.bc-toast-root {
+  position: fixed; right: 20px; bottom: 20px; z-index: 200;
+  display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+}
+.bc-toast {
+  padding: 12px 17px; border-radius: 10px;
+  background: #131a2b; color: #fff; font-size: 13.5px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .2s, transform .2s;
+  max-width: 340px;
+}
+.bc-toast.bc-in { opacity: 1; transform: none; }
+.bc-toast-success { background: #10a37f; }
+.bc-toast-error { background: var(--danger); }
+
+/* ---------- loader ---------- */
+.bc-loader { position: fixed; inset: 0; z-index: 150; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, .55); }
+.bc-spinner {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid #dfe3ec; border-top-color: var(--primary);
+  animation: bc-spin .7s linear infinite;
+}
+@keyframes bc-spin { to { transform: rotate(360deg); } }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1500px) { .bc-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1100px) {
+  .bc-voucher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bc-search { margin-left: 0; }
+}
+@media (max-width: 700px) {
+  .bc-app { padding: 16px 14px 26px; }
+  .bc-voucher-grid, .bc-form-grid, .bc-checklist, .bc-stats { grid-template-columns: 1fr; }
+  .bc-header h1 { font-size: 24px; }
+}
+
+  </style>
+  <script src="https://js.zohostatic.com/creator/widgets/version/2.0/widgetsdk-min.js"></script>
+</head>
+<body>
+  <div class="bc-app" id="bcApp">
+    <header class="bc-header">
+      <h1>Barcode Session</h1>
+      <p>Jewellery Retail Management</p>
+    </header>
+
+    <section class="bc-card bc-voucher">
+      <div class="bc-card-title"><span class="bc-accent"></span>Voucher Information</div>
+      <div class="bc-voucher-grid">
+        <label class="bc-field">
+          <span>Voucher Type</span>
+          <select id="voucherType">
+            <option>Purchase</option>
+            <option>Sales</option>
+            <option>Transfer</option>
+            <option>Return</option>
+          </select>
+        </label>
+        <label class="bc-field">
+          <span>Voucher Date</span>
+          <input type="date" id="voucherDate" />
+        </label>
+        <label class="bc-field">
+          <span>Supplier</span>
+          <select id="supplier"><option value="">Select Supplier</option></select>
+        </label>
+        <label class="bc-field">
+          <span>Invoice Number</span>
+          <input type="text" id="invoiceNumber" placeholder="INV-2026-001" />
+        </label>
+        <label class="bc-field">
+          <span>Rate Master</span>
+          <select id="rateMaster"><option>Standard Rate</option></select>
+        </label>
+        <label class="bc-field">
+          <span>Price Level</span>
+          <select id="priceLevel">
+            <option>Retail</option>
+            <option>Wholesale</option>
+            <option>Dealer</option>
+          </select>
+        </label>
+        <label class="bc-field">
+          <span>Session ID</span>
+          <input type="text" id="sessionId" readonly />
+        </label>
+        <div class="bc-voucher-actions">
+          <button class="bc-btn bc-btn-ghost" data-action="create-session">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Create New
+          </button>
+          <button class="bc-btn bc-btn-primary" data-action="generate">
+            <svg viewBox="0 0 24 24"><path d="M4 6v12M8 6v12M11 6v12M14 6v12M17 6v12M20 6v12"/></svg>Generate Barcodes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="bc-card bc-toolbar">
+      <button class="bc-btn bc-btn-primary" data-action="add">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add Barcode
+      </button>
+      <span class="bc-divider"></span>
+      <button class="bc-btn" data-action="print"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4v-6h16v6h-2M8 14h8v7H8z"/></svg>Print</button>
+      <button class="bc-btn" data-action="export"><svg viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4M4 18v2h16v-2"/></svg>Export</button>
+      <button class="bc-btn" data-action="import"><svg viewBox="0 0 24 24"><path d="M12 4v12M8 12l4 4 4-4M4 18v2h16v-2"/></svg>Import</button>
+      <div class="bc-search">
+        <input type="search" id="searchInput" placeholder="Search items..." />
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </div>
+      <button class="bc-btn" data-action="filter"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Filter</button>
+      <button class="bc-btn" data-action="sort"><svg viewBox="0 0 24 24"><path d="M4 7h12M4 12h8M4 17h4M17 5v14M14 16l3 3 3-3"/></svg>Sort</button>
+      <button class="bc-btn" data-action="columns"><svg viewBox="0 0 24 24"><path d="M4 4h6v16H4zM14 4h6v16h-6z"/></svg>Columns</button>
+      <span class="bc-divider"></span>
+      <button class="bc-btn" data-action="refresh"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 10-2.3 5.7M20 5v6h-6"/></svg>Refresh</button>
+      <button class="bc-btn" data-action="reset"><svg viewBox="0 0 24 24"><path d="M4 13a8 8 0 102.3-5.7M4 19v-6h6"/></svg>Reset</button>
+    </section>
+
+    <section class="bc-stats" id="statsRow"></section>
+
+    <section class="bc-card bc-table-card">
+      <div class="bc-table-scroll">
+        <table class="bc-table">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="bc-empty" id="emptyState" hidden>
+        <svg viewBox="0 0 24 24"><path d="M4 6v12M8 6v12M11 6v12M14 6v12M17 6v12M20 6v12"/></svg>
+        <p>No barcode items yet</p>
+        <button class="bc-btn bc-btn-primary" data-action="add">Add Barcode</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="bc-modal-root" id="modalRoot" hidden></div>
+  <div class="bc-toast-root" id="toastRoot"></div>
+  <div class="bc-loader" id="loader" hidden><div class="bc-spinner"></div></div>
+
+  <script>
+/* ---------- js/config.js ---------- */
+/* Zoho Creator form/report names and column model. Adjust link names to match your app. */
+window.BC_CONFIG = {
+  appLinkName: 'jewellery-retail',
+
+  forms: {
+    barcodeItem: 'Barcode_Item',
+    barcodeSession: 'Barcode_Session'
+  },
+
+  reports: {
+    barcodeItem: 'All_Barcode_Items',
+    barcodeSession: 'All_Barcode_Sessions',
+    supplier: 'All_Suppliers',
+    rateMaster: 'All_Rate_Masters'
+  },
+
+  pageSize: 200,
+
+  columns: [
+    { key: 'no',           label: 'NO',           type: 'index',  width: 60,  sortable: false },
+    { key: 'action',       label: 'ACTION',       type: 'action', width: 90,  sortable: false },
+    { key: 'Barcode',      label: 'BARCODE',      type: 'link',   width: 140 },
+    { key: 'Item_Name',    label: 'ITEM NAME',    type: 'text',   width: 200 },
+    { key: 'Category',     label: 'CATEGORY',     type: 'tag',    width: 130 },
+    { key: 'Purity',       label: 'PURITY',       type: 'text',   width: 100 },
+    { key: 'Gross_Weight', label: 'GROSS WEIGHT', type: 'weight', width: 140 },
+    { key: 'Net_Weight',   label: 'NET WEIGHT',   type: 'weight', width: 140 },
+    { key: 'MRP',          label: 'MRP',          type: 'money',  width: 130, align: 'right' },
+    { key: 'Making_Charge',label: 'MAKING',       type: 'money',  width: 120, align: 'right' },
+    { key: 'Discount',     label: 'DISCOUNT',     type: 'money',  width: 120, align: 'right' },
+    { key: 'Net_Amount',   label: 'NET AMOUNT',   type: 'money',  width: 140, align: 'right' }
+  ],
+
+  stats: [
+    { key: 'count',       label: 'Total Items',   icon: 'hash',    tone: 'blue',   format: 'int' },
+    { key: 'grossWeight', label: 'Gross Weight',  icon: 'scale',   tone: 'violet', format: 'weight' },
+    { key: 'netWeight',   label: 'Net Weight',    icon: 'gem',     tone: 'green',  format: 'weight' },
+    { key: 'totalAmount', label: 'Total Amount',  icon: 'rupee',   tone: 'amber',  format: 'money' },
+    { key: 'discount',    label: 'Discount',      icon: 'tag',     tone: 'rose',   format: 'money2' },
+    { key: 'netAmount',   label: 'Net Amount',    icon: 'wallet',  tone: 'indigo', format: 'money' }
+  ],
+
+  categories: ['Bangles', 'Ring', 'Necklace', 'Chain', 'Earrings', 'Bracelet', 'Pendant', 'Coin'],
+  purities: ['24K', '22K', '18K', '14K', '925 Silver', 'Platinum']
+};
+
+/* ---------- js/utils.js ---------- */
+window.BC_UTILS = (function () {
+  const num = (v) => {
+    const n = parseFloat(String(v == null ? '' : v).replace(/[^0-9.\-]/g, ''));
+    return isNaN(n) ? 0 : n;
+  };
+
+  const fmt = {
+    int: (v) => String(Math.round(num(v))),
+    weight: (v) => num(v).toFixed(3),
+    money: (v) => num(v).toLocaleString('en-US', { maximumFractionDigits: 0 }),
+    money2: (v) => num(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  };
+
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+
+  const todayISO = () => new Date().toISOString().slice(0, 10);
+
+  /* Creator date fields use dd-MMM-yyyy */
+  const toCreatorDate = (iso) => {
+    if (!iso) return '';
+    const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return '';
+    return `${String(d.getDate()).padStart(2, '0')}-${m[d.getMonth()]}-${d.getFullYear()}`;
+  };
+
+  const fromCreatorDate = (s) => {
+    if (!s) return '';
+    const m = { Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12' };
+    const p = String(s).split(/[-\s]/);
+    if (p.length < 3 || !m[p[1]]) return '';
+    return `${p[2]}-${m[p[1]]}-${String(p[0]).padStart(2, '0')}`;
+  };
+
+  const download = (filename, content, mime) => {
+    const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const toCSV = (rows, columns) => {
+    const cell = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+    const head = columns.map((c) => cell(c.label)).join(',');
+    const body = rows.map((r, i) =>
+      columns.map((c) => cell(c.key === 'no' ? i + 1 : r[c.key])).join(',')
+    );
+    return [head].concat(body).join('\n');
+  };
+
+  const parseCSV = (text) => {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (quoted) {
+        if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
+        else if (ch === '"') quoted = false;
+        else field += ch;
+      } else if (ch === '"') quoted = true;
+      else if (ch === ',') { row.push(field); field = ''; }
+      else if (ch === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (ch !== '\r') field += ch;
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    return rows.filter((r) => r.some((c) => c.trim() !== ''));
+  };
+
+  const debounce = (fn, ms) => {
+    let t;
+    return function () {
+      clearTimeout(t);
+      const args = arguments;
+      t = setTimeout(() => fn.apply(this, args), ms);
+    };
+  };
+
+  return { num, fmt, esc, todayISO, toCreatorDate, fromCreatorDate, download, toCSV, parseCSV, debounce };
+})();
+
+/* ---------- js/api.js ---------- */
+/*
+ * Zoho Creator JS API wrapper.
+ * Falls back to in-memory sample data when the widget is opened outside Creator,
+ * so the UI can be developed and previewed locally.
+ */
+window.BC_API = (function () {
+  const C = window.BC_CONFIG;
+  const U = window.BC_UTILS;
+
+  const hasSDK = () => typeof ZOHO !== 'undefined' && ZOHO.CREATOR && ZOHO.CREATOR.API;
+
+  let ready = null;
+  let offline = false;
+
+  function init() {
+    if (ready) return ready;
+    ready = new Promise((resolve) => {
+      if (!hasSDK()) { offline = true; return resolve({ offline: true }); }
+      ZOHO.CREATOR.init()
+        .then((params) => resolve({ offline: false, params: params || {} }))
+        .catch(() => { offline = true; resolve({ offline: true }); });
+    });
+    return ready;
+  }
+
+  const isOffline = () => offline;
+
+  /* ---------------- sample data (offline preview only) ---------------- */
+  let mock = [
+    { ID: '1', Barcode: 'BC-100452', Item_Name: 'Gold Bangles 22K', Category: 'Bangles',  Purity: '22K', Gross_Weight: 45.3, Net_Weight: 45.3, MRP: 350000, Making_Charge: 0, Discount: 0, Net_Amount: 350000 },
+    { ID: '2', Barcode: 'BC-100453', Item_Name: 'Diamond Ring 18K', Category: 'Ring',     Purity: '18K', Gross_Weight: 5.2,  Net_Weight: 4.8,  MRP: 85000,  Making_Charge: 0, Discount: 0, Net_Amount: 85000 },
+    { ID: '3', Barcode: 'BC-100454', Item_Name: 'Gold Necklace 22K', Category: 'Necklace', Purity: '22K', Gross_Weight: 68.5, Net_Weight: 66.2, MRP: 520000, Making_Charge: 0, Discount: 0, Net_Amount: 520000 },
+    { ID: '4', Barcode: 'BC-100455', Item_Name: 'Silver Chain',     Category: 'Chain',    Purity: '925 Silver', Gross_Weight: 32.1, Net_Weight: 32.1, MRP: 15500, Making_Charge: 0, Discount: 0, Net_Amount: 15500 },
+    { ID: '5', Barcode: 'BC-100456', Item_Name: 'Gold Earrings 22K', Category: 'Earrings', Purity: '22K', Gross_Weight: 22.3, Net_Weight: 19.3, MRP: 110000, Making_Charge: 0, Discount: 0, Net_Amount: 110000 }
+  ];
+
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const delay = (v) => new Promise((r) => setTimeout(() => r(v), 120));
+
+  /* ---------------- records ---------------- */
+
+  function getItems(sessionId) {
+    if (offline) return delay(clone(mock));
+    const criteria = sessionId ? `Session_ID == "${sessionId}"` : null;
+    return fetchAll(C.reports.barcodeItem, criteria);
+  }
+
+  function fetchAll(reportName, criteria) {
+    const out = [];
+    const page = (n) => {
+      const cfg = { reportName, page: n, pageSize: C.pageSize };
+      if (criteria) cfg.criteria = criteria;
+      return ZOHO.CREATOR.API.getAllRecords(cfg).then((res) => {
+        const data = (res && res.data) || [];
+        out.push.apply(out, data);
+        return data.length === C.pageSize ? page(n + 1) : out;
+      });
+    };
+    return page(1).catch((err) => {
+      /* Creator returns code 3100 / empty result when no rows match */
+      if (err && (err.code === 3100 || err.code === 9280)) return [];
+      throw err;
+    });
+  }
+
+  function addItem(data) {
+    if (offline) {
+      const rec = Object.assign({ ID: String(Date.now()) }, data);
+      mock.push(rec);
+      return delay(rec);
+    }
+    return ZOHO.CREATOR.API.addRecord({
+      formName: C.forms.barcodeItem,
+      data: { data: data }
+    }).then((res) => Object.assign({ ID: res && res.data && res.data.ID }, data));
+  }
+
+  function updateItem(id, data) {
+    if (offline) {
+      const rec = mock.find((r) => r.ID === id);
+      if (rec) Object.assign(rec, data);
+      return delay(rec);
+    }
+    return ZOHO.CREATOR.API.updateRecord({
+      reportName: C.reports.barcodeItem,
+      id: id,
+      data: { data: data }
+    }).then(() => Object.assign({ ID: id }, data));
+  }
+
+  function deleteItem(id) {
+    if (offline) {
+      mock = mock.filter((r) => r.ID !== id);
+      return delay(true);
+    }
+    return ZOHO.CREATOR.API.deleteRecord({
+      reportName: C.reports.barcodeItem,
+      criteria: `ID == ${id}`
+    }).then(() => true);
+  }
+
+  function getLookup(reportName, labelField) {
+    if (offline) {
+      return delay([
+        { ID: 's1', label: 'Shree Gold Traders' },
+        { ID: 's2', label: 'Kalyan Bullion' },
+        { ID: 's3', label: 'Rajesh Jewels Pvt Ltd' }
+      ]);
+    }
+    return fetchAll(reportName, null)
+      .then((rows) => rows.map((r) => ({ ID: r.ID, label: r[labelField] || r.Name || r.ID })))
+      .catch(() => []);
+  }
+
+  /* ---------------- session ---------------- */
+
+  function createSession(voucher) {
+    const sessionId = 'SES-' + Math.floor(100000 + Math.random() * 900000);
+    if (offline) return delay({ ID: sessionId, Session_ID: sessionId });
+    return ZOHO.CREATOR.API.addRecord({
+      formName: C.forms.barcodeSession,
+      data: {
+        data: {
+          Session_ID: sessionId,
+          Voucher_Type: voucher.voucherType,
+          Voucher_Date: U.toCreatorDate(voucher.voucherDate),
+          Supplier: voucher.supplier,
+          Invoice_Number: voucher.invoiceNumber,
+          Rate_Master: voucher.rateMaster,
+          Price_Level: voucher.priceLevel
+        }
+      }
+    }).then(() => ({ Session_ID: sessionId }));
+  }
+
+  function nextBarcode() {
+    if (offline) {
+      const max = mock.reduce((m, r) => Math.max(m, U.num(String(r.Barcode).replace(/\D/g, ''))), 100000);
+      return delay('BC-' + (max + 1));
+    }
+    return ZOHO.CREATOR.API.getAllRecords({
+      reportName: C.reports.barcodeItem,
+      pageSize: 1,
+      page: 1
+    }).then((res) => {
+      const rows = (res && res.data) || [];
+      const last = rows.length ? U.num(String(rows[0].Barcode).replace(/\D/g, '')) : 100000;
+      return 'BC-' + (last + 1);
+    }).catch(() => 'BC-' + Date.now().toString().slice(-6));
+  }
+
+  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, createSession, nextBarcode };
+})();
+
+/* ---------- js/store.js ---------- */
+window.BC_STORE = (function () {
+  const U = window.BC_UTILS;
+  const C = window.BC_CONFIG;
+
+  const state = {
+    voucher: {
+      voucherType: 'Purchase',
+      voucherDate: U.todayISO(),
+      supplier: '',
+      invoiceNumber: '',
+      rateMaster: 'Standard Rate',
+      priceLevel: 'Retail',
+      sessionId: ''
+    },
+    items: [],
+    search: '',
+    sort: { key: null, dir: 'asc' },
+    filters: {},
+    hiddenColumns: new Set(),
+    listeners: []
+  };
+
+  const subscribe = (fn) => { state.listeners.push(fn); };
+  const emit = () => state.listeners.forEach((fn) => fn(state));
+
+  function setItems(items) { state.items = items || []; emit(); }
+  function setVoucher(patch) { Object.assign(state.voucher, patch); emit(); }
+  function setSearch(q) { state.search = q; emit(); }
+
+  function toggleSort(key) {
+    if (state.sort.key === key) state.sort.dir = state.sort.dir === 'asc' ? 'desc' : 'asc';
+    else state.sort = { key, dir: 'asc' };
+    emit();
+  }
+
+  function setFilter(key, value) {
+    if (value) state.filters[key] = value;
+    else delete state.filters[key];
+    emit();
+  }
+
+  function toggleColumn(key) {
+    if (state.hiddenColumns.has(key)) state.hiddenColumns.delete(key);
+    else state.hiddenColumns.add(key);
+    emit();
+  }
+
+  function reset() {
+    state.search = '';
+    state.sort = { key: null, dir: 'asc' };
+    state.filters = {};
+    state.hiddenColumns = new Set();
+    emit();
+  }
+
+  function visibleColumns() {
+    return C.columns.filter((c) => !state.hiddenColumns.has(c.key));
+  }
+
+  function visibleItems() {
+    let rows = state.items.slice();
+
+    const q = state.search.trim().toLowerCase();
+    if (q) {
+      rows = rows.filter((r) =>
+        C.columns.some((c) => String(r[c.key] == null ? '' : r[c.key]).toLowerCase().includes(q))
+      );
+    }
+
+    Object.keys(state.filters).forEach((key) => {
+      const val = String(state.filters[key]).toLowerCase();
+      rows = rows.filter((r) => String(r[key] == null ? '' : r[key]).toLowerCase() === val);
+    });
+
+    if (state.sort.key) {
+      const col = C.columns.find((c) => c.key === state.sort.key);
+      const numeric = col && ['weight', 'money'].includes(col.type);
+      const dir = state.sort.dir === 'asc' ? 1 : -1;
+      rows.sort((a, b) => {
+        const x = a[state.sort.key], y = b[state.sort.key];
+        if (numeric) return (U.num(x) - U.num(y)) * dir;
+        return String(x == null ? '' : x).localeCompare(String(y == null ? '' : y)) * dir;
+      });
+    }
+
+    return rows;
+  }
+
+  function totals() {
+    const rows = visibleItems();
+    const sum = (key) => rows.reduce((acc, r) => acc + U.num(r[key]), 0);
+    const totalAmount = sum('MRP') + sum('Making_Charge');
+    const discount = sum('Discount');
+    return {
+      count: rows.length,
+      grossWeight: sum('Gross_Weight'),
+      netWeight: sum('Net_Weight'),
+      totalAmount: totalAmount,
+      discount: discount,
+      netAmount: totalAmount - discount
+    };
+  }
+
+  return {
+    state, subscribe, setItems, setVoucher, setSearch, toggleSort,
+    setFilter, toggleColumn, reset, visibleItems, visibleColumns, totals
+  };
+})();
+
+/* ---------- js/ui.js ---------- */
+window.BC_UI = (function () {
+  const U = window.BC_UTILS;
+  const C = window.BC_CONFIG;
+  const S = window.BC_STORE;
+
+  const $ = (sel) => document.querySelector(sel);
+
+  const ICONS = {
+    hash:  '<path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/>',
+    scale: '<path d="M12 3v18M7 7l-4 7h8zM17 7l-4 7h8zM5 21h14"/>',
+    gem:   '<path d="M6 3h12l3 6-9 12L3 9z"/>',
+    rupee: '<path d="M7 4h10M7 9h10M14 4c3 0 4 5 0 5H7l7 11"/>',
+    tag:   '<path d="M3 12l9-9h8v8l-9 9zM16 8h.01"/>',
+    wallet:'<path d="M3 7h18v12H3zM3 7l3-4h12l3 4M16 13h.01"/>'
+  };
+
+  /* ---------------- stat cards ---------------- */
+  function renderStats() {
+    const t = S.totals();
+    $('#statsRow').innerHTML = C.stats.map((s) => {
+      const raw = t[s.key];
+      const value = U.fmt[s.format](raw);
+      const prefix = s.format.startsWith('money') ? '<span class="bc-unit">₹</span>' : '';
+      const suffix = s.format === 'weight' ? '<span class="bc-unit">g</span>' : '';
+      return `
+        <div class="bc-stat bc-tone-${s.tone}">
+          <div class="bc-stat-icon"><svg viewBox="0 0 24 24">${ICONS[s.icon]}</svg></div>
+          <div class="bc-stat-label">${U.esc(s.label)}</div>
+          <div class="bc-stat-value">${prefix}${value}${suffix}</div>
+        </div>`;
+    }).join('');
+  }
+
+  /* ---------------- table ---------------- */
+  function cellHTML(col, row, index) {
+    switch (col.type) {
+      case 'index':  return String(index + 1);
+      case 'action': return `
+        <button class="bc-icon-btn bc-edit" data-row-action="edit" data-id="${U.esc(row.ID)}" title="Edit">
+          <svg viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16zM14 6l4 4"/></svg>
+        </button>
+        <button class="bc-icon-btn bc-delete" data-row-action="delete" data-id="${U.esc(row.ID)}" title="Delete">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>
+        </button>`;
+      case 'link':   return `<a class="bc-link" href="#" data-row-action="edit" data-id="${U.esc(row.ID)}">${U.esc(row[col.key])}</a>`;
+      case 'tag':    return `<span class="bc-chip">${U.esc(row[col.key])}</span>`;
+      case 'weight': return `${U.fmt.weight(row[col.key])} <span class="bc-unit">g</span>`;
+      case 'money':  return `<strong>₹${U.fmt.money(row[col.key])}</strong>`;
+      default:       return U.esc(row[col.key]);
+    }
+  }
+
+  function renderTable() {
+    const cols = S.visibleColumns();
+    const rows = S.visibleItems();
+    const sort = S.state.sort;
+
+    $('#tableHead').innerHTML = '<tr>' + cols.map((c) => {
+      const sortable = c.sortable !== false;
+      const active = sort.key === c.key ? ` bc-sorted bc-${sort.dir}` : '';
+      return `<th class="bc-al-${c.align || 'left'}${active}" style="min-width:${c.width}px"
+                  ${sortable ? `data-sort-key="${c.key}"` : ''}>
+        <span>${U.esc(c.label)}</span>
+        ${sortable ? '<svg class="bc-caret" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>' : ''}
+      </th>`;
+    }).join('') + '</tr>';
+
+    $('#tableBody').innerHTML = rows.map((row, i) =>
+      `<tr data-id="${U.esc(row.ID)}">` + cols.map((c) =>
+        `<td class="bc-al-${c.align || 'left'}">${cellHTML(c, row, i)}</td>`
+      ).join('') + '</tr>'
+    ).join('');
+
+    $('#emptyState').hidden = rows.length > 0;
+    $('.bc-table-scroll').hidden = rows.length === 0;
+  }
+
+  function renderVoucher() {
+    const v = S.state.voucher;
+    $('#voucherType').value = v.voucherType;
+    $('#voucherDate').value = v.voucherDate;
+    $('#invoiceNumber').value = v.invoiceNumber;
+    $('#priceLevel').value = v.priceLevel;
+    $('#sessionId').value = v.sessionId;
+  }
+
+  function renderAll() {
+    renderStats();
+    renderTable();
+  }
+
+  /* ---------------- modal ---------------- */
+  function closeModal() {
+    const root = $('#modalRoot');
+    root.hidden = true;
+    root.innerHTML = '';
+  }
+
+  function openModal(title, bodyHTML, footerHTML) {
+    const root = $('#modalRoot');
+    root.innerHTML = `
+      <div class="bc-modal-backdrop" data-close="1"></div>
+      <div class="bc-modal" role="dialog" aria-modal="true" aria-label="${U.esc(title)}">
+        <div class="bc-modal-head">
+          <h2>${U.esc(title)}</h2>
+          <button class="bc-icon-btn" data-close="1" aria-label="Close">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="bc-modal-body">${bodyHTML}</div>
+        <div class="bc-modal-foot">${footerHTML || ''}</div>
+      </div>`;
+    root.hidden = false;
+    root.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeModal));
+    const first = root.querySelector('input,select,textarea,button');
+    if (first) first.focus();
+    return root.querySelector('.bc-modal');
+  }
+
+  function itemFormHTML(row) {
+    const r = row || {};
+    const opts = (list, sel) => list.map((o) => `<option${o === sel ? ' selected' : ''}>${U.esc(o)}</option>`).join('');
+    const f = (name, label, value, type, extra) => `
+      <label class="bc-field">
+        <span>${label}</span>
+        <input name="${name}" type="${type || 'text'}" value="${U.esc(value == null ? '' : value)}" ${extra || ''} />
+      </label>`;
+    return `<form id="itemForm" class="bc-form-grid">
+      ${f('Barcode', 'Barcode', r.Barcode, 'text', 'required')}
+      ${f('Item_Name', 'Item Name', r.Item_Name, 'text', 'required')}
+      <label class="bc-field"><span>Category</span><select name="Category">${opts(C.categories, r.Category)}</select></label>
+      <label class="bc-field"><span>Purity</span><select name="Purity">${opts(C.purities, r.Purity)}</select></label>
+      ${f('Gross_Weight', 'Gross Weight (g)', r.Gross_Weight, 'number', 'step="0.001" min="0"')}
+      ${f('Net_Weight', 'Net Weight (g)', r.Net_Weight, 'number', 'step="0.001" min="0"')}
+      ${f('MRP', 'MRP (₹)', r.MRP, 'number', 'step="0.01" min="0"')}
+      ${f('Making_Charge', 'Making Charge (₹)', r.Making_Charge, 'number', 'step="0.01" min="0"')}
+      ${f('Discount', 'Discount (₹)', r.Discount, 'number', 'step="0.01" min="0"')}
+    </form>`;
+  }
+
+  /* ---------------- toast / loader ---------------- */
+  function toast(message, tone) {
+    const el = document.createElement('div');
+    el.className = 'bc-toast bc-toast-' + (tone || 'info');
+    el.textContent = message;
+    $('#toastRoot').appendChild(el);
+    setTimeout(() => el.classList.add('bc-in'), 10);
+    setTimeout(() => {
+      el.classList.remove('bc-in');
+      setTimeout(() => el.remove(), 250);
+    }, 3000);
+  }
+
+  const loading = (on) => { $('#loader').hidden = !on; };
+
+  return { renderAll, renderStats, renderTable, renderVoucher, openModal, closeModal, itemFormHTML, toast, loading, $ };
+})();
+
+/* ---------- js/app.js ---------- */
+(function () {
+  const U = window.BC_UTILS;
+  const C = window.BC_CONFIG;
+  const S = window.BC_STORE;
+  const UI = window.BC_UI;
+  const API = window.BC_API;
+  const $ = UI.$;
+
+  /* ---------------- data ---------------- */
+
+  function loadItems() {
+    UI.loading(true);
+    return API.getItems(S.state.voucher.sessionId)
+      .then((rows) => S.setItems(rows))
+      .catch((err) => UI.toast('Could not load items: ' + (err.message || err), 'error'))
+      .then(() => UI.loading(false));
+  }
+
+  function loadSuppliers() {
+    return API.getLookup(C.reports.supplier, 'Supplier_Name').then((list) => {
+      const sel = $('#supplier');
+      list.forEach((s) => {
+        const o = document.createElement('option');
+        o.value = s.ID;
+        o.textContent = s.label;
+        sel.appendChild(o);
+      });
+    });
+  }
+
+  function readForm(form) {
+    const data = {};
+    new FormData(form).forEach((v, k) => { data[k] = v; });
+    ['Gross_Weight', 'Net_Weight', 'MRP', 'Making_Charge', 'Discount'].forEach((k) => {
+      data[k] = U.num(data[k]);
+    });
+    data.Net_Amount = data.MRP + data.Making_Charge - data.Discount;
+    if (S.state.voucher.sessionId) data.Session_ID = S.state.voucher.sessionId;
+    return data;
+  }
+
+  /* ---------------- actions ---------------- */
+
+  function openItemModal(row) {
+    const editing = !!row;
+    UI.openModal(
+      editing ? 'Edit Barcode Item' : 'Add Barcode Item',
+      UI.itemFormHTML(row),
+      `<button class="bc-btn" data-close="1">Cancel</button>
+       <button class="bc-btn bc-btn-primary" id="saveItem">${editing ? 'Save Changes' : 'Add Item'}</button>`
+    );
+
+    if (!editing) {
+      API.nextBarcode().then((code) => {
+        const input = document.querySelector('#itemForm [name="Barcode"]');
+        if (input && !input.value) input.value = code;
+      });
+    }
+
+    $('#saveItem').addEventListener('click', () => {
+      const form = $('#itemForm');
+      if (!form.reportValidity()) return;
+      const data = readForm(form);
+      UI.loading(true);
+      const req = editing ? API.updateItem(row.ID, data) : API.addItem(data);
+      req.then(() => {
+        UI.closeModal();
+        UI.toast(editing ? 'Item updated' : 'Item added', 'success');
+        return loadItems();
+      }).catch((err) => {
+        UI.toast('Save failed: ' + (err.message || err), 'error');
+      }).then(() => UI.loading(false));
+    });
+  }
+
+  function confirmDelete(row) {
+    UI.openModal(
+      'Delete Item',
+      `<p class="bc-confirm">Delete <strong>${U.esc(row.Barcode)}</strong> — ${U.esc(row.Item_Name)}? This cannot be undone.</p>`,
+      `<button class="bc-btn" data-close="1">Cancel</button>
+       <button class="bc-btn bc-btn-danger" id="confirmDelete">Delete</button>`
+    );
+    $('#confirmDelete').addEventListener('click', () => {
+      UI.loading(true);
+      API.deleteItem(row.ID).then(() => {
+        UI.closeModal();
+        UI.toast('Item deleted', 'success');
+        return loadItems();
+      }).catch((err) => UI.toast('Delete failed: ' + (err.message || err), 'error'))
+        .then(() => UI.loading(false));
+    });
+  }
+
+  function openFilterModal() {
+    const f = S.state.filters;
+    const opts = (list, sel) =>
+      ['<option value="">All</option>'].concat(
+        list.map((o) => `<option${o === sel ? ' selected' : ''}>${U.esc(o)}</option>`)
+      ).join('');
+    UI.openModal('Filter Items',
+      `<form id="filterForm" class="bc-form-grid">
+        <label class="bc-field"><span>Category</span><select name="Category">${opts(C.categories, f.Category)}</select></label>
+        <label class="bc-field"><span>Purity</span><select name="Purity">${opts(C.purities, f.Purity)}</select></label>
+      </form>`,
+      `<button class="bc-btn" id="clearFilters">Clear</button>
+       <button class="bc-btn bc-btn-primary" id="applyFilters">Apply</button>`
+    );
+    $('#applyFilters').addEventListener('click', () => {
+      new FormData($('#filterForm')).forEach((v, k) => S.setFilter(k, v));
+      UI.closeModal();
+    });
+    $('#clearFilters').addEventListener('click', () => {
+      Object.keys(S.state.filters).forEach((k) => S.setFilter(k, ''));
+      UI.closeModal();
+    });
+  }
+
+  function openSortModal() {
+    const sortable = C.columns.filter((c) => c.sortable !== false);
+    UI.openModal('Sort Items',
+      `<form id="sortForm" class="bc-form-grid">
+        <label class="bc-field"><span>Sort by</span>
+          <select name="key">${sortable.map((c) =>
+            `<option value="${c.key}"${S.state.sort.key === c.key ? ' selected' : ''}>${U.esc(c.label)}</option>`
+          ).join('')}</select></label>
+        <label class="bc-field"><span>Direction</span>
+          <select name="dir">
+            <option value="asc"${S.state.sort.dir === 'asc' ? ' selected' : ''}>Ascending</option>
+            <option value="desc"${S.state.sort.dir === 'desc' ? ' selected' : ''}>Descending</option>
+          </select></label>
+      </form>`,
+      `<button class="bc-btn" data-close="1">Cancel</button>
+       <button class="bc-btn bc-btn-primary" id="applySort">Apply</button>`
+    );
+    $('#applySort').addEventListener('click', () => {
+      const fd = new FormData($('#sortForm'));
+      S.state.sort = { key: fd.get('key'), dir: fd.get('dir') };
+      UI.closeModal();
+      UI.renderAll();
+    });
+  }
+
+  function openColumnsModal() {
+    UI.openModal('Toggle Columns',
+      `<div class="bc-checklist">${C.columns.map((c) => `
+        <label class="bc-check">
+          <input type="checkbox" value="${c.key}" ${S.state.hiddenColumns.has(c.key) ? '' : 'checked'} />
+          <span>${U.esc(c.label)}</span>
+        </label>`).join('')}</div>`,
+      `<button class="bc-btn bc-btn-primary" data-close="1">Done</button>`
+    );
+    document.querySelectorAll('.bc-checklist input').forEach((cb) => {
+      cb.addEventListener('change', () => S.toggleColumn(cb.value));
+    });
+  }
+
+  function exportCSV() {
+    const cols = S.visibleColumns().filter((c) => c.type !== 'action');
+    const csv = U.toCSV(S.visibleItems(), cols);
+    U.download(`barcodes-${S.state.voucher.sessionId || 'session'}.csv`, csv, 'text/csv;charset=utf-8');
+    UI.toast('Exported ' + S.visibleItems().length + ' items', 'success');
+  }
+
+  function importCSV() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv,text/csv';
+    input.addEventListener('change', () => {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const rows = U.parseCSV(String(reader.result));
+        if (rows.length < 2) return UI.toast('CSV has no data rows', 'error');
+        const header = rows[0].map((h) => h.trim());
+        const colByLabel = {};
+        C.columns.forEach((c) => { colByLabel[c.label.toUpperCase()] = c.key; });
+
+        const records = rows.slice(1).map((r) => {
+          const rec = {};
+          header.forEach((h, i) => {
+            const key = colByLabel[h.toUpperCase()] || h;
+            rec[key] = r[i];
+          });
+          ['Gross_Weight', 'Net_Weight', 'MRP', 'Making_Charge', 'Discount'].forEach((k) => {
+            rec[k] = U.num(rec[k]);
+          });
+          rec.Net_Amount = rec.MRP + rec.Making_Charge - rec.Discount;
+          if (S.state.voucher.sessionId) rec.Session_ID = S.state.voucher.sessionId;
+          delete rec.no;
+          delete rec.action;
+          return rec;
+        });
+
+        UI.loading(true);
+        records.reduce((chain, rec) => chain.then(() => API.addItem(rec)), Promise.resolve())
+          .then(() => {
+            UI.toast('Imported ' + records.length + ' items', 'success');
+            return loadItems();
+          })
+          .catch((err) => UI.toast('Import failed: ' + (err.message || err), 'error'))
+          .then(() => UI.loading(false));
+      };
+      reader.readAsText(file);
+    });
+    input.click();
+  }
+
+  function printLabels() {
+    const rows = S.visibleItems();
+    if (!rows.length) return UI.toast('Nothing to print', 'error');
+    const labels = rows.map((r) => `
+      <div class="label">
+        <div class="code">${U.esc(r.Barcode)}</div>
+        <div class="bars">${barsSVG(r.Barcode)}</div>
+        <div class="name">${U.esc(r.Item_Name)}</div>
+        <div class="meta">${U.esc(r.Purity)} &middot; ${U.fmt.weight(r.Net_Weight)}g</div>
+        <div class="price">&#8377;${U.fmt.money(r.MRP)}</div>
+      </div>`).join('');
+
+    const win = window.open('', '_blank');
+    if (!win) return UI.toast('Popup blocked — allow popups to print', 'error');
+    win.document.write(`<!DOCTYPE html><html><head><title>Barcode Labels</title><style>
+      body{font-family:system-ui,sans-serif;margin:12px;display:flex;flex-wrap:wrap;gap:8px}
+      .label{width:180px;border:1px solid #d5d9e0;border-radius:6px;padding:8px;text-align:center;page-break-inside:avoid}
+      .code{font:600 11px/1.2 monospace;letter-spacing:.5px}
+      .bars{margin:4px 0}
+      .name{font-size:11px;font-weight:600;margin-top:2px}
+      .meta{font-size:10px;color:#6b7280}
+      .price{font-size:12px;font-weight:700;margin-top:2px}
+      @media print{body{margin:0}}
+    </style></head><body>${labels}</body></html>`);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 300);
+  }
+
+  /* Code-39 style visual bars derived from the barcode string. */
+  function barsSVG(code) {
+    const text = String(code || '');
+    let x = 0;
+    let bars = '';
+    for (let i = 0; i < text.length; i++) {
+      const c = text.charCodeAt(i);
+      for (let b = 0; b < 4; b++) {
+        const w = ((c >> b) & 1) ? 2 : 1;
+        if (b % 2 === 0) bars += `<rect x="${x}" y="0" width="${w}" height="40" fill="#111"/>`;
+        x += w + 1;
+      }
+    }
+    return `<svg width="100%" height="40" viewBox="0 0 ${Math.max(x, 1)} 40" preserveAspectRatio="none">${bars}</svg>`;
+  }
+
+  function createSession() {
+    UI.loading(true);
+    API.createSession(S.state.voucher)
+      .then((res) => {
+        S.setVoucher({ sessionId: res.Session_ID });
+        UI.renderVoucher();
+        UI.toast('Session ' + res.Session_ID + ' created', 'success');
+        return loadItems();
+      })
+      .catch((err) => UI.toast('Could not create session: ' + (err.message || err), 'error'))
+      .then(() => UI.loading(false));
+  }
+
+  function generateBarcodes() {
+    if (!S.state.items.length) return UI.toast('Add items before generating barcodes', 'error');
+    printLabels();
+  }
+
+  /* ---------------- events ---------------- */
+
+  function bind() {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (btn) {
+        const action = btn.dataset.action;
+        if (action === 'add') openItemModal(null);
+        else if (action === 'refresh') loadItems();
+        else if (action === 'reset') { S.reset(); $('#searchInput').value = ''; }
+        else if (action === 'export') exportCSV();
+        else if (action === 'import') importCSV();
+        else if (action === 'print') printLabels();
+        else if (action === 'filter') openFilterModal();
+        else if (action === 'sort') openSortModal();
+        else if (action === 'columns') openColumnsModal();
+        else if (action === 'create-session') createSession();
+        else if (action === 'generate') generateBarcodes();
+        return;
+      }
+
+      const rowBtn = e.target.closest('[data-row-action]');
+      if (rowBtn) {
+        e.preventDefault();
+        const row = S.state.items.find((r) => String(r.ID) === rowBtn.dataset.id);
+        if (!row) return;
+        if (rowBtn.dataset.rowAction === 'edit') openItemModal(row);
+        else confirmDelete(row);
+        return;
+      }
+
+      const th = e.target.closest('th[data-sort-key]');
+      if (th) S.toggleSort(th.dataset.sortKey);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') UI.closeModal();
+    });
+
+    $('#searchInput').addEventListener('input', U.debounce((e) => S.setSearch(e.target.value), 200));
+
+    [['voucherType', 'voucherType'], ['voucherDate', 'voucherDate'], ['supplier', 'supplier'],
+     ['invoiceNumber', 'invoiceNumber'], ['rateMaster', 'rateMaster'], ['priceLevel', 'priceLevel']
+    ].forEach(([id, key]) => {
+      $('#' + id).addEventListener('change', (e) => S.setVoucher({ [key]: e.target.value }));
+    });
+  }
+
+  /* ---------------- init ---------------- */
+
+  API.init().then((ctx) => {
+    const params = (ctx && ctx.params) || {};
+    if (params.sessionId) S.setVoucher({ sessionId: params.sessionId });
+    if (API.isOffline()) UI.toast('Preview mode — showing sample data', 'info');
+
+    S.subscribe(UI.renderAll);
+    bind();
+    UI.renderVoucher();
+    UI.renderAll();
+    loadSuppliers();
+    loadItems();
+  });
+})();
+
+</script>
+</body>
+</html>
