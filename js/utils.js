@@ -15,25 +15,6 @@ window.BC_UTILS = (function () {
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
-  const todayISO = () => new Date().toISOString().slice(0, 10);
-
-  /* Creator date fields use dd-MMM-yyyy */
-  const toCreatorDate = (iso) => {
-    if (!iso) return '';
-    const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const d = new Date(iso + 'T00:00:00');
-    if (isNaN(d)) return '';
-    return `${String(d.getDate()).padStart(2, '0')}-${m[d.getMonth()]}-${d.getFullYear()}`;
-  };
-
-  const fromCreatorDate = (s) => {
-    if (!s) return '';
-    const m = { Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12' };
-    const p = String(s).split(/[-\s]/);
-    if (p.length < 3 || !m[p[1]]) return '';
-    return `${p[2]}-${m[p[1]]}-${String(p[0]).padStart(2, '0')}`;
-  };
-
   const download = (filename, content, mime) => {
     const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -82,5 +63,5 @@ window.BC_UTILS = (function () {
     };
   };
 
-  return { num, fmt, esc, todayISO, toCreatorDate, fromCreatorDate, download, toCSV, parseCSV, debounce };
+  return { num, fmt, esc, download, toCSV, parseCSV, debounce };
 })();

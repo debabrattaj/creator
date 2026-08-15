@@ -3,14 +3,12 @@ window.BC_CONFIG = {
   appLinkName: 'jewellery-retail',
 
   forms: {
-    barcodeItem: 'Barcode_Item',
-    barcodeSession: 'Barcode_Session'
+    barcodeItem: 'Barcode_Item'
   },
 
   reports: {
     barcodeItem: 'All_Barcode_Items',
-    barcodeSession: 'All_Barcode_Sessions',
-    supplier: 'All_Suppliers',
+    vendor: 'All_Vendors',
     rateMaster: 'All_Rate_Masters'
   },
 

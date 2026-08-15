@@ -18,21 +18,8 @@
       <div class="bc-card-title"><span class="bc-accent"></span>Voucher Information</div>
       <div class="bc-voucher-grid">
         <label class="bc-field">
-          <span>Voucher Type</span>
-          <select id="voucherType">
-            <option>Purchase</option>
-            <option>Sales</option>
-            <option>Transfer</option>
-            <option>Return</option>
-          </select>
-        </label>
-        <label class="bc-field">
-          <span>Voucher Date</span>
-          <input type="date" id="voucherDate" />
-        </label>
-        <label class="bc-field">
-          <span>Supplier</span>
-          <select id="supplier"><option value="">Select Supplier</option></select>
+          <span>Vendor</span>
+          <select id="vendor"><option value="">Select Vendor</option></select>
         </label>
         <label class="bc-field">
           <span>Invoice Number</span>
@@ -43,25 +30,9 @@
           <select id="rateMaster"><option>Standard Rate</option></select>
         </label>
         <label class="bc-field">
-          <span>Price Level</span>
-          <select id="priceLevel">
-            <option>Retail</option>
-            <option>Wholesale</option>
-            <option>Dealer</option>
-          </select>
-        </label>
-        <label class="bc-field">
           <span>Session ID</span>
           <input type="text" id="sessionId" readonly />
         </label>
-        <div class="bc-voucher-actions">
-          <button class="bc-btn bc-btn-ghost" data-action="create-session">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Create New
-          </button>
-          <button class="bc-btn bc-btn-primary" data-action="generate">
-            <svg viewBox="0 0 24 24"><path d="M4 6v12M8 6v12M11 6v12M14 6v12M17 6v12M20 6v12"/></svg>Generate Barcodes
-          </button>
-        </div>
       </div>
     </section>
 

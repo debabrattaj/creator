@@ -4,12 +4,9 @@ window.BC_STORE = (function () {
 
   const state = {
     voucher: {
-      voucherType: 'Purchase',
-      voucherDate: U.todayISO(),
-      supplier: '',
+      vendor: '',
       invoiceNumber: '',
       rateMaster: 'Standard Rate',
-      priceLevel: 'Retail',
       sessionId: ''
     },
     items: [],

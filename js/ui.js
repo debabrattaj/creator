@@ -77,10 +77,7 @@ window.BC_UI = (function () {
 
   function renderVoucher() {
     const v = S.state.voucher;
-    $('#voucherType').value = v.voucherType;
-    $('#voucherDate').value = v.voucherDate;
     $('#invoiceNumber').value = v.invoiceNumber;
-    $('#priceLevel').value = v.priceLevel;
     $('#sessionId').value = v.sessionId;
   }
 

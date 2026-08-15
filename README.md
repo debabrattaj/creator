@@ -3,8 +3,9 @@
 Barcode session management widget for jewellery retail, built on the
 [Zoho Creator JS API](https://www.zoho.com/creator/help/widgets/) (SDK v2.0).
 
-Voucher header, live totals, and a barcode item grid with add/edit/delete,
-search, sort, filter, column toggles, CSV import/export, and label printing.
+Voucher header (vendor, invoice number, rate master, session), live totals, and
+a barcode item grid with add/edit/delete, search, sort, filter, column toggles,
+CSV import/export, and label printing.
 
 ## Layout
 
@@ -56,6 +57,6 @@ python3 -m http.server 8000
 
 - Records are paged through `getAllRecords` at `pageSize` (default 200) until a
   short page comes back, so sessions larger than one page load fully.
-- Creator date fields use `dd-MMM-yyyy`; `utils.js` converts to and from the
-  `yyyy-mm-dd` the date input uses.
+- The vendor dropdown is populated from `reports.vendor` using the `Vendor_Name`
+  field; change that field name in `js/app.js` if yours differs.
 - Label printing renders in a popup window — the browser must allow popups.

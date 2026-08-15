@@ -86,11 +86,6 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .bc-field input[readonly] { background: #f6f7fa; color: var(--text-muted); }
 .bc-field input::placeholder { color: var(--text-faint); }
 
-.bc-voucher-actions {
-  display: flex; flex-direction: column; gap: 10px;
-  align-items: stretch; justify-content: flex-end;
-}
-
 /* ---------- buttons ---------- */
 .bc-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;

@@ -93,11 +93,6 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .bc-field input[readonly] { background: #f6f7fa; color: var(--text-muted); }
 .bc-field input::placeholder { color: var(--text-faint); }
 
-.bc-voucher-actions {
-  display: flex; flex-direction: column; gap: 10px;
-  align-items: stretch; justify-content: flex-end;
-}
-
 /* ---------- buttons ---------- */
 .bc-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -328,21 +323,8 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
       <div class="bc-card-title"><span class="bc-accent"></span>Voucher Information</div>
       <div class="bc-voucher-grid">
         <label class="bc-field">
-          <span>Voucher Type</span>
-          <select id="voucherType">
-            <option>Purchase</option>
-            <option>Sales</option>
-            <option>Transfer</option>
-            <option>Return</option>
-          </select>
-        </label>
-        <label class="bc-field">
-          <span>Voucher Date</span>
-          <input type="date" id="voucherDate" />
-        </label>
-        <label class="bc-field">
-          <span>Supplier</span>
-          <select id="supplier"><option value="">Select Supplier</option></select>
+          <span>Vendor</span>
+          <select id="vendor"><option value="">Select Vendor</option></select>
         </label>
         <label class="bc-field">
           <span>Invoice Number</span>
@@ -353,25 +335,9 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
           <select id="rateMaster"><option>Standard Rate</option></select>
         </label>
         <label class="bc-field">
-          <span>Price Level</span>
-          <select id="priceLevel">
-            <option>Retail</option>
-            <option>Wholesale</option>
-            <option>Dealer</option>
-          </select>
-        </label>
-        <label class="bc-field">
           <span>Session ID</span>
           <input type="text" id="sessionId" readonly />
         </label>
-        <div class="bc-voucher-actions">
-          <button class="bc-btn bc-btn-ghost" data-action="create-session">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Create New
-          </button>
-          <button class="bc-btn bc-btn-primary" data-action="generate">
-            <svg viewBox="0 0 24 24"><path d="M4 6v12M8 6v12M11 6v12M14 6v12M17 6v12M20 6v12"/></svg>Generate Barcodes
-          </button>
-        </div>
       </div>
     </section>
 
@@ -423,14 +389,12 @@ window.BC_CONFIG = {
   appLinkName: 'jewellery-retail',
 
   forms: {
-    barcodeItem: 'Barcode_Item',
-    barcodeSession: 'Barcode_Session'
+    barcodeItem: 'Barcode_Item'
   },
 
   reports: {
     barcodeItem: 'All_Barcode_Items',
-    barcodeSession: 'All_Barcode_Sessions',
-    supplier: 'All_Suppliers',
+    vendor: 'All_Vendors',
     rateMaster: 'All_Rate_Masters'
   },
 
@@ -482,25 +446,6 @@ window.BC_UTILS = (function () {
     { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
   ));
 
-  const todayISO = () => new Date().toISOString().slice(0, 10);
-
-  /* Creator date fields use dd-MMM-yyyy */
-  const toCreatorDate = (iso) => {
-    if (!iso) return '';
-    const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const d = new Date(iso + 'T00:00:00');
-    if (isNaN(d)) return '';
-    return `${String(d.getDate()).padStart(2, '0')}-${m[d.getMonth()]}-${d.getFullYear()}`;
-  };
-
-  const fromCreatorDate = (s) => {
-    if (!s) return '';
-    const m = { Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05',Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12' };
-    const p = String(s).split(/[-\s]/);
-    if (p.length < 3 || !m[p[1]]) return '';
-    return `${p[2]}-${m[p[1]]}-${String(p[0]).padStart(2, '0')}`;
-  };
-
   const download = (filename, content, mime) => {
     const blob = new Blob([content], { type: mime || 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -549,7 +494,7 @@ window.BC_UTILS = (function () {
     };
   };
 
-  return { num, fmt, esc, todayISO, toCreatorDate, fromCreatorDate, download, toCSV, parseCSV, debounce };
+  return { num, fmt, esc, download, toCSV, parseCSV, debounce };
 })();
 
 /* ---------- js/api.js ---------- */
@@ -657,35 +602,14 @@ window.BC_API = (function () {
   function getLookup(reportName, labelField) {
     if (offline) {
       return delay([
-        { ID: 's1', label: 'Shree Gold Traders' },
-        { ID: 's2', label: 'Kalyan Bullion' },
-        { ID: 's3', label: 'Rajesh Jewels Pvt Ltd' }
+        { ID: 'v1', label: 'Shree Gold Traders' },
+        { ID: 'v2', label: 'Kalyan Bullion' },
+        { ID: 'v3', label: 'Rajesh Jewels Pvt Ltd' }
       ]);
     }
     return fetchAll(reportName, null)
       .then((rows) => rows.map((r) => ({ ID: r.ID, label: r[labelField] || r.Name || r.ID })))
       .catch(() => []);
-  }
-
-  /* ---------------- session ---------------- */
-
-  function createSession(voucher) {
-    const sessionId = 'SES-' + Math.floor(100000 + Math.random() * 900000);
-    if (offline) return delay({ ID: sessionId, Session_ID: sessionId });
-    return ZOHO.CREATOR.API.addRecord({
-      formName: C.forms.barcodeSession,
-      data: {
-        data: {
-          Session_ID: sessionId,
-          Voucher_Type: voucher.voucherType,
-          Voucher_Date: U.toCreatorDate(voucher.voucherDate),
-          Supplier: voucher.supplier,
-          Invoice_Number: voucher.invoiceNumber,
-          Rate_Master: voucher.rateMaster,
-          Price_Level: voucher.priceLevel
-        }
-      }
-    }).then(() => ({ Session_ID: sessionId }));
   }
 
   function nextBarcode() {
@@ -704,7 +628,7 @@ window.BC_API = (function () {
     }).catch(() => 'BC-' + Date.now().toString().slice(-6));
   }
 
-  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, createSession, nextBarcode };
+  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, nextBarcode };
 })();
 
 /* ---------- js/store.js ---------- */
@@ -714,12 +638,9 @@ window.BC_STORE = (function () {
 
   const state = {
     voucher: {
-      voucherType: 'Purchase',
-      voucherDate: U.todayISO(),
-      supplier: '',
+      vendor: '',
       invoiceNumber: '',
       rateMaster: 'Standard Rate',
-      priceLevel: 'Retail',
       sessionId: ''
     },
     items: [],
@@ -897,10 +818,7 @@ window.BC_UI = (function () {
 
   function renderVoucher() {
     const v = S.state.voucher;
-    $('#voucherType').value = v.voucherType;
-    $('#voucherDate').value = v.voucherDate;
     $('#invoiceNumber').value = v.invoiceNumber;
-    $('#priceLevel').value = v.priceLevel;
     $('#sessionId').value = v.sessionId;
   }
 
@@ -995,9 +913,9 @@ window.BC_UI = (function () {
       .then(() => UI.loading(false));
   }
 
-  function loadSuppliers() {
-    return API.getLookup(C.reports.supplier, 'Supplier_Name').then((list) => {
-      const sel = $('#supplier');
+  function loadVendors() {
+    return API.getLookup(C.reports.vendor, 'Vendor_Name').then((list) => {
+      const sel = $('#vendor');
       list.forEach((s) => {
         const o = document.createElement('option');
         o.value = s.ID;
@@ -1230,24 +1148,6 @@ window.BC_UI = (function () {
     return `<svg width="100%" height="40" viewBox="0 0 ${Math.max(x, 1)} 40" preserveAspectRatio="none">${bars}</svg>`;
   }
 
-  function createSession() {
-    UI.loading(true);
-    API.createSession(S.state.voucher)
-      .then((res) => {
-        S.setVoucher({ sessionId: res.Session_ID });
-        UI.renderVoucher();
-        UI.toast('Session ' + res.Session_ID + ' created', 'success');
-        return loadItems();
-      })
-      .catch((err) => UI.toast('Could not create session: ' + (err.message || err), 'error'))
-      .then(() => UI.loading(false));
-  }
-
-  function generateBarcodes() {
-    if (!S.state.items.length) return UI.toast('Add items before generating barcodes', 'error');
-    printLabels();
-  }
-
   /* ---------------- events ---------------- */
 
   function bind() {
@@ -1264,8 +1164,6 @@ window.BC_UI = (function () {
         else if (action === 'filter') openFilterModal();
         else if (action === 'sort') openSortModal();
         else if (action === 'columns') openColumnsModal();
-        else if (action === 'create-session') createSession();
-        else if (action === 'generate') generateBarcodes();
         return;
       }
 
@@ -1289,10 +1187,8 @@ window.BC_UI = (function () {
 
     $('#searchInput').addEventListener('input', U.debounce((e) => S.setSearch(e.target.value), 200));
 
-    [['voucherType', 'voucherType'], ['voucherDate', 'voucherDate'], ['supplier', 'supplier'],
-     ['invoiceNumber', 'invoiceNumber'], ['rateMaster', 'rateMaster'], ['priceLevel', 'priceLevel']
-    ].forEach(([id, key]) => {
-      $('#' + id).addEventListener('change', (e) => S.setVoucher({ [key]: e.target.value }));
+    ['vendor', 'invoiceNumber', 'rateMaster'].forEach((id) => {
+      $('#' + id).addEventListener('change', (e) => S.setVoucher({ [id]: e.target.value }));
     });
   }
 
@@ -1307,7 +1203,7 @@ window.BC_UI = (function () {
     bind();
     UI.renderVoucher();
     UI.renderAll();
-    loadSuppliers();
+    loadVendors();
     loadItems();
   });
 })();

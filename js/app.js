@@ -16,9 +16,9 @@
       .then(() => UI.loading(false));
   }
 
-  function loadSuppliers() {
-    return API.getLookup(C.reports.supplier, 'Supplier_Name').then((list) => {
-      const sel = $('#supplier');
+  function loadVendors() {
+    return API.getLookup(C.reports.vendor, 'Vendor_Name').then((list) => {
+      const sel = $('#vendor');
       list.forEach((s) => {
         const o = document.createElement('option');
         o.value = s.ID;
@@ -251,24 +251,6 @@
     return `<svg width="100%" height="40" viewBox="0 0 ${Math.max(x, 1)} 40" preserveAspectRatio="none">${bars}</svg>`;
   }
 
-  function createSession() {
-    UI.loading(true);
-    API.createSession(S.state.voucher)
-      .then((res) => {
-        S.setVoucher({ sessionId: res.Session_ID });
-        UI.renderVoucher();
-        UI.toast('Session ' + res.Session_ID + ' created', 'success');
-        return loadItems();
-      })
-      .catch((err) => UI.toast('Could not create session: ' + (err.message || err), 'error'))
-      .then(() => UI.loading(false));
-  }
-
-  function generateBarcodes() {
-    if (!S.state.items.length) return UI.toast('Add items before generating barcodes', 'error');
-    printLabels();
-  }
-
   /* ---------------- events ---------------- */
 
   function bind() {
@@ -285,8 +267,6 @@
         else if (action === 'filter') openFilterModal();
         else if (action === 'sort') openSortModal();
         else if (action === 'columns') openColumnsModal();
-        else if (action === 'create-session') createSession();
-        else if (action === 'generate') generateBarcodes();
         return;
       }
 
@@ -310,10 +290,8 @@
 
     $('#searchInput').addEventListener('input', U.debounce((e) => S.setSearch(e.target.value), 200));
 
-    [['voucherType', 'voucherType'], ['voucherDate', 'voucherDate'], ['supplier', 'supplier'],
-     ['invoiceNumber', 'invoiceNumber'], ['rateMaster', 'rateMaster'], ['priceLevel', 'priceLevel']
-    ].forEach(([id, key]) => {
-      $('#' + id).addEventListener('change', (e) => S.setVoucher({ [key]: e.target.value }));
+    ['vendor', 'invoiceNumber', 'rateMaster'].forEach((id) => {
+      $('#' + id).addEventListener('change', (e) => S.setVoucher({ [id]: e.target.value }));
     });
   }
 
@@ -328,7 +306,7 @@
     bind();
     UI.renderVoucher();
     UI.renderAll();
-    loadSuppliers();
+    loadVendors();
     loadItems();
   });
 })();

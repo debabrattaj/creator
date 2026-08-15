@@ -102,35 +102,14 @@ window.BC_API = (function () {
   function getLookup(reportName, labelField) {
     if (offline) {
       return delay([
-        { ID: 's1', label: 'Shree Gold Traders' },
-        { ID: 's2', label: 'Kalyan Bullion' },
-        { ID: 's3', label: 'Rajesh Jewels Pvt Ltd' }
+        { ID: 'v1', label: 'Shree Gold Traders' },
+        { ID: 'v2', label: 'Kalyan Bullion' },
+        { ID: 'v3', label: 'Rajesh Jewels Pvt Ltd' }
       ]);
     }
     return fetchAll(reportName, null)
       .then((rows) => rows.map((r) => ({ ID: r.ID, label: r[labelField] || r.Name || r.ID })))
       .catch(() => []);
-  }
-
-  /* ---------------- session ---------------- */
-
-  function createSession(voucher) {
-    const sessionId = 'SES-' + Math.floor(100000 + Math.random() * 900000);
-    if (offline) return delay({ ID: sessionId, Session_ID: sessionId });
-    return ZOHO.CREATOR.API.addRecord({
-      formName: C.forms.barcodeSession,
-      data: {
-        data: {
-          Session_ID: sessionId,
-          Voucher_Type: voucher.voucherType,
-          Voucher_Date: U.toCreatorDate(voucher.voucherDate),
-          Supplier: voucher.supplier,
-          Invoice_Number: voucher.invoiceNumber,
-          Rate_Master: voucher.rateMaster,
-          Price_Level: voucher.priceLevel
-        }
-      }
-    }).then(() => ({ Session_ID: sessionId }));
   }
 
   function nextBarcode() {
@@ -149,5 +128,5 @@ window.BC_API = (function () {
     }).catch(() => 'BC-' + Date.now().toString().slice(-6));
   }
 
-  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, createSession, nextBarcode };
+  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, nextBarcode };
 })();
