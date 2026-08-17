@@ -265,6 +265,60 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 }
 
 .bc-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; }
+
+/* ---------- wide item dialog ---------- */
+.bc-modal-wide { width: min(1500px, calc(100vw - 40px)); }
+.bc-modal-wide .bc-modal-body { background: var(--bg); padding: 18px; }
+.bc-modal-head-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bc-modal-head-actions .bc-btn { height: 38px; }
+.bc-btn-sm { height: 38px; padding: 0 14px; }
+
+.bc-form-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+.bc-form-main, .bc-form-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.bc-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.bc-panel-title {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  font-size: 15px; font-weight: 650;
+}
+.bc-panel-body { padding: 18px; }
+
+.bc-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 18px; }
+.bc-field-inline { min-width: 0; }
+.bc-inline-row { display: flex; gap: 8px; align-items: stretch; }
+.bc-inline-row > input, .bc-inline-row > select { min-width: 0; }
+.bc-unit-select { flex: 0 0 78px; }
+
+/* balance cards */
+.bc-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bc-mini { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: var(--surface); }
+.bc-mini-icon {
+  width: 32px; height: 32px; border-radius: 9px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8edff; color: var(--primary);
+}
+.bc-mini-icon svg { width: 17px; height: 17px; }
+.bc-mini-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;
+}
+.bc-mini-value { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+
+/* image upload */
+.bc-upload {
+  border: 1.5px dashed var(--border-strong); border-radius: 12px;
+  padding: 26px 16px; text-align: center; cursor: pointer;
+  color: var(--text-muted); transition: border-color .15s, background .15s;
+}
+.bc-upload:hover, .bc-upload.bc-dragging { border-color: var(--primary); background: #f7f8ff; }
+.bc-upload svg { width: 30px; height: 30px; color: var(--text-faint); }
+.bc-upload strong { display: block; margin: 10px 0 4px; color: var(--text); font-size: 14px; }
+.bc-upload p { margin: 0 0 10px; font-size: 12px; }
+.bc-hint { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #eef0f6; font-size: 11px; }
+.bc-upload-preview { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.bc-upload-preview img { max-width: 100%; border-radius: 10px; border: 1px solid var(--border); }
+
 .bc-confirm { margin: 0; line-height: 1.6; }
 
 .bc-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
@@ -303,8 +357,14 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
   .bc-voucher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bc-search { margin-left: 0; }
 }
+@media (max-width: 1250px) {
+  .bc-form-layout { grid-template-columns: 1fr; }
+  .bc-mini-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 950px) { .bc-grid-4 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 700px) {
   .bc-app { padding: 16px 14px 26px; }
+  .bc-grid-4, .bc-mini-grid { grid-template-columns: 1fr; }
   .bc-voucher-grid, .bc-form-grid, .bc-checklist, .bc-stats { grid-template-columns: 1fr; }
   .bc-header h1 { font-size: 24px; }
 }
@@ -395,7 +455,15 @@ window.BC_CONFIG = {
   reports: {
     barcodeItem: 'All_Barcode_Items',
     vendor: 'All_Vendors',
-    rateMaster: 'All_Rate_Masters'
+    rateMaster: 'All_Rate_Masters',
+    purchaseEntry: 'Purchase_Entry_Report',
+    materialReceive: 'Material_Receive_Report'
+  },
+
+  /* Total Nos / Total Weight are summed across the two reports above. */
+  sourceFields: {
+    qty: 'Total_Qty',
+    netWeight: 'Total_Net_Weight'
   },
 
   pageSize: 200,
@@ -407,6 +475,7 @@ window.BC_CONFIG = {
     { key: 'Item_Name',    label: 'ITEM NAME',    type: 'text',   width: 200 },
     { key: 'Category',     label: 'CATEGORY',     type: 'tag',    width: 130 },
     { key: 'Purity',       label: 'PURITY',       type: 'text',   width: 100 },
+    { key: 'Qty',          label: 'QTY',          type: 'text',   width: 80,  align: 'right' },
     { key: 'Gross_Weight', label: 'GROSS WEIGHT', type: 'weight', width: 140 },
     { key: 'Net_Weight',   label: 'NET WEIGHT',   type: 'weight', width: 140 },
     { key: 'MRP',          label: 'MRP',          type: 'money',  width: 130, align: 'right' },
@@ -425,7 +494,11 @@ window.BC_CONFIG = {
   ],
 
   categories: ['Bangles', 'Ring', 'Necklace', 'Chain', 'Earrings', 'Bracelet', 'Pendant', 'Coin'],
-  purities: ['24K', '22K', '18K', '14K', '925 Silver', 'Platinum']
+  purities: ['24K', '22K', '18K', '14K', '925 Silver', 'Platinum'],
+  purityUnits: ['gm', 'ct', 'pcs'],
+  sizeUnits: ['in', 'cm', 'mm'],
+  salesmen: ['SHYAM', 'RAVI', 'ANITA', 'KIRAN'],
+  subGroups: ['Plain Gold', 'Studded', 'Antique', 'Temple', 'Casting']
 };
 
 /* ---------- js/utils.js ---------- */
@@ -612,6 +685,28 @@ window.BC_API = (function () {
       .catch(() => []);
   }
 
+  /* ---------------- source totals ----------------
+   * Total Nos  = sum of Total_Qty        across Purchase Entry + Material Receive
+   * Total Weight = sum of Total_Net_Weight across the same two reports
+   */
+  function getSourceTotals(sessionId) {
+    if (offline) return delay({ totalNos: 12, totalWeight: 486.25 });
+
+    const criteria = sessionId ? `Session_ID == "${sessionId}"` : null;
+    const f = C.sourceFields;
+
+    return Promise.all([
+      fetchAll(C.reports.purchaseEntry, criteria).catch(() => []),
+      fetchAll(C.reports.materialReceive, criteria).catch(() => [])
+    ]).then((sets) => {
+      const rows = sets[0].concat(sets[1]);
+      return {
+        totalNos: rows.reduce((s, r) => s + U.num(r[f.qty]), 0),
+        totalWeight: rows.reduce((s, r) => s + U.num(r[f.netWeight]), 0)
+      };
+    });
+  }
+
   function nextBarcode() {
     if (offline) {
       const max = mock.reduce((m, r) => Math.max(m, U.num(String(r.Barcode).replace(/\D/g, ''))), 100000);
@@ -628,7 +723,7 @@ window.BC_API = (function () {
     }).catch(() => 'BC-' + Date.now().toString().slice(-6));
   }
 
-  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, nextBarcode };
+  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, getSourceTotals, nextBarcode };
 })();
 
 /* ---------- js/store.js ---------- */
@@ -644,6 +739,8 @@ window.BC_STORE = (function () {
       sessionId: ''
     },
     items: [],
+    /* Total_Qty / Total_Net_Weight summed from Purchase Entry + Material Receive */
+    sourceTotals: { totalNos: 0, totalWeight: 0 },
     search: '',
     sort: { key: null, dir: 'asc' },
     filters: {},
@@ -655,6 +752,7 @@ window.BC_STORE = (function () {
   const emit = () => state.listeners.forEach((fn) => fn(state));
 
   function setItems(items) { state.items = items || []; emit(); }
+  function setSourceTotals(t) { state.sourceTotals = t || { totalNos: 0, totalWeight: 0 }; emit(); }
   function setVoucher(patch) { Object.assign(state.voucher, patch); emit(); }
   function setSearch(q) { state.search = q; emit(); }
 
@@ -717,6 +815,25 @@ window.BC_STORE = (function () {
     return rows;
   }
 
+  /* Barcoded so far in this session — the counterpart of the source totals. */
+  function barcoded() {
+    return {
+      nos: state.items.reduce((s, r) => s + (U.num(r.Qty) || 1), 0),
+      weight: state.items.reduce((s, r) => s + U.num(r.Net_Weight), 0)
+    };
+  }
+
+  /* Balance = what came in (source reports) minus what has been barcoded. */
+  function balances() {
+    const done = barcoded();
+    return {
+      totalNos: state.sourceTotals.totalNos,
+      totalWeight: state.sourceTotals.totalWeight,
+      nosBalance: state.sourceTotals.totalNos - done.nos,
+      weightBalance: state.sourceTotals.totalWeight - done.weight
+    };
+  }
+
   function totals() {
     const rows = visibleItems();
     const sum = (key) => rows.reduce((acc, r) => acc + U.num(r[key]), 0);
@@ -724,6 +841,8 @@ window.BC_STORE = (function () {
     const discount = sum('Discount');
     return {
       count: rows.length,
+      totalNos: state.sourceTotals.totalNos,
+      totalWeight: state.sourceTotals.totalWeight,
       grossWeight: sum('Gross_Weight'),
       netWeight: sum('Net_Weight'),
       totalAmount: totalAmount,
@@ -733,8 +852,8 @@ window.BC_STORE = (function () {
   }
 
   return {
-    state, subscribe, setItems, setVoucher, setSearch, toggleSort,
-    setFilter, toggleColumn, reset, visibleItems, visibleColumns, totals
+    state, subscribe, setItems, setSourceTotals, setVoucher, setSearch, toggleSort,
+    setFilter, toggleColumn, reset, visibleItems, visibleColumns, totals, balances
   };
 })();
 
@@ -834,46 +953,30 @@ window.BC_UI = (function () {
     root.innerHTML = '';
   }
 
-  function openModal(title, bodyHTML, footerHTML) {
+  /* opts: { headerHTML } renders actions in the title bar instead of a footer. */
+  function openModal(title, bodyHTML, footerHTML, opts) {
+    const o = opts || {};
     const root = $('#modalRoot');
     root.innerHTML = `
       <div class="bc-modal-backdrop" data-close="1"></div>
-      <div class="bc-modal" role="dialog" aria-modal="true" aria-label="${U.esc(title)}">
+      <div class="bc-modal${o.headerHTML ? ' bc-modal-wide' : ''}" role="dialog" aria-modal="true" aria-label="${U.esc(title)}">
         <div class="bc-modal-head">
           <h2>${U.esc(title)}</h2>
-          <button class="bc-icon-btn" data-close="1" aria-label="Close">
-            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          </button>
+          <div class="bc-modal-head-actions">
+            ${o.headerHTML || ''}
+            <button class="bc-icon-btn" data-close="1" aria-label="Close">
+              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
         </div>
         <div class="bc-modal-body">${bodyHTML}</div>
-        <div class="bc-modal-foot">${footerHTML || ''}</div>
+        ${footerHTML ? `<div class="bc-modal-foot">${footerHTML}</div>` : ''}
       </div>`;
     root.hidden = false;
     root.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeModal));
     const first = root.querySelector('input,select,textarea,button');
     if (first) first.focus();
     return root.querySelector('.bc-modal');
-  }
-
-  function itemFormHTML(row) {
-    const r = row || {};
-    const opts = (list, sel) => list.map((o) => `<option${o === sel ? ' selected' : ''}>${U.esc(o)}</option>`).join('');
-    const f = (name, label, value, type, extra) => `
-      <label class="bc-field">
-        <span>${label}</span>
-        <input name="${name}" type="${type || 'text'}" value="${U.esc(value == null ? '' : value)}" ${extra || ''} />
-      </label>`;
-    return `<form id="itemForm" class="bc-form-grid">
-      ${f('Barcode', 'Barcode', r.Barcode, 'text', 'required')}
-      ${f('Item_Name', 'Item Name', r.Item_Name, 'text', 'required')}
-      <label class="bc-field"><span>Category</span><select name="Category">${opts(C.categories, r.Category)}</select></label>
-      <label class="bc-field"><span>Purity</span><select name="Purity">${opts(C.purities, r.Purity)}</select></label>
-      ${f('Gross_Weight', 'Gross Weight (g)', r.Gross_Weight, 'number', 'step="0.001" min="0"')}
-      ${f('Net_Weight', 'Net Weight (g)', r.Net_Weight, 'number', 'step="0.001" min="0"')}
-      ${f('MRP', 'MRP (₹)', r.MRP, 'number', 'step="0.01" min="0"')}
-      ${f('Making_Charge', 'Making Charge (₹)', r.Making_Charge, 'number', 'step="0.01" min="0"')}
-      ${f('Discount', 'Discount (₹)', r.Discount, 'number', 'step="0.01" min="0"')}
-    </form>`;
   }
 
   /* ---------------- toast / loader ---------------- */
@@ -891,7 +994,150 @@ window.BC_UI = (function () {
 
   const loading = (on) => { $('#loader').hidden = !on; };
 
-  return { renderAll, renderStats, renderTable, renderVoucher, openModal, closeModal, itemFormHTML, toast, loading, $ };
+  return { renderAll, renderStats, renderTable, renderVoucher, openModal, closeModal, toast, loading, $ };
+})();
+
+/* ---------- js/itemform.js ---------- */
+/* "Add New Barcode" form — two-column dialog with a live Balance Information panel. */
+window.BC_ITEMFORM = (function () {
+  const U = window.BC_UTILS;
+  const C = window.BC_CONFIG;
+  const S = window.BC_STORE;
+
+  const opts = (list, sel) => list.map((o) =>
+    `<option${String(o) === String(sel) ? ' selected' : ''}>${U.esc(o)}</option>`).join('');
+
+  const field = (name, label, value, attrs) => `
+    <label class="bc-field">
+      <span>${label}</span>
+      <input name="${name}" value="${U.esc(value == null ? '' : value)}" ${attrs || ''} />
+    </label>`;
+
+  const select = (name, label, list, value, extra) => `
+    <label class="bc-field">
+      <span>${label}</span>
+      <select name="${name}" ${extra || ''}>${opts(list, value)}</select>
+    </label>`;
+
+  const section = (title, bodyHTML, extraClass) => `
+    <section class="bc-panel ${extraClass || ''}">
+      <div class="bc-panel-title"><span class="bc-accent"></span>${title}</div>
+      <div class="bc-panel-body">${bodyHTML}</div>
+    </section>`;
+
+  /* ---------- balance panel ---------- */
+
+  const BAL_ICON = '<path d="M12 3v18M7 7l-4 7h8zM17 7l-4 7h8zM5 21h14"/>';
+
+  function balanceCardsHTML() {
+    const b = S.balances();
+    const card = (label, value, unit) => `
+      <div class="bc-mini">
+        <div class="bc-mini-icon"><svg viewBox="0 0 24 24">${BAL_ICON}</svg></div>
+        <div class="bc-mini-label">${label}</div>
+        <div class="bc-mini-value">${value}${unit ? `<span class="bc-unit">${unit}</span>` : ''}</div>
+      </div>`;
+    return card('Total Weight', U.fmt.weight(b.totalWeight), 'gm') +
+           card('Total Nos', U.fmt.int(b.totalNos), '') +
+           card('Weight Balance', U.fmt.weight(b.weightBalance), 'gm') +
+           card('Nos Balance', U.fmt.int(b.nosBalance), '');
+  }
+
+  /* ---------- body ---------- */
+
+  function bodyHTML(row) {
+    const r = row || {};
+    const basic = `
+      ${field('Date', 'Date', r.Date || new Date().toISOString().slice(0, 10), 'type="date"')}
+      ${select('Supplier', 'Supplier', ['Select Supplier'].concat(C.suppliersLoaded || []), r.Supplier)}
+      ${select('SM', 'SM', C.salesmen, r.SM)}
+      ${field('Barcode', 'Barcode', r.Barcode, 'required')}
+      ${field('Item_Name', 'Item Name', r.Item_Name, 'placeholder="Enter item name" required')}
+      ${field('Vendor_Item_Code', 'Vendor Item Code', r.Vendor_Item_Code)}
+      <label class="bc-field bc-field-inline">
+        <span>Sub Group</span>
+        <div class="bc-inline-row">
+          <select name="Sub_Group">${opts(['Select Sub Group'].concat(C.subGroups), r.Sub_Group)}</select>
+          <button type="button" class="bc-btn bc-btn-primary bc-btn-sm" data-form-action="new-subgroup">New</button>
+        </div>
+      </label>`;
+
+    const product = `
+      ${select('Purity', 'Purity', C.purities, r.Purity)}
+      ${select('Purity_Unit', 'Purity Unit', C.purityUnits, r.Purity_Unit)}
+      ${field('Qty', 'Qty', r.Qty == null ? 1 : r.Qty, 'type="number" min="0" step="1"')}
+      ${field('Rate_gm', 'Rate / gm', r.Rate_gm, 'type="number" min="0" step="0.01"')}`;
+
+    const weight = `
+      ${field('Gross_Weight', 'Gross Weight', r.Gross_Weight, 'type="number" min="0" step="0.001"')}
+      ${field('Stone_Weight', 'Stone Weight', r.Stone_Weight, 'type="number" min="0" step="0.001"')}
+      ${field('Net_Weight', 'Net Weight', U.fmt.weight(r.Net_Weight), 'type="text" readonly')}
+      <label class="bc-field bc-field-inline">
+        <span>Size / Model</span>
+        <div class="bc-inline-row">
+          <input name="Size_Model" value="${U.esc(r.Size_Model || '')}" placeholder="e.g. 17" />
+          <select name="Size_Unit" class="bc-unit-select">${opts(C.sizeUnits, r.Size_Unit)}</select>
+        </div>
+      </label>`;
+
+    const stone = `
+      ${field('Stone_Type', 'Stone Type', r.Stone_Type)}
+      ${field('Stone_Pieces', 'Pieces', r.Stone_Pieces, 'type="number" min="0" step="1"')}
+      ${field('Stone_Rate', 'Rate', r.Stone_Rate, 'type="number" min="0" step="0.01"')}
+      ${field('Stone_Amount', 'Amount', r.Stone_Amount, 'type="number" min="0" step="0.01"')}`;
+
+    const dmd = `
+      ${field('DMD_Shape', 'Shape', r.DMD_Shape)}
+      ${field('DMD_Carat', 'Carat', r.DMD_Carat, 'type="number" min="0" step="0.001"')}
+      ${field('DMD_Clarity', 'Clarity', r.DMD_Clarity)}
+      ${field('DMD_Rate', 'Rate / ct', r.DMD_Rate, 'type="number" min="0" step="0.01"')}`;
+
+    const pricing = `
+      ${field('MRP', 'MRP', r.MRP, 'type="number" min="0" step="0.01"')}
+      ${field('Making_Charge', 'Making Charge', r.Making_Charge, 'type="number" min="0" step="0.01"')}
+      ${field('Discount', 'Discount', r.Discount, 'type="number" min="0" step="0.01"')}
+      ${select('Category', 'Category', C.categories, r.Category)}`;
+
+    const upload = `
+      <div class="bc-upload" id="bcUpload">
+        <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <strong>Upload Image</strong>
+        <p>Click, Drag &amp; Drop or Paste (Ctrl + V)</p>
+        <span class="bc-hint">Supported: JPG &bull; PNG &bull; WEBP</span>
+        <input type="file" id="bcImageInput" accept="image/jpeg,image/png,image/webp" hidden />
+      </div>
+      <div class="bc-upload-preview" id="bcUploadPreview" hidden>
+        <img alt="Item preview" id="bcPreviewImg" />
+        <button type="button" class="bc-btn bc-btn-sm" data-form-action="clear-image">Remove</button>
+      </div>`;
+
+    return `
+      <div class="bc-form-layout">
+        <form id="itemForm" class="bc-form-main">
+          ${section('Basic Information', `<div class="bc-grid-4">${basic}</div>`)}
+          ${section('Product Information', `<div class="bc-grid-4">${product}</div>`)}
+          ${section('Weight Information', `<div class="bc-grid-4">${weight}</div>`)}
+          ${section('Stone Details', `<div class="bc-grid-4">${stone}</div>`, 'bc-optional')}
+          ${section('DMD Details', `<div class="bc-grid-4">${dmd}</div>`, 'bc-optional')}
+          ${section('Pricing', `<div class="bc-grid-4">${pricing}</div>`)}
+        </form>
+        <aside class="bc-form-side">
+          ${section('Balance Information', `<div class="bc-mini-grid" id="balanceCards">${balanceCardsHTML()}</div>`)}
+          ${section('Image Upload', upload)}
+        </aside>
+      </div>`;
+  }
+
+  const headerHTML = (editing) => `
+    <button class="bc-btn" data-form-action="barcode-list">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Barcode List
+    </button>
+    <label class="bc-check"><input type="checkbox" id="toggleDMD" /><span>DMD Details</span></label>
+    <label class="bc-check"><input type="checkbox" id="toggleStone" /><span>Stone Details</span></label>
+    <button class="bc-btn bc-btn-primary" id="saveItem">${editing ? 'Update' : 'Save'}</button>
+    <button class="bc-btn" data-form-action="reset-form">Reset</button>`;
+
+  return { bodyHTML, headerHTML, balanceCardsHTML };
 })();
 
 /* ---------- js/app.js ---------- */
@@ -907,8 +1153,11 @@ window.BC_UI = (function () {
 
   function loadItems() {
     UI.loading(true);
-    return API.getItems(S.state.voucher.sessionId)
-      .then((rows) => S.setItems(rows))
+    return Promise.all([
+      API.getItems(S.state.voucher.sessionId),
+      API.getSourceTotals(S.state.voucher.sessionId)
+    ])
+      .then((res) => { S.setItems(res[0]); S.setSourceTotals(res[1]); })
       .catch((err) => UI.toast('Could not load items: ' + (err.message || err), 'error'))
       .then(() => UI.loading(false));
   }
@@ -916,6 +1165,7 @@ window.BC_UI = (function () {
   function loadVendors() {
     return API.getLookup(C.reports.vendor, 'Vendor_Name').then((list) => {
       const sel = $('#vendor');
+      C.suppliersLoaded = list.map((s) => s.label);
       list.forEach((s) => {
         const o = document.createElement('option');
         o.value = s.ID;
@@ -928,8 +1178,9 @@ window.BC_UI = (function () {
   function readForm(form) {
     const data = {};
     new FormData(form).forEach((v, k) => { data[k] = v; });
-    ['Gross_Weight', 'Net_Weight', 'MRP', 'Making_Charge', 'Discount'].forEach((k) => {
-      data[k] = U.num(data[k]);
+    ['Gross_Weight', 'Stone_Weight', 'Net_Weight', 'Qty', 'Rate_gm',
+     'MRP', 'Making_Charge', 'Discount'].forEach((k) => {
+      if (k in data) data[k] = U.num(data[k]);
     });
     data.Net_Amount = data.MRP + data.Making_Charge - data.Discount;
     if (S.state.voucher.sessionId) data.Session_ID = S.state.voucher.sessionId;
@@ -940,29 +1191,135 @@ window.BC_UI = (function () {
 
   function openItemModal(row) {
     const editing = !!row;
+    const FORM = window.BC_ITEMFORM;
+    let imageData = (row && row.Image) || '';
+
     UI.openModal(
-      editing ? 'Edit Barcode Item' : 'Add Barcode Item',
-      UI.itemFormHTML(row),
-      `<button class="bc-btn" data-close="1">Cancel</button>
-       <button class="bc-btn bc-btn-primary" id="saveItem">${editing ? 'Save Changes' : 'Add Item'}</button>`
+      editing ? 'Edit Barcode' : 'Add New Barcode',
+      FORM.bodyHTML(row),
+      '',
+      { headerHTML: FORM.headerHTML(editing) }
     );
+
+    const form = $('#itemForm');
+
+    /* Net Weight is always Gross - Stone, and the balance panel tracks it live. */
+    const recalcNet = () => {
+      const gross = U.num(form.Gross_Weight.value);
+      const stone = U.num(form.Stone_Weight.value);
+      form.Net_Weight.value = U.fmt.weight(Math.max(gross - stone, 0));
+      refreshBalance();
+    };
+
+    /* Preview the pending row's effect on Weight/Nos Balance before saving. */
+    const refreshBalance = () => {
+      const b = S.balances();
+      const qty = U.num(form.Qty.value) || 0;
+      const net = U.num(form.Net_Weight.value);
+      const prevQty = editing ? (U.num(row.Qty) || 1) : 0;
+      const prevNet = editing ? U.num(row.Net_Weight) : 0;
+      const pending = { nos: qty - prevQty, weight: net - prevNet };
+      const el = $('#balanceCards');
+      if (!el) return;
+      el.innerHTML = FORM.balanceCardsHTML();
+      const vals = el.querySelectorAll('.bc-mini-value');
+      vals[2].innerHTML = U.fmt.weight(b.weightBalance - pending.weight) + '<span class="bc-unit">gm</span>';
+      vals[3].innerHTML = U.fmt.int(b.nosBalance - pending.nos);
+    };
+
+    ['Gross_Weight', 'Stone_Weight'].forEach((n) =>
+      form[n].addEventListener('input', recalcNet));
+    form.Qty.addEventListener('input', refreshBalance);
+
+    /* Optional sections are hidden until their header checkbox is ticked. */
+    const panels = form.querySelectorAll('.bc-optional');
+    const stonePanel = panels[0], dmdPanel = panels[1];
+    stonePanel.hidden = !(row && row.Stone_Type);
+    dmdPanel.hidden = !(row && row.DMD_Shape);
+    $('#toggleStone').checked = !stonePanel.hidden;
+    $('#toggleDMD').checked = !dmdPanel.hidden;
+    $('#toggleStone').addEventListener('change', (e) => { stonePanel.hidden = !e.target.checked; });
+    $('#toggleDMD').addEventListener('change', (e) => { dmdPanel.hidden = !e.target.checked; });
 
     if (!editing) {
       API.nextBarcode().then((code) => {
-        const input = document.querySelector('#itemForm [name="Barcode"]');
-        if (input && !input.value) input.value = code;
+        if (form.Barcode && !form.Barcode.value) form.Barcode.value = code;
       });
     }
+    recalcNet();
+    bindImageUpload();
+
+    function bindImageUpload() {
+      const drop = $('#bcUpload');
+      const input = $('#bcImageInput');
+      const preview = $('#bcUploadPreview');
+
+      const show = (dataUrl) => {
+        imageData = dataUrl;
+        $('#bcPreviewImg').src = dataUrl;
+        preview.hidden = false;
+        drop.hidden = true;
+      };
+      const read = (file) => {
+        if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type)) {
+          return UI.toast('Use a JPG, PNG or WEBP image', 'error');
+        }
+        const fr = new FileReader();
+        fr.onload = () => show(String(fr.result));
+        fr.readAsDataURL(file);
+      };
+
+      if (imageData) show(imageData);
+
+      drop.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => read(input.files[0]));
+      drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('bc-dragging'); });
+      drop.addEventListener('dragleave', () => drop.classList.remove('bc-dragging'));
+      drop.addEventListener('drop', (e) => {
+        e.preventDefault();
+        drop.classList.remove('bc-dragging');
+        read(e.dataTransfer.files[0]);
+      });
+      document.addEventListener('paste', onPaste);
+      function onPaste(e) {
+        if (!document.body.contains(drop)) return document.removeEventListener('paste', onPaste);
+        const item = Array.from(e.clipboardData.items).find((i) => i.type.startsWith('image/'));
+        if (item) read(item.getAsFile());
+      }
+    }
+
+    document.querySelectorAll('[data-form-action]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.formAction;
+        if (a === 'clear-image') {
+          imageData = '';
+          $('#bcUploadPreview').hidden = true;
+          $('#bcUpload').hidden = false;
+        } else if (a === 'reset-form') {
+          form.reset();
+          recalcNet();
+        } else if (a === 'barcode-list') {
+          UI.closeModal();
+        } else if (a === 'new-subgroup') {
+          const name = prompt('New sub group name');
+          if (!name) return;
+          C.subGroups.push(name);
+          const sel = form.Sub_Group;
+          sel.appendChild(new Option(name, name));
+          sel.value = name;
+        }
+      });
+    });
 
     $('#saveItem').addEventListener('click', () => {
-      const form = $('#itemForm');
       if (!form.reportValidity()) return;
       const data = readForm(form);
+      data.Image = imageData;
       UI.loading(true);
       const req = editing ? API.updateItem(row.ID, data) : API.addItem(data);
       req.then(() => {
         UI.closeModal();
-        UI.toast(editing ? 'Item updated' : 'Item added', 'success');
+        UI.toast(editing ? 'Item updated' : 'Item saved', 'success');
         return loadItems();
       }).catch((err) => {
         UI.toast('Save failed: ' + (err.message || err), 'error');

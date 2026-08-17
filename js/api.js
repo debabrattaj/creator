@@ -112,6 +112,28 @@ window.BC_API = (function () {
       .catch(() => []);
   }
 
+  /* ---------------- source totals ----------------
+   * Total Nos  = sum of Total_Qty        across Purchase Entry + Material Receive
+   * Total Weight = sum of Total_Net_Weight across the same two reports
+   */
+  function getSourceTotals(sessionId) {
+    if (offline) return delay({ totalNos: 12, totalWeight: 486.25 });
+
+    const criteria = sessionId ? `Session_ID == "${sessionId}"` : null;
+    const f = C.sourceFields;
+
+    return Promise.all([
+      fetchAll(C.reports.purchaseEntry, criteria).catch(() => []),
+      fetchAll(C.reports.materialReceive, criteria).catch(() => [])
+    ]).then((sets) => {
+      const rows = sets[0].concat(sets[1]);
+      return {
+        totalNos: rows.reduce((s, r) => s + U.num(r[f.qty]), 0),
+        totalWeight: rows.reduce((s, r) => s + U.num(r[f.netWeight]), 0)
+      };
+    });
+  }
+
   function nextBarcode() {
     if (offline) {
       const max = mock.reduce((m, r) => Math.max(m, U.num(String(r.Barcode).replace(/\D/g, ''))), 100000);
@@ -128,5 +150,5 @@ window.BC_API = (function () {
     }).catch(() => 'BC-' + Date.now().toString().slice(-6));
   }
 
-  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, nextBarcode };
+  return { init, isOffline, getItems, addItem, updateItem, deleteItem, getLookup, getSourceTotals, nextBarcode };
 })();

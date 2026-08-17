@@ -258,6 +258,60 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 }
 
 .bc-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; }
+
+/* ---------- wide item dialog ---------- */
+.bc-modal-wide { width: min(1500px, calc(100vw - 40px)); }
+.bc-modal-wide .bc-modal-body { background: var(--bg); padding: 18px; }
+.bc-modal-head-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bc-modal-head-actions .bc-btn { height: 38px; }
+.bc-btn-sm { height: 38px; padding: 0 14px; }
+
+.bc-form-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+.bc-form-main, .bc-form-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.bc-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.bc-panel-title {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  font-size: 15px; font-weight: 650;
+}
+.bc-panel-body { padding: 18px; }
+
+.bc-grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px 18px; }
+.bc-field-inline { min-width: 0; }
+.bc-inline-row { display: flex; gap: 8px; align-items: stretch; }
+.bc-inline-row > input, .bc-inline-row > select { min-width: 0; }
+.bc-unit-select { flex: 0 0 78px; }
+
+/* balance cards */
+.bc-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bc-mini { border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: var(--surface); }
+.bc-mini-icon {
+  width: 32px; height: 32px; border-radius: 9px; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8edff; color: var(--primary);
+}
+.bc-mini-icon svg { width: 17px; height: 17px; }
+.bc-mini-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;
+}
+.bc-mini-value { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+
+/* image upload */
+.bc-upload {
+  border: 1.5px dashed var(--border-strong); border-radius: 12px;
+  padding: 26px 16px; text-align: center; cursor: pointer;
+  color: var(--text-muted); transition: border-color .15s, background .15s;
+}
+.bc-upload:hover, .bc-upload.bc-dragging { border-color: var(--primary); background: #f7f8ff; }
+.bc-upload svg { width: 30px; height: 30px; color: var(--text-faint); }
+.bc-upload strong { display: block; margin: 10px 0 4px; color: var(--text); font-size: 14px; }
+.bc-upload p { margin: 0 0 10px; font-size: 12px; }
+.bc-hint { display: inline-block; padding: 4px 10px; border-radius: 999px; background: #eef0f6; font-size: 11px; }
+.bc-upload-preview { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.bc-upload-preview img { max-width: 100%; border-radius: 10px; border: 1px solid var(--border); }
+
 .bc-confirm { margin: 0; line-height: 1.6; }
 
 .bc-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
@@ -296,8 +350,14 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
   .bc-voucher-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bc-search { margin-left: 0; }
 }
+@media (max-width: 1250px) {
+  .bc-form-layout { grid-template-columns: 1fr; }
+  .bc-mini-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 950px) { .bc-grid-4 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 700px) {
   .bc-app { padding: 16px 14px 26px; }
+  .bc-grid-4, .bc-mini-grid { grid-template-columns: 1fr; }
   .bc-voucher-grid, .bc-form-grid, .bc-checklist, .bc-stats { grid-template-columns: 1fr; }
   .bc-header h1 { font-size: 24px; }
 }

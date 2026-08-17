@@ -9,7 +9,15 @@ window.BC_CONFIG = {
   reports: {
     barcodeItem: 'All_Barcode_Items',
     vendor: 'All_Vendors',
-    rateMaster: 'All_Rate_Masters'
+    rateMaster: 'All_Rate_Masters',
+    purchaseEntry: 'Purchase_Entry_Report',
+    materialReceive: 'Material_Receive_Report'
+  },
+
+  /* Total Nos / Total Weight are summed across the two reports above. */
+  sourceFields: {
+    qty: 'Total_Qty',
+    netWeight: 'Total_Net_Weight'
   },
 
   pageSize: 200,
@@ -21,6 +29,7 @@ window.BC_CONFIG = {
     { key: 'Item_Name',    label: 'ITEM NAME',    type: 'text',   width: 200 },
     { key: 'Category',     label: 'CATEGORY',     type: 'tag',    width: 130 },
     { key: 'Purity',       label: 'PURITY',       type: 'text',   width: 100 },
+    { key: 'Qty',          label: 'QTY',          type: 'text',   width: 80,  align: 'right' },
     { key: 'Gross_Weight', label: 'GROSS WEIGHT', type: 'weight', width: 140 },
     { key: 'Net_Weight',   label: 'NET WEIGHT',   type: 'weight', width: 140 },
     { key: 'MRP',          label: 'MRP',          type: 'money',  width: 130, align: 'right' },
@@ -39,5 +48,9 @@ window.BC_CONFIG = {
   ],
 
   categories: ['Bangles', 'Ring', 'Necklace', 'Chain', 'Earrings', 'Bracelet', 'Pendant', 'Coin'],
-  purities: ['24K', '22K', '18K', '14K', '925 Silver', 'Platinum']
+  purities: ['24K', '22K', '18K', '14K', '925 Silver', 'Platinum'],
+  purityUnits: ['gm', 'ct', 'pcs'],
+  sizeUnits: ['in', 'cm', 'mm'],
+  salesmen: ['SHYAM', 'RAVI', 'ANITA', 'KIRAN'],
+  subGroups: ['Plain Gold', 'Studded', 'Antique', 'Temple', 'Casting']
 };

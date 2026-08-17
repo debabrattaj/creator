@@ -10,8 +10,11 @@
 
   function loadItems() {
     UI.loading(true);
-    return API.getItems(S.state.voucher.sessionId)
-      .then((rows) => S.setItems(rows))
+    return Promise.all([
+      API.getItems(S.state.voucher.sessionId),
+      API.getSourceTotals(S.state.voucher.sessionId)
+    ])
+      .then((res) => { S.setItems(res[0]); S.setSourceTotals(res[1]); })
       .catch((err) => UI.toast('Could not load items: ' + (err.message || err), 'error'))
       .then(() => UI.loading(false));
   }
@@ -19,6 +22,7 @@
   function loadVendors() {
     return API.getLookup(C.reports.vendor, 'Vendor_Name').then((list) => {
       const sel = $('#vendor');
+      C.suppliersLoaded = list.map((s) => s.label);
       list.forEach((s) => {
         const o = document.createElement('option');
         o.value = s.ID;
@@ -31,8 +35,9 @@
   function readForm(form) {
     const data = {};
     new FormData(form).forEach((v, k) => { data[k] = v; });
-    ['Gross_Weight', 'Net_Weight', 'MRP', 'Making_Charge', 'Discount'].forEach((k) => {
-      data[k] = U.num(data[k]);
+    ['Gross_Weight', 'Stone_Weight', 'Net_Weight', 'Qty', 'Rate_gm',
+     'MRP', 'Making_Charge', 'Discount'].forEach((k) => {
+      if (k in data) data[k] = U.num(data[k]);
     });
     data.Net_Amount = data.MRP + data.Making_Charge - data.Discount;
     if (S.state.voucher.sessionId) data.Session_ID = S.state.voucher.sessionId;
@@ -43,29 +48,135 @@
 
   function openItemModal(row) {
     const editing = !!row;
+    const FORM = window.BC_ITEMFORM;
+    let imageData = (row && row.Image) || '';
+
     UI.openModal(
-      editing ? 'Edit Barcode Item' : 'Add Barcode Item',
-      UI.itemFormHTML(row),
-      `<button class="bc-btn" data-close="1">Cancel</button>
-       <button class="bc-btn bc-btn-primary" id="saveItem">${editing ? 'Save Changes' : 'Add Item'}</button>`
+      editing ? 'Edit Barcode' : 'Add New Barcode',
+      FORM.bodyHTML(row),
+      '',
+      { headerHTML: FORM.headerHTML(editing) }
     );
+
+    const form = $('#itemForm');
+
+    /* Net Weight is always Gross - Stone, and the balance panel tracks it live. */
+    const recalcNet = () => {
+      const gross = U.num(form.Gross_Weight.value);
+      const stone = U.num(form.Stone_Weight.value);
+      form.Net_Weight.value = U.fmt.weight(Math.max(gross - stone, 0));
+      refreshBalance();
+    };
+
+    /* Preview the pending row's effect on Weight/Nos Balance before saving. */
+    const refreshBalance = () => {
+      const b = S.balances();
+      const qty = U.num(form.Qty.value) || 0;
+      const net = U.num(form.Net_Weight.value);
+      const prevQty = editing ? (U.num(row.Qty) || 1) : 0;
+      const prevNet = editing ? U.num(row.Net_Weight) : 0;
+      const pending = { nos: qty - prevQty, weight: net - prevNet };
+      const el = $('#balanceCards');
+      if (!el) return;
+      el.innerHTML = FORM.balanceCardsHTML();
+      const vals = el.querySelectorAll('.bc-mini-value');
+      vals[2].innerHTML = U.fmt.weight(b.weightBalance - pending.weight) + '<span class="bc-unit">gm</span>';
+      vals[3].innerHTML = U.fmt.int(b.nosBalance - pending.nos);
+    };
+
+    ['Gross_Weight', 'Stone_Weight'].forEach((n) =>
+      form[n].addEventListener('input', recalcNet));
+    form.Qty.addEventListener('input', refreshBalance);
+
+    /* Optional sections are hidden until their header checkbox is ticked. */
+    const panels = form.querySelectorAll('.bc-optional');
+    const stonePanel = panels[0], dmdPanel = panels[1];
+    stonePanel.hidden = !(row && row.Stone_Type);
+    dmdPanel.hidden = !(row && row.DMD_Shape);
+    $('#toggleStone').checked = !stonePanel.hidden;
+    $('#toggleDMD').checked = !dmdPanel.hidden;
+    $('#toggleStone').addEventListener('change', (e) => { stonePanel.hidden = !e.target.checked; });
+    $('#toggleDMD').addEventListener('change', (e) => { dmdPanel.hidden = !e.target.checked; });
 
     if (!editing) {
       API.nextBarcode().then((code) => {
-        const input = document.querySelector('#itemForm [name="Barcode"]');
-        if (input && !input.value) input.value = code;
+        if (form.Barcode && !form.Barcode.value) form.Barcode.value = code;
       });
     }
+    recalcNet();
+    bindImageUpload();
+
+    function bindImageUpload() {
+      const drop = $('#bcUpload');
+      const input = $('#bcImageInput');
+      const preview = $('#bcUploadPreview');
+
+      const show = (dataUrl) => {
+        imageData = dataUrl;
+        $('#bcPreviewImg').src = dataUrl;
+        preview.hidden = false;
+        drop.hidden = true;
+      };
+      const read = (file) => {
+        if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type)) {
+          return UI.toast('Use a JPG, PNG or WEBP image', 'error');
+        }
+        const fr = new FileReader();
+        fr.onload = () => show(String(fr.result));
+        fr.readAsDataURL(file);
+      };
+
+      if (imageData) show(imageData);
+
+      drop.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => read(input.files[0]));
+      drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('bc-dragging'); });
+      drop.addEventListener('dragleave', () => drop.classList.remove('bc-dragging'));
+      drop.addEventListener('drop', (e) => {
+        e.preventDefault();
+        drop.classList.remove('bc-dragging');
+        read(e.dataTransfer.files[0]);
+      });
+      document.addEventListener('paste', onPaste);
+      function onPaste(e) {
+        if (!document.body.contains(drop)) return document.removeEventListener('paste', onPaste);
+        const item = Array.from(e.clipboardData.items).find((i) => i.type.startsWith('image/'));
+        if (item) read(item.getAsFile());
+      }
+    }
+
+    document.querySelectorAll('[data-form-action]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.formAction;
+        if (a === 'clear-image') {
+          imageData = '';
+          $('#bcUploadPreview').hidden = true;
+          $('#bcUpload').hidden = false;
+        } else if (a === 'reset-form') {
+          form.reset();
+          recalcNet();
+        } else if (a === 'barcode-list') {
+          UI.closeModal();
+        } else if (a === 'new-subgroup') {
+          const name = prompt('New sub group name');
+          if (!name) return;
+          C.subGroups.push(name);
+          const sel = form.Sub_Group;
+          sel.appendChild(new Option(name, name));
+          sel.value = name;
+        }
+      });
+    });
 
     $('#saveItem').addEventListener('click', () => {
-      const form = $('#itemForm');
       if (!form.reportValidity()) return;
       const data = readForm(form);
+      data.Image = imageData;
       UI.loading(true);
       const req = editing ? API.updateItem(row.ID, data) : API.addItem(data);
       req.then(() => {
         UI.closeModal();
-        UI.toast(editing ? 'Item updated' : 'Item added', 'success');
+        UI.toast(editing ? 'Item updated' : 'Item saved', 'success');
         return loadItems();
       }).catch((err) => {
         UI.toast('Save failed: ' + (err.message || err), 'error');

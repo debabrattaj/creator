@@ -18,8 +18,26 @@ js/utils.js            formatting, CSV, date helpers
 js/api.js              ZOHO.CREATOR.API wrapper (+ offline sample data)
 js/store.js            state, derived rows, totals
 js/ui.js               rendering
+js/itemform.js         Add New Barcode dialog + balance panel
 js/app.js              init and event wiring
+build.py               regenerates the standalone index.html
 ```
+
+## Balance Information
+
+The Add New Barcode dialog shows four figures, sourced two different ways:
+
+| Card | Source |
+|---|---|
+| Total Weight | `Total_Net_Weight` summed across `Purchase_Entry_Report` + `Material_Receive_Report` |
+| Total Nos | `Total_Qty` summed across the same two reports |
+| Weight Balance | Total Weight − net weight already barcoded in the session |
+| Nos Balance | Total Nos − quantity already barcoded in the session |
+
+Report and field names live in `reports` and `sourceFields` in `js/config.js`.
+Both balances also net off the row being edited, so they preview the effect of
+the current entry before it is saved. When a session ID is set, the two reports
+are filtered by `Session_ID`.
 
 ## Setup
 

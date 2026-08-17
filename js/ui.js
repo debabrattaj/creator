@@ -93,46 +93,30 @@ window.BC_UI = (function () {
     root.innerHTML = '';
   }
 
-  function openModal(title, bodyHTML, footerHTML) {
+  /* opts: { headerHTML } renders actions in the title bar instead of a footer. */
+  function openModal(title, bodyHTML, footerHTML, opts) {
+    const o = opts || {};
     const root = $('#modalRoot');
     root.innerHTML = `
       <div class="bc-modal-backdrop" data-close="1"></div>
-      <div class="bc-modal" role="dialog" aria-modal="true" aria-label="${U.esc(title)}">
+      <div class="bc-modal${o.headerHTML ? ' bc-modal-wide' : ''}" role="dialog" aria-modal="true" aria-label="${U.esc(title)}">
         <div class="bc-modal-head">
           <h2>${U.esc(title)}</h2>
-          <button class="bc-icon-btn" data-close="1" aria-label="Close">
-            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
-          </button>
+          <div class="bc-modal-head-actions">
+            ${o.headerHTML || ''}
+            <button class="bc-icon-btn" data-close="1" aria-label="Close">
+              <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
         </div>
         <div class="bc-modal-body">${bodyHTML}</div>
-        <div class="bc-modal-foot">${footerHTML || ''}</div>
+        ${footerHTML ? `<div class="bc-modal-foot">${footerHTML}</div>` : ''}
       </div>`;
     root.hidden = false;
     root.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeModal));
     const first = root.querySelector('input,select,textarea,button');
     if (first) first.focus();
     return root.querySelector('.bc-modal');
-  }
-
-  function itemFormHTML(row) {
-    const r = row || {};
-    const opts = (list, sel) => list.map((o) => `<option${o === sel ? ' selected' : ''}>${U.esc(o)}</option>`).join('');
-    const f = (name, label, value, type, extra) => `
-      <label class="bc-field">
-        <span>${label}</span>
-        <input name="${name}" type="${type || 'text'}" value="${U.esc(value == null ? '' : value)}" ${extra || ''} />
-      </label>`;
-    return `<form id="itemForm" class="bc-form-grid">
-      ${f('Barcode', 'Barcode', r.Barcode, 'text', 'required')}
-      ${f('Item_Name', 'Item Name', r.Item_Name, 'text', 'required')}
-      <label class="bc-field"><span>Category</span><select name="Category">${opts(C.categories, r.Category)}</select></label>
-      <label class="bc-field"><span>Purity</span><select name="Purity">${opts(C.purities, r.Purity)}</select></label>
-      ${f('Gross_Weight', 'Gross Weight (g)', r.Gross_Weight, 'number', 'step="0.001" min="0"')}
-      ${f('Net_Weight', 'Net Weight (g)', r.Net_Weight, 'number', 'step="0.001" min="0"')}
-      ${f('MRP', 'MRP (₹)', r.MRP, 'number', 'step="0.01" min="0"')}
-      ${f('Making_Charge', 'Making Charge (₹)', r.Making_Charge, 'number', 'step="0.01" min="0"')}
-      ${f('Discount', 'Discount (₹)', r.Discount, 'number', 'step="0.01" min="0"')}
-    </form>`;
   }
 
   /* ---------------- toast / loader ---------------- */
@@ -150,5 +134,5 @@ window.BC_UI = (function () {
 
   const loading = (on) => { $('#loader').hidden = !on; };
 
-  return { renderAll, renderStats, renderTable, renderVoucher, openModal, closeModal, itemFormHTML, toast, loading, $ };
+  return { renderAll, renderStats, renderTable, renderVoucher, openModal, closeModal, toast, loading, $ };
 })();

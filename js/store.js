@@ -10,6 +10,8 @@ window.BC_STORE = (function () {
       sessionId: ''
     },
     items: [],
+    /* Total_Qty / Total_Net_Weight summed from Purchase Entry + Material Receive */
+    sourceTotals: { totalNos: 0, totalWeight: 0 },
     search: '',
     sort: { key: null, dir: 'asc' },
     filters: {},
@@ -21,6 +23,7 @@ window.BC_STORE = (function () {
   const emit = () => state.listeners.forEach((fn) => fn(state));
 
   function setItems(items) { state.items = items || []; emit(); }
+  function setSourceTotals(t) { state.sourceTotals = t || { totalNos: 0, totalWeight: 0 }; emit(); }
   function setVoucher(patch) { Object.assign(state.voucher, patch); emit(); }
   function setSearch(q) { state.search = q; emit(); }
 
@@ -83,6 +86,25 @@ window.BC_STORE = (function () {
     return rows;
   }
 
+  /* Barcoded so far in this session — the counterpart of the source totals. */
+  function barcoded() {
+    return {
+      nos: state.items.reduce((s, r) => s + (U.num(r.Qty) || 1), 0),
+      weight: state.items.reduce((s, r) => s + U.num(r.Net_Weight), 0)
+    };
+  }
+
+  /* Balance = what came in (source reports) minus what has been barcoded. */
+  function balances() {
+    const done = barcoded();
+    return {
+      totalNos: state.sourceTotals.totalNos,
+      totalWeight: state.sourceTotals.totalWeight,
+      nosBalance: state.sourceTotals.totalNos - done.nos,
+      weightBalance: state.sourceTotals.totalWeight - done.weight
+    };
+  }
+
   function totals() {
     const rows = visibleItems();
     const sum = (key) => rows.reduce((acc, r) => acc + U.num(r[key]), 0);
@@ -90,6 +112,8 @@ window.BC_STORE = (function () {
     const discount = sum('Discount');
     return {
       count: rows.length,
+      totalNos: state.sourceTotals.totalNos,
+      totalWeight: state.sourceTotals.totalWeight,
       grossWeight: sum('Gross_Weight'),
       netWeight: sum('Net_Weight'),
       totalAmount: totalAmount,
@@ -99,7 +123,7 @@ window.BC_STORE = (function () {
   }
 
   return {
-    state, subscribe, setItems, setVoucher, setSearch, toggleSort,
-    setFilter, toggleColumn, reset, visibleItems, visibleColumns, totals
+    state, subscribe, setItems, setSourceTotals, setVoucher, setSearch, toggleSort,
+    setFilter, toggleColumn, reset, visibleItems, visibleColumns, totals, balances
   };
 })();
