@@ -2550,6 +2550,10 @@
                 toggleSection('return');
                 return;
             }
+            if (!document.getElementById('customerSelect').value) {
+                showToast("Please select a Customer first to fetch their past purchases.", 'error');
+                return;
+            }
             toggleSection('return');
             openReturnFetch();
         }
