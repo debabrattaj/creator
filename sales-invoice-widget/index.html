@@ -509,7 +509,7 @@
 
                                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                         <button onclick="openPaymentModal()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payment
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> <span id="payment-btn-label">Payment</span>
                         </button>
                         <div id="payment-summary" class="hidden text-[12px] text-slate-600 px-1 pt-1"></div>
                     </div>
@@ -2401,6 +2401,11 @@
             document.getElementById('sum-grandtotal').innerText = formatDrCr(grandTotal);
             document.getElementById('grandtotal-label').textContent = grandTotal < 0 ? 'Grand Total (Payable To Customer)' : 'Grand Total (Payable By You)';
             document.getElementById('grandtotal-words').textContent = amountInWords(grandTotal);
+
+            // Customer owes the shop (Dr) -> shop is collecting a Receipt.
+            // Shop owes the customer (Cr) -> shop is making a Payment out.
+            const paymentBtnLabel = document.getElementById('payment-btn-label');
+            if (paymentBtnLabel) paymentBtnLabel.textContent = grandTotal < 0 ? 'Payment' : 'Receipt';
 
             updateAllSectionSummaries();
         }
