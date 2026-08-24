@@ -503,8 +503,15 @@
                             <div class="text-indigo-600 font-medium text-[13px] mb-1" id="grandtotal-label">Grand Total (Payable By You)</div>
                             <div class="text-[22px] font-bold text-indigo-700 tracking-tight" id="sum-grandtotal">₹ 0.00</div>
                             <div id="grandtotal-rounded-note" class="hidden text-[11px] text-slate-400 mt-0.5">(Rounded)</div>
-                            <div class="text-[12px] text-slate-500 mt-2" id="grandtotal-words"></div>
+                            <div id="grandtotal-words" class="text-[12px] text-slate-500 mt-2"></div>
                         </div>
+                    </div>
+
+                                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <button onclick="openPaymentModal()" class="w-full text-left px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[13px] font-medium rounded-lg flex items-center gap-2 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payment
+                        </button>
+                        <div id="payment-summary" class="hidden text-[12px] text-slate-600 px-1 pt-1"></div>
                     </div>
 
                 </div>
