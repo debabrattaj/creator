@@ -2557,7 +2557,7 @@
         function openReturnFetch() {
             const customer = document.getElementById('customerSelect').value;
             if(!customer) {
-                alert("Please select a Customer first to fetch their past purchases.");
+                showToast("Please select a Customer first to fetch their past purchases.", 'error');
                 return;
             }
 
